@@ -11,7 +11,7 @@ namespace Hub
             this.Id = id;
         }
 
-        public bool Equals(Connection other)
+        public bool Equals(Connection? other)
         {
             return other != null && this.Id.Equals(other.Id);
         }

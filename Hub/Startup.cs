@@ -19,8 +19,12 @@ namespace Hub
                 .AddHostedMqttServer(mqttServer => mqttServer.WithoutDefaultEndpoint())
                 .AddMqttConnectionHandler()
                 .AddConnections();
+
+            services.AddCors();
             
             services.AddSignalR();
+            
+            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -29,9 +33,14 @@ namespace Hub
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseRouting();
-
+            
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context =>
@@ -41,7 +50,7 @@ namespace Hub
                 
                 endpoints.MapHub<GatewayHub>("/hub");
             });
-            
+
             app.UseMqttServer(server =>
             {
                 server.UseApplicationMessageReceivedHandler(e =>
