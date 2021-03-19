@@ -23,8 +23,6 @@ namespace Hub
             services.AddCors();
             
             services.AddSignalR();
-            
-            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,6 +66,9 @@ namespace Hub
                 server.ClientConnectedHandler = connectionHandler;
                 server.ClientDisconnectedHandler = connectionHandler;
             });
+
+            var serviceDiscovery = new LocalServiceDiscovery();
+            serviceDiscovery.Advertise("CurtainHub", "_sc_hub._tcp", 5000);
         }
     }
 }

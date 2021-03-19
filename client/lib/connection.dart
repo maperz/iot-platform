@@ -3,10 +3,10 @@ import 'package:signalr_core/signalr_core.dart';
 class Connection {
   HubConnection _connection;
 
-  Future<void> start() async {
+  Future<void> start(String hubAddress) async {
     print("Starting connection");
     _connection = HubConnectionBuilder()
-        .withUrl('http://10.0.0.111:5000/hub')
+        .withUrl(hubAddress + '/hub')
         .withAutomaticReconnect()
         .build();
 

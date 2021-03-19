@@ -116,6 +116,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0"
+  multicast_dns:
+    dependency: "direct main"
+    description:
+      name: multicast_dns
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.2"
   path:
     dependency: transitive
     description:

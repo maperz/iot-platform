@@ -1,11 +1,15 @@
 import 'package:curtains_client/connection.dart';
+import 'package:curtains_client/discovery.dart';
 import 'package:flutter/material.dart';
 
 Connection connection = new Connection();
+LocalHubDiscovery hubDiscovery = new LocalHubDiscovery();
 
-void main() {
+void main() async {
   runApp(MyApp());
-  connection.start();
+  var hubAddress = await hubDiscovery.discoverAddress();
+  print("Found address at: " + hubAddress);
+  connection.start(hubAddress);
 }
 
 class MyApp extends StatelessWidget {
