@@ -1,15 +1,35 @@
 import 'package:curtains_client/connection.dart';
-import 'package:curtains_client/discovery.dart';
+import 'package:curtains_client/discovery/hub-address.dart';
+import 'package:curtains_client/discovery/local-hub-discovery.dart';
+import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:flutter/material.dart';
 
-Connection connection = new Connection();
-LocalHubDiscovery hubDiscovery = new LocalHubDiscovery();
+var localDiscovery = new LocalHubDiscovery();
+var remoteDiscovery = new RemoteHubDiscovery();
+Connection connection;
+
+Stream<HubAddress> getHubAddress() async* {
+  yield* localDiscovery.getHubAddresses();
+  yield* remoteDiscovery.getHubAddresses();
+}
 
 void main() async {
+  var addressStream = getHubAddress();
+
+  await for (var address in addressStream) {
+    try {
+      var hubAddress = address.toString();
+      print("Found address at: " + hubAddress);
+      connection = new Connection();
+      await connection.start(hubAddress);
+      print("Successfully started connection");
+      break;
+    } catch (e) {
+      print(e);
+    }
+  }
+
   runApp(MyApp());
-  var hubAddress = await hubDiscovery.discoverAddress();
-  print("Found address at: " + hubAddress);
-  connection.start(hubAddress);
 }
 
 class MyApp extends StatelessWidget {
@@ -60,11 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 min: -1.0,
                 max: 1.0,
                 divisions: 40,
-                label: _currentSliderValue.round().toString() + " Percent",
+                label:
+                    (_currentSliderValue * 100).round().toString() + " Percent",
                 onChanged: (double value) {
                   setState(() {
                     _currentSliderValue = value;
-                    connection.sendSpeed(_currentSliderValue);
+                    connection.setSpeed(_currentSliderValue);
                   });
                 },
               ),

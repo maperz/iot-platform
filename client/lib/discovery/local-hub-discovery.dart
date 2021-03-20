@@ -1,9 +1,35 @@
+import 'package:curtains_client/discovery/hub-address.dart';
+import 'package:curtains_client/discovery/hub-discovery.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 
-class LocalHubDiscovery {
+class LocalHubDiscovery implements HubDiscovery {
   static const String service = '_sc_hub._tcp';
 
-  Future<String> discoverAddress() async {
+  @override
+  Stream<HubAddress> getHubAddresses() async* {
+    var cachedAddress = await _loadCachedAddress();
+    if (cachedAddress != null) {
+      yield cachedAddress;
+    }
+    var discoveredAddress = await _discoverLocalAddressViaMDNS();
+    if (discoveredAddress != null) {
+      await _saveAddressToCache(discoveredAddress);
+      yield discoveredAddress;
+    }
+  }
+
+  Future _saveAddressToCache(HubAddress address) async {
+    // TODO: Cache address
+    return null;
+  }
+
+  Future<HubAddress> _loadCachedAddress() async {
+    // TODO: Return cached address
+    return null;
+  }
+
+  Future<HubAddress> _discoverLocalAddressViaMDNS() async {
+    print("Running mDNS discovery");
     final MDnsClient client = MDnsClient();
     await client.start();
     try {
@@ -16,13 +42,13 @@ class LocalHubDiscovery {
           await for (IPAddressResourceRecord record
               in client.lookup<IPAddressResourceRecord>(
                   ResourceRecordQuery.addressIPv4(name))) {
-            return 'http://${record.address.host}:$port';
+            return new HubAddress("http", record.address.host, port);
           }
 
           await for (IPAddressResourceRecord record
               in client.lookup<IPAddressResourceRecord>(
                   ResourceRecordQuery.addressIPv6(name))) {
-            return 'http://${record.address.host}:$port';
+            return new HubAddress("http", record.address.host, port);
           }
         }
       }
@@ -30,6 +56,7 @@ class LocalHubDiscovery {
       print("Quitting discovery");
       client.stop();
     }
+
     return null;
   }
 }

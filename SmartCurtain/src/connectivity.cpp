@@ -28,12 +28,13 @@ namespace Connectivity
     void setupLocalWifi(const char *ssid, const char *password)
     {
         WiFi.begin(ssid, password);
+        log(LogLevel::Info, "Trying to connect to Wifi ");
         while (WiFi.status() != WL_CONNECTED)
         {
             delay(500);
             log(LogLevel::Info, ".");
         }
-        log(LogLevel::Info, " Connected to WIFI.\n");
+        log(LogLevel::Info, "[Connected]\n");
         serverIP = WiFi.localIP();
     }
 
@@ -58,35 +59,36 @@ namespace Connectivity
         pubSubClient.setCallback(topicCallback);
 
         // Loop until we're reconnected
+        Serial.print("Establishing MQTT connection ");
         while (!client.connected())
         {
-            Serial.print("Attempting MQTT connection...");
             String clientId = String("SC_") + getUniqueDeviceId();
 
             if (pubSubClient.connect(clientId.c_str()))
             {
-                log(LogLevel::Info, "Setup PubSub Client - Connected to %s\n", host);
+                log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s\n", host);
                 pubSubClient.subscribe("speed");
             }
             else
             {
                 delay(2000);
+                log(LogLevel::Info, ".");
             }
         }
     }
 
     void topicCallback(char *topicBytes, byte *payload, unsigned int length)
     {
-        log(LogLevel::Info, "Received message in topic: ");
-        log(LogLevel::Info, "%s\n", topicBytes);
+        log(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
 
         String topic(topicBytes);
         if (topic.equals("speed"))
         {
             char *start = (char *)payload;
-            double val = strtod(start, NULL);
-            driveMotor(val, Direction::Forward);
+            double speed = strtod(start, NULL);
+            speed = max(-1.0, min(1.0, speed));
+            auto direction = speed >= 0.0 ? Direction::Forward : Direction::Backward;
+            driveMotor(fabs(speed), direction);
         }
     }
-
 } // namespace Connectivity

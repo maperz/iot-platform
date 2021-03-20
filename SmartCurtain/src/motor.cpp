@@ -8,11 +8,11 @@ uint8 motorSpeedPin = D1;
 
 void initMotor()
 {
-    log(LogLevel::Info, "Setting up motor ...");
-
+    log(LogLevel::Info, "Setting up motor ");
     pinMode(dirForwardPin, OUTPUT);
     pinMode(dirBackwardPin, OUTPUT);
     pinMode(motorSpeedPin, OUTPUT);
+    log(LogLevel::Info, "[DONE]\n");
 }
 
 int _speed = 0;
@@ -23,6 +23,7 @@ void driveMotor(double speed, Direction direction)
     speed = max(0.0, min(1.0, speed));
 
     log(LogLevel::Debug, "Drive motor, Speed: %5.1f%%, Direction: %s\n", speed * 100, direction == Direction::Forward ? "FWD" : "BWD");
+
     _speed = speed * PWMRANGE;
     _direction = direction;
 }

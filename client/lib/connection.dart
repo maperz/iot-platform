@@ -1,6 +1,7 @@
+import 'package:curtains_client/api/api-methods.dart';
 import 'package:signalr_core/signalr_core.dart';
 
-class Connection {
+class Connection implements ApiMethods {
   HubConnection _connection;
 
   Future<void> start(String hubAddress) async {
@@ -20,14 +21,11 @@ class Connection {
 
     _connection?.onclose((error) => print("Connection Closed"));
 
-    try {
-      await _connection?.start();
-    } on Error catch (err) {
-      print(err.stackTrace.toString());
-    }
+    await _connection?.start();
   }
 
-  Future sendSpeed(double speed) async {
+  @override
+  Future setSpeed(double speed) async {
     if (_connection == null) {
       return;
     }

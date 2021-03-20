@@ -7,6 +7,7 @@
 void setup()
 {
   Serial.begin(115200);
+  printf("\n\n");
   initMotor();
 }
 
@@ -26,19 +27,4 @@ void loop()
 
   Connectivity::pubSubClient.loop();
   motorLoop();
-
-  /*
-  Direction dir = forward ? Direction::Forward : Direction::Backward;
-  for (double speed = 0.0; speed < 1.0; speed += 0.05)
-  {
-    driveMotor(speed, dir);
-    delay(200);
-  }
-
-  for (double speed = 1.0; speed > 0.0; speed -= 0.05)
-  {
-    driveMotor(speed, dir);
-    delay(200);
-  }
-  forward = !forward;*/
 }
