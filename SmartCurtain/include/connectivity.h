@@ -10,7 +10,7 @@ namespace Connectivity
     extern WiFiServer server;
     extern IPAddress serverIP;
     extern WiFiUDP udp;
-    extern PubSubClient pubSubClient;
+    extern PubSubClient mqtt;
 
     bool isWifiConnected();
 
@@ -22,7 +22,9 @@ namespace Connectivity
 
     void setupUdp();
 
-    void setupPubSub(const char *host);
+    void setupMqtt(const char *host);
+
+    void sendStateUpdate(double speed);
 
 } // namespace Connectivity
 

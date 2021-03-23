@@ -1,26 +1,25 @@
 import 'package:curtains_client/connection.dart';
+import 'package:curtains_client/devicelist.dart';
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 var localDiscovery = new LocalHubDiscovery();
 var remoteDiscovery = new RemoteHubDiscovery();
-Connection connection;
-
 Stream<HubAddress> getHubAddress() async* {
   yield* localDiscovery.getHubAddresses();
   yield* remoteDiscovery.getHubAddresses();
 }
 
-void main() async {
+Future<Connection> createAndStartConnection() async {
+  Connection connection = new Connection();
   var addressStream = getHubAddress();
-
   await for (var address in addressStream) {
     try {
       var hubAddress = address.toString();
       print("Found address at: " + hubAddress);
-      connection = new Connection();
       await connection.start(hubAddress);
       print("Successfully started connection");
       break;
@@ -28,8 +27,13 @@ void main() async {
       print(e);
     }
   }
+  return connection;
+}
 
-  runApp(MyApp());
+void main() async {
+  var connection = await createAndStartConnection();
+  runApp(
+      ChangeNotifierProvider(create: (context) => connection, child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -54,49 +58,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double _currentSliderValue = 0;
-
-  void _sendMessage() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: ListView.builder(
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.sensor_window_rounded,
-                size: 48,
-              ),
-              title: Slider(
-                value: _currentSliderValue,
-                min: -1.0,
-                max: 1.0,
-                divisions: 40,
-                label:
-                    (_currentSliderValue * 100).round().toString() + " Percent",
-                onChanged: (double value) {
-                  setState(() {
-                    _currentSliderValue = value;
-                    connection.setSpeed(_currentSliderValue);
-                  });
-                },
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendMessage,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Consumer<Connection>(builder: (context, connection, child) {
+          if (!connection.isConnected()) return ConnectingPlaceholder();
+          return DeviceListWidget();
+        }));
+  }
+}
+
+// TODO: Give some information on what is happening.. Host address etc..
+class ConnectingPlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

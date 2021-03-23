@@ -10,7 +10,7 @@ namespace Connectivity
     IPAddress serverIP;
     WiFiUDP udp;
     WiFiClient client;
-    PubSubClient pubSubClient(client);
+    PubSubClient mqtt(client);
 
     void setupSoftAccesspoint()
     {
@@ -53,21 +53,38 @@ namespace Connectivity
 
     void topicCallback(char *topic, byte *payload, unsigned int length);
 
-    void setupPubSub(const char *host)
+    String getClientId()
     {
-        pubSubClient.setServer(host, 1883);
-        pubSubClient.setCallback(topicCallback);
+        String clientId = String("SC_") + getUniqueDeviceId();
+        return clientId;
+    }
+
+    String getDeviceChannel(String channelName)
+    {
+        return getClientId() + "/" + channelName;
+    }
+
+    double getState()
+    {
+        // TODO: Get actual speed
+        return 11.11;
+    }
+
+    void setupMqtt(const char *host)
+    {
+        mqtt.setServer(host, 1883);
+        mqtt.setCallback(topicCallback);
 
         // Loop until we're reconnected
         Serial.print("Establishing MQTT connection ");
         while (!client.connected())
         {
-            String clientId = String("SC_") + getUniqueDeviceId();
+            String clientId = getClientId();
 
-            if (pubSubClient.connect(clientId.c_str()))
+            if (mqtt.connect(clientId.c_str()))
             {
                 log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s\n", host);
-                pubSubClient.subscribe("speed");
+                mqtt.subscribe(getDeviceChannel("#").c_str());
             }
             else
             {
@@ -75,6 +92,8 @@ namespace Connectivity
                 log(LogLevel::Info, ".");
             }
         }
+
+        sendStateUpdate(getState());
     }
 
     void topicCallback(char *topicBytes, byte *payload, unsigned int length)
@@ -82,13 +101,29 @@ namespace Connectivity
         log(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
 
         String topic(topicBytes);
-        if (topic.equals("speed"))
+        if (topic.equals(getDeviceChannel("speed")))
         {
             char *start = (char *)payload;
             double speed = strtod(start, NULL);
+            sendStateUpdate(speed);
+
             speed = max(-1.0, min(1.0, speed));
             auto direction = speed >= 0.0 ? Direction::Forward : Direction::Backward;
             driveMotor(fabs(speed), direction);
+            return;
         }
+
+        if (topic.equals(getDeviceChannel("info")))
+        {
+            sendStateUpdate(getState());
+            return;
+        }
+    }
+
+    void sendStateUpdate(double speed)
+    {
+        String stateTopic = getClientId() + "/state";
+        String speedString(speed);
+        mqtt.publish(stateTopic.c_str(), speedString.c_str(), speedString.length());
     }
 } // namespace Connectivity

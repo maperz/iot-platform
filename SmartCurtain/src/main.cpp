@@ -20,11 +20,11 @@ void loop()
     Connectivity::setupLocalWifi(network_ssid, network_pw);
   }
 
-  if (!Connectivity::pubSubClient.connected())
+  if (!Connectivity::mqtt.connected())
   {
-    Connectivity::setupPubSub("10.0.0.111");
+    Connectivity::setupMqtt("10.0.0.111");
   }
 
-  Connectivity::pubSubClient.loop();
+  Connectivity::mqtt.loop();
   motorLoop();
 }

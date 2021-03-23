@@ -1,17 +1,17 @@
 using System;
 
-namespace Hub
+namespace Shared
 {
-    public class Connection : IEquatable<Connection>
+    public class Device : IEquatable<Device>
     {
         public string Id { get; }
 
-        public Connection(string id)
+        public Device(string id)
         {
             this.Id = id;
         }
 
-        public bool Equals(Connection? other)
+        public bool Equals(Device? other)
         {
             return other != null && this.Id.Equals(other.Id);
         }

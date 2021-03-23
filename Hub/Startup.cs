@@ -1,6 +1,3 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using Hub.Server;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.AspNetCore.Extensions;
-using MQTTnet.Server;
 
 namespace Hub
 {
@@ -28,6 +24,10 @@ namespace Hub
             services.AddMediatR(typeof(Startup));
 
             services.AddHostedService<ServerConnection>();
+            services.AddHostedService<MqttConnectionManager>();
+            
+            services.AddSingleton<IDeviceService, DeviceService>();
+            services.AddSingleton<IDeviceChangeBroadcaster, DeviceChangeBroadcaster>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -49,12 +49,7 @@ namespace Hub
                 endpoints.MapHub<GatewayHub>("/hub");
             });
 
-            app.UseMqttServer(server =>
-            {
-                var connectionHandler = new ClientConnectionHandler();
-                server.ClientConnectedHandler = connectionHandler;
-                server.ClientDisconnectedHandler = connectionHandler;
-            });
+            app.UseMqttServer(server => { });
 
             var serviceDiscovery = new LocalServiceDiscovery();
             serviceDiscovery.Advertise("CurtainHub", "_sc_hub._tcp", 5000);
