@@ -31,6 +31,7 @@ dependencies:
   signalr_core: ^1.0.8
   multicast_dns: ^0.2.2
   provider: ^5.0.0
+  rxdart: ^0.26.0
 
 dev_dependencies:
   flutter_test:

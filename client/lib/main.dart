@@ -1,5 +1,6 @@
 import 'package:curtains_client/connection.dart';
 import 'package:curtains_client/devicelist.dart';
+import 'package:curtains_client/devices-model.dart';
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
@@ -32,8 +33,14 @@ Future<Connection> createAndStartConnection() async {
 
 void main() async {
   var connection = await createAndStartConnection();
-  runApp(
-      ChangeNotifierProvider(create: (context) => connection, child: MyApp()));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<Connection>(
+      create: (context) => connection,
+    ),
+    ChangeNotifierProvider<DevicesModel>(
+      create: (context) => connection.getDevicesModel(),
+    )
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
