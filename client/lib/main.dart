@@ -65,7 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: Consumer<Connection>(builder: (context, connection, child) {
-          if (!connection.isConnected()) return ConnectingPlaceholder();
+          if (!connection.isConnected())
+            return ConnectingPlaceholder(connection.getAddress());
           return DeviceListWidget();
         }));
   }
@@ -73,11 +74,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
 // TODO: Give some information on what is happening.. Host address etc..
 class ConnectingPlaceholder extends StatelessWidget {
+  String address;
+  ConnectingPlaceholder(this.address);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(
+                strokeWidth: 6,
+              ),
+            ),
+            Text(
+              "Establishing connection",
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            Text(
+              'Connecting to Hub at $address',
+              style: Theme.of(context).textTheme.caption,
+            )
+          ],
+        ),
       ),
     );
   }

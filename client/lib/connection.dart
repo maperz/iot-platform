@@ -5,8 +5,11 @@ import 'package:signalr_core/signalr_core.dart';
 
 class Connection extends ChangeNotifier implements ApiMethods {
   HubConnection _connection;
+  String _address;
 
   Future<void> start(String hubAddress) async {
+    _address = hubAddress;
+
     print("Starting connection");
     _connection = HubConnectionBuilder()
         .withUrl(hubAddress + '/hub')
@@ -31,6 +34,10 @@ class Connection extends ChangeNotifier implements ApiMethods {
 
   bool isConnected() {
     return _connection?.state == HubConnectionState.connected ?? false;
+  }
+
+  String getAddress() {
+    return _address;
   }
 
   void setupListeners() {
