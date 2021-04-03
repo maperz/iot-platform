@@ -22,7 +22,7 @@ namespace Connectivity
 
     void setupUdp();
 
-    void setupMqtt(const char *host);
+    void setupMqtt(const String& address, uint16 port);
 
     void sendStateUpdate(double speed);
 

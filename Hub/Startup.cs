@@ -25,7 +25,8 @@ namespace Hub
 
             services.AddHostedService<ServerConnection>();
             services.AddHostedService<MqttConnectionManager>();
-            
+            services.AddHostedService<LocalServiceDiscovery>();
+
             services.AddSingleton<IDeviceService, DeviceService>();
             services.AddSingleton<IDeviceChangeBroadcaster, DeviceChangeBroadcaster>();
         }
@@ -50,9 +51,6 @@ namespace Hub
             });
 
             app.UseMqttServer(server => { });
-
-            var serviceDiscovery = new LocalServiceDiscovery();
-            serviceDiscovery.Advertise("CurtainHub", "_sc_hub._tcp", 5000);
         }
     }
 }

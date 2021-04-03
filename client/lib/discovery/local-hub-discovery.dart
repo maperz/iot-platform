@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/hub-discovery.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 
 class LocalHubDiscovery implements HubDiscovery {
-  static const String service = '_sc_hub._tcp';
+  static const String service = '_iothub._tcp.local';
 
   @override
   Stream<HubAddress> getHubAddresses() async* {
@@ -31,6 +33,7 @@ class LocalHubDiscovery implements HubDiscovery {
   Future<HubAddress> _discoverLocalAddressViaMDNS() async {
     print("Running mDNS discovery");
     final MDnsClient client = MDnsClient();
+
     await client.start();
     try {
       await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(

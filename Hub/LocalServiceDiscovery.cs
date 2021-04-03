@@ -1,18 +1,23 @@
+using System.Threading;
 using Makaretu.Dns;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace Hub
 {
-    public class LocalServiceDiscovery
+    public class LocalServiceDiscovery : BackgroundService
     {
-        public Task Advertise(string name, string serviceName, ushort port)
-        {
-            var service = new ServiceProfile(name, serviceName, port);
-            
-            var sd = new ServiceDiscovery();
-            sd.Advertise(service);
 
-            return Task.CompletedTask;
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            var serviceDiscovery = new ServiceDiscovery();
+            serviceDiscovery.Advertise(new ServiceProfile("IotHub", "_iothub._tcp", 5000));
+            serviceDiscovery.Advertise(new ServiceProfile("IotMqtt", "_iotmqtt._tcp", 1883));
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(1000000, stoppingToken);
+            }
         }
     }
 }

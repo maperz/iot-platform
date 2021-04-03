@@ -3,6 +3,7 @@
 #include "connectivity.h"
 #include "logger.h"
 #include "secrets.h"
+#include "discovery.h"
 
 void setup()
 {
@@ -13,6 +14,10 @@ void setup()
 
 bool forward = true;
 
+#define MAX_MDNS_PACKET_SIZE 512
+byte buffer[MAX_MDNS_PACKET_SIZE];
+ServiceDiscovery serviceDiscovery(buffer, MAX_MDNS_PACKET_SIZE);
+
 void loop()
 {
   if (!Connectivity::isWifiConnected())
@@ -20,9 +25,16 @@ void loop()
     Connectivity::setupLocalWifi(network_ssid, network_pw);
   }
 
-  if (!Connectivity::mqtt.connected())
+  bool discoveryCompleted = serviceDiscovery.discoveryCompleted();
+  if (!discoveryCompleted)
   {
-    Connectivity::setupMqtt("10.0.0.111");
+    serviceDiscovery.loop();
+  }
+
+  if (!Connectivity::mqtt.connected() && discoveryCompleted)
+  {
+    MSDNHost host = serviceDiscovery.getHost();
+    Connectivity::setupMqtt(host.address, host.port);
   }
 
   Connectivity::mqtt.loop();

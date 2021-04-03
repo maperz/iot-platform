@@ -70,9 +70,9 @@ namespace Connectivity
         return 11.11;
     }
 
-    void setupMqtt(const char *host)
+    void setupMqtt(const String &address, uint16 port)
     {
-        mqtt.setServer(host, 1883);
+        mqtt.setServer(address.c_str(), port);
         mqtt.setCallback(topicCallback);
 
         // Loop until we're reconnected
@@ -83,7 +83,7 @@ namespace Connectivity
 
             if (mqtt.connect(clientId.c_str()))
             {
-                log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s\n", host);
+                log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s:%d\n", address.c_str(), port);
                 mqtt.subscribe(getDeviceChannel("#").c_str());
             }
             else
