@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/hub-discovery.dart';
-import 'package:multicast_dns/multicast_dns.dart';
+import 'package:curtains_client/discovery/patched-mdns-client.dart';
 
 class LocalHubDiscovery implements HubDiscovery {
-  static const String service = '_iothub._tcp.local';
+  static const String service = '_iothub._tcp';
 
   @override
   Stream<HubAddress> getHubAddresses() async* {

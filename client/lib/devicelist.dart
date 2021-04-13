@@ -41,14 +41,33 @@ class _DeviceListTileState extends State<DeviceListTile> {
     return Consumer<Connection>(
         builder: (context, connection, child) => Card(
               child: ListTile(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                 enabled: widget._deviceState.connected,
                 leading: Icon(
                   Icons.sensor_window_rounded,
                   size: 48,
                 ),
+                trailing: InkWell(
+                  onTap: widget._deviceState.connected
+                      ? () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailDevicePage(widget._deviceState)));
+                        }
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.more_vert_rounded,
+                    ),
+                  ),
+                ),
                 title: Row(
                   children: [
-                    Text(widget._deviceState.deviceId),
+                    Text(_getDeviceName()),
                     Expanded(
                       child: Slider(
                         value: _currentSliderValue,
@@ -71,5 +90,37 @@ class _DeviceListTileState extends State<DeviceListTile> {
                 ),
               ),
             ));
+  }
+
+  _getDeviceNameByType(DeviceType type) {
+    switch (type) {
+      case DeviceType.Curtain:
+        return "Curtain";
+      default:
+        return 'Device';
+    }
+  }
+
+  _getDeviceName() {
+    return widget._deviceState.name ??
+        _getDeviceNameByType(widget._deviceState.type);
+  }
+}
+
+class DetailDevicePage extends StatelessWidget {
+  final DeviceState state;
+
+  DetailDevicePage(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    final appBar = AppBar(
+      title: Text(this.state.deviceId),
+    );
+
+    return Scaffold(
+      appBar: appBar,
+      body: Column(),
+    );
   }
 }

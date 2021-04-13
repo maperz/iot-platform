@@ -43,6 +43,10 @@
 	<false/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>This is needed to find devices in your home.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_iothub._tcp</string>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

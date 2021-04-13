@@ -67,15 +67,41 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final appBar = AppBar(
+      title: Text(widget.title),
+    );
+
+    final bottomBar = Container(
+        height: 50,
+        child: BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(Icons.analytics),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ));
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Consumer<Connection>(builder: (context, connection, child) {
-          if (!connection.isConnected())
-            return ConnectingPlaceholder(connection.getAddress());
-          return DeviceListWidget();
-        }));
+      appBar: appBar,
+      body: Consumer<Connection>(builder: (context, connection, child) {
+        if (!connection.isConnected())
+          return ConnectingPlaceholder(connection.getAddress());
+        return DeviceListWidget();
+      }),
+      bottomNavigationBar: bottomBar,
+    );
   }
 }
 

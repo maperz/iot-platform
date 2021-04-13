@@ -46,6 +46,7 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_dartobservatory._tcp</string>
+		<string>_iothub._tcp</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

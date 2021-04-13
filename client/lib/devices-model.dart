@@ -3,12 +3,16 @@ import 'package:flutter/foundation.dart';
 
 import 'endpoints.dart';
 
+enum DeviceType { Curtain }
+
 class DeviceState {
   final String deviceId;
+  final String name;
+  final DeviceType type;
   final bool connected;
   final double speed;
 
-  DeviceState(this.deviceId, this.connected, this.speed);
+  DeviceState(this.deviceId, this.connected, this.speed, this.name, this.type);
 
   factory DeviceState.fromJson(Map<String, dynamic> json) {
     if (json == null) {
@@ -17,7 +21,12 @@ class DeviceState {
 
     var speedJson = json['speed'];
     var speed = speedJson is int ? (speedJson).toDouble() : speedJson;
-    return DeviceState(json['deviceId'], json['connected'], speed);
+
+    // TODO:
+    String name;
+    var type = DeviceType.Curtain;
+
+    return DeviceState(json['deviceId'], json['connected'], speed, name, type);
   }
 }
 

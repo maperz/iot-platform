@@ -7,7 +7,6 @@ namespace Hub
 {
     public class LocalServiceDiscovery : BackgroundService
     {
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var serviceDiscovery = new ServiceDiscovery();
@@ -16,7 +15,7 @@ namespace Hub
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(1000000, stoppingToken);
+                await Task.Delay(100000, stoppingToken);
             }
         }
     }
