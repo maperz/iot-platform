@@ -7,7 +7,6 @@ namespace Server
 {
     public class ServerHub : Hub, IApiMethods
     {
-
         private readonly ILogger<ServerHub> _logger;
         
         public ServerHub(ILogger<ServerHub> logger)
@@ -17,9 +16,14 @@ namespace Server
         
         public Task SetSpeed(double speed)
         {
-            // TODO: Find correct client - for now send it to all connected
             _logger.LogInformation("SetSpeed called wit [{Double}]", speed);
+            // TODO: Find correct client - for now send it to all connected
             return Clients.All.SendAsync("SetSpeed", speed);
+        }
+
+        public Task ChangeDeviceName(string deviceId, string name)
+        {
+            return Clients.All.SendAsync("ChangeDeviceName", deviceId, name);
         }
     }
 }

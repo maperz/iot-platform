@@ -25,6 +25,7 @@ namespace Connectivity
     void setupMqtt(const String& address, uint16 port);
 
     void sendStateUpdate(double speed);
+    void sendDeviceInfo();
 
 } // namespace Connectivity
 

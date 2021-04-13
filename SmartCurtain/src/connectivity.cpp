@@ -3,6 +3,9 @@
 #include "Arduino.h"
 #include "motor.h"
 #include "utils.h"
+#include "device.h"
+
+#include <ArduinoJson.h>
 
 namespace Connectivity
 {
@@ -64,6 +67,11 @@ namespace Connectivity
         return getClientId() + "/" + channelName;
     }
 
+    String getRequestChannel(String channelName)
+    {
+        return getClientId() + "/r/" + channelName;
+    }
+
     double getState()
     {
         // TODO: Get actual speed
@@ -84,7 +92,7 @@ namespace Connectivity
             if (mqtt.connect(clientId.c_str()))
             {
                 log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s:%d\n", address.c_str(), port);
-                mqtt.subscribe(getDeviceChannel("#").c_str());
+                mqtt.subscribe(getRequestChannel("#").c_str());
             }
             else
             {
@@ -93,6 +101,7 @@ namespace Connectivity
             }
         }
 
+        sendDeviceInfo();
         sendStateUpdate(getState());
     }
 
@@ -101,7 +110,7 @@ namespace Connectivity
         log(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
 
         String topic(topicBytes);
-        if (topic.equals(getDeviceChannel("speed")))
+        if (topic.equals(getRequestChannel("speed")))
         {
             char *start = (char *)payload;
             double speed = strtod(start, NULL);
@@ -113,17 +122,36 @@ namespace Connectivity
             return;
         }
 
-        if (topic.equals(getDeviceChannel("info")))
+        if (topic.equals(getRequestChannel("name")))
+        {
+            char *newName = (char *)payload;
+            Device::setName(newName);
+            sendDeviceInfo();
+            return;
+        }
+
+        if (topic.equals(getRequestChannel("info")))
         {
             sendStateUpdate(getState());
             return;
         }
     }
 
+    void sendDeviceInfo()
+    {
+        String topic = getDeviceChannel("device");
+        StaticJsonDocument<200> document;
+        document["name"] = Device::getName();
+        document["type"] = Device::getType();
+
+        size_t size = serializeJson(document, sharedBuffer, SHARED_BUFFER_SIZE);
+        mqtt.publish(topic.c_str(), sharedBuffer, size);
+    }
+
     void sendStateUpdate(double speed)
     {
-        String stateTopic = getClientId() + "/state";
+        String topic = getDeviceChannel("state");
         String speedString(speed);
-        mqtt.publish(stateTopic.c_str(), speedString.c_str(), speedString.length());
+        mqtt.publish(topic.c_str(), speedString.c_str(), speedString.length());
     }
 } // namespace Connectivity

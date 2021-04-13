@@ -2,6 +2,7 @@
 #define DISCOVERY_H_GUARD
 
 #include <Arduino.h>
+
 #include <mdns.h>
 #include "time.h"
 
@@ -31,8 +32,7 @@ private:
     mdns::MDns mdnsClient;
 
     clock_t lastSent;
-
-    bool sentQuery = false;
+    long ticks = 0;
 };
 
 #endif // DISCOVERY_H_GUARD

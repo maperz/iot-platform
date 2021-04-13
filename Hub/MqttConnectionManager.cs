@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,16 +42,27 @@ namespace Hub
             _mqttServer.UseApplicationMessageReceivedHandler(async e =>
             {
                 var topic = e.ApplicationMessage.Topic;
-                if (topic.EndsWith("/state"))
-                {
-                    var deviceId = topic.Split("/")[0];
-                    var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                    var state = double.Parse(message);
-                    await _deviceService.SetStateOfDevice(deviceId, state);
-                }
+                var deviceId = topic.Split("/")[0];
+                var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+
+                await OnDeviceMessageReceived(deviceId, topic, message);
             });
             
             return Task.CompletedTask;
         }
+
+        private async Task OnDeviceMessageReceived(String deviceId, String topic, String message)
+        {
+            if (topic.EndsWith("/state"))
+            {
+                var state = double.Parse(message);
+                await _deviceService.SetStateOfDevice(deviceId, state);
+            }
+                
+            if (topic.EndsWith("/device"))
+            {
+                Console.WriteLine($"{deviceId}: Message: '{message}'");
+            }
+        } 
     }
 }

@@ -4,19 +4,19 @@
 #include "logger.h"
 #include "secrets.h"
 #include "discovery.h"
+#include "storage.h"
+#include "utils.h"
 
 void setup()
 {
   Serial.begin(115200);
+  Storage::init();
   printf("\n\n");
   initMotor();
 }
 
 bool forward = true;
-
-#define MAX_MDNS_PACKET_SIZE 512
-byte buffer[MAX_MDNS_PACKET_SIZE];
-ServiceDiscovery serviceDiscovery(buffer, MAX_MDNS_PACKET_SIZE);
+ServiceDiscovery serviceDiscovery(sharedBuffer, SHARED_BUFFER_SIZE);
 
 void loop()
 {

@@ -28,5 +28,10 @@ namespace Hub
             // TODO: Get actual device id
             return _mediator.Send(new SetSpeedRequest() { DeviceId = "SC_CC50E35605F5", Speed = speed });
         }
+
+        public Task ChangeDeviceName(string deviceId, string name)
+        {
+            return _mediator.Send(new SetNameRequest() { DeviceId = deviceId, Name = name });
+        }
     }
 }

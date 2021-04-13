@@ -27,7 +27,7 @@ namespace Hub.Domain
 
             speed = Math.Max(-1.0, Math.Min(1.0, speed));
 
-            await _mqttServer.PublishAsync(request.DeviceId + "/speed", speed.ToString(CultureInfo.InvariantCulture));
+            await _mqttServer.PublishAsync(request.DeviceId + "/r/speed", speed.ToString(CultureInfo.InvariantCulture));
         }
     }
 }
