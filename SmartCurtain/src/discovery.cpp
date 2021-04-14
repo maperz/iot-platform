@@ -19,7 +19,6 @@ void answerCallback(const mdns::Answer *answer)
     if (answer->rrtype == MDNS_TYPE_PTR && strstr(answer->name_buffer, SERVICE_NAME) != 0)
     {
         host.serviceName = answer->rdata_buffer;
-        log(LogLevel::Info, "Matching %s -> %s", host.serviceName.c_str(), answer->rdata_buffer);
     }
 
     // A typical SRV record matches a human readable name to port and FQDN info.
@@ -114,8 +113,6 @@ void ServiceDiscovery::sendQuery()
     mdnsClient.Send();
 
     log(LogLevel::Info, "ServiceDiscovery: mDNS discovery packet sent for '%s'\n", query.qname_buffer);
-
-    // lastSent = clock();
 }
 
 MSDNHost ServiceDiscovery::getHost()

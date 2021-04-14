@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.AspNetCore.Extensions;
+using Shared;
 
 namespace Hub
 {
@@ -28,7 +29,7 @@ namespace Hub
             services.AddHostedService<LocalServiceDiscovery>();
 
             services.AddSingleton<IDeviceService, DeviceService>();
-            services.AddSingleton<IDeviceChangeBroadcaster, DeviceChangeBroadcaster>();
+            services.AddSingleton<IApiBroadcaster, ApiBroadcaster>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

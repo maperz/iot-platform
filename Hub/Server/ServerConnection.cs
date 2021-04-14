@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Hub.Domain;
@@ -6,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace Hub.Server
 {
@@ -14,19 +16,40 @@ namespace Hub.Server
         private readonly string ServerHubAddress = "http://localhost:4000/hub";
         private readonly HubConnection _hubConnection;
         private readonly ILogger<ServerConnection> _logger;
-        
-        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger)
+        private readonly IMediator _mediator;
+
+        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster)
         {
             _logger = logger;
+            _mediator = mediator;
             
             _logger.LogInformation("Creating server hub connection with address at {String}", ServerHubAddress);
             _hubConnection = new HubConnectionBuilder().WithUrl(ServerHubAddress)
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(1) })
                 .Build();
+
+
+            apiBroadcaster.ConnectListener(this);
             
-            _hubConnection.On<double>("SetSpeed", (speed) => mediator.Send(new SetSpeedRequest() {Speed = speed}));
+            RegisterListeners();
         }
 
+        private void RegisterListeners()
+        {
+            _hubConnection.On<double>(
+                nameof(IApiMethods.SetSpeed), 
+                (speed) => _mediator.Send(new SetSpeedRequest() { Speed = speed }));
+            
+            _hubConnection.On<string, string>(
+                nameof(IApiMethods.ChangeDeviceName), 
+                (deviceId, name) => _mediator.Send(new SetNameRequest() { DeviceId = deviceId, Name = name}));
+        }
+
+        public Task<bool> IsConnected()
+        {
+            return Task.FromResult(_hubConnection.State == HubConnectionState.Connected);
+        }
+        
         public async Task<bool> Connect(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Establishing server connection");
@@ -55,6 +78,14 @@ namespace Hub.Server
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {            
             return Connect(stoppingToken);
+        }
+
+        public async Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
+        {
+            if (await IsConnected())
+            { 
+                await _hubConnection.InvokeAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
+            }
         }
     }
 }

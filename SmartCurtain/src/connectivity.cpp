@@ -105,15 +105,18 @@ namespace Connectivity
         sendStateUpdate(getState());
     }
 
-    void topicCallback(char *topicBytes, byte *payload, unsigned int length)
+    void topicCallback(char *topicBytes, byte *rawPayload, unsigned int length)
     {
         log(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
+
+        char payload[length + 1];
+        memcpy(payload, rawPayload, length);
+        payload[length] = 0;
 
         String topic(topicBytes);
         if (topic.equals(getRequestChannel("speed")))
         {
-            char *start = (char *)payload;
-            double speed = strtod(start, NULL);
+            double speed = strtod(payload, NULL);
             sendStateUpdate(speed);
 
             speed = max(-1.0, min(1.0, speed));
@@ -124,8 +127,7 @@ namespace Connectivity
 
         if (topic.equals(getRequestChannel("name")))
         {
-            char *newName = (char *)payload;
-            Device::setName(newName);
+            Device::setName(payload);
             sendDeviceInfo();
             return;
         }

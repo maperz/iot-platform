@@ -1,6 +1,6 @@
 import 'package:curtains_client/connection.dart';
-import 'package:curtains_client/devicelist.dart';
-import 'package:curtains_client/devices-model.dart';
+import 'package:curtains_client/device-list.dart';
+import 'package:curtains_client/model/devices-model.dart';
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';

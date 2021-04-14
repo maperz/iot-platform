@@ -1,5 +1,7 @@
 abstract class ApiMethods {
   // Stream<String> GetConnectedDevices();
 
-  Future setSpeed(double speed);
+  Future setSpeed(String deviceId, double speed);
+
+  Future setDeviceName(String deviceId, String name);
 }

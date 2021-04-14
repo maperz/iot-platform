@@ -5,6 +5,8 @@ namespace Shared
     public class Device : IEquatable<Device>
     {
         public string Id { get; }
+        
+        public string Name { get; set; }
 
         public Device(string id)
         {

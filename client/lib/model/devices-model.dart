@@ -1,7 +1,7 @@
 import 'package:curtains_client/connection.dart';
 import 'package:flutter/foundation.dart';
 
-import 'endpoints.dart';
+import '../endpoints.dart';
 
 enum DeviceType { Curtain }
 
@@ -27,6 +27,19 @@ class DeviceState {
     var type = DeviceType.Curtain;
 
     return DeviceState(json['deviceId'], json['connected'], speed, name, type);
+  }
+
+  getTypeName(DeviceType type) {
+    switch (type) {
+      case DeviceType.Curtain:
+        return "Curtain";
+      default:
+        return 'Device';
+    }
+  }
+
+  getDisplayName() {
+    return name ?? getTypeName(type);
   }
 }
 

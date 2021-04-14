@@ -12,10 +12,10 @@ namespace Hub
     {
         private readonly ReaderWriterLockSlim _lock = new();
         private readonly Dictionary<string, DeviceState> _deviceStates = new();
-        private readonly IDeviceChangeBroadcaster _broadcaster;
+        private readonly IApiBroadcaster _broadcaster;
         private readonly ILogger<DeviceService> _logger;
 
-        public DeviceService(IDeviceChangeBroadcaster broadcaster, ILogger<DeviceService> logger)
+        public DeviceService(IApiBroadcaster broadcaster, ILogger<DeviceService> logger)
         {
             _broadcaster = broadcaster;
             _logger = logger;
@@ -35,7 +35,7 @@ namespace Hub
                 }
 
                 deviceState.Connected = true;
-                _broadcaster.BroadcastDeviceStatesChange(new List<DeviceState>() { deviceState });
+                _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
             }
             finally
             {
@@ -55,7 +55,7 @@ namespace Hub
                     _logger.LogInformation("Client disconnected: {String}", deviceId);
 
                     deviceState.Connected = false;
-                    _broadcaster.BroadcastDeviceStatesChange(new List<DeviceState>() { deviceState });
+                    _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
                 }
             }
             finally
@@ -81,7 +81,7 @@ namespace Hub
                 if (deviceState.Speed == null || Math.Abs((double) (deviceState.Speed - state)) > double.Epsilon)
                 {
                     deviceState.Speed = state;
-                    _broadcaster.BroadcastDeviceStatesChange(new List<DeviceState>() { deviceState });
+                    _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
                 }
             }
             finally

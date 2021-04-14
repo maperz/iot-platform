@@ -17,6 +17,7 @@
     },
     "peacock.color": "#215732",
     "files.associations": {
-        "random": "cpp"
+        "random": "cpp",
+        "typeinfo": "cpp"
     }
 }

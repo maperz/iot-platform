@@ -1,9 +1,9 @@
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MQTTnet.Server;
 
 namespace Hub
@@ -12,11 +12,13 @@ namespace Hub
     {
         private readonly IDeviceService _deviceService;
         private readonly IMqttServer _mqttServer;
+        private readonly ILogger<MqttConnectionManager> _logger;
 
-        public MqttConnectionManager(IDeviceService deviceService, IMqttServer server)
+        public MqttConnectionManager(IDeviceService deviceService, IMqttServer server, ILogger<MqttConnectionManager> logger)
         {
             _mqttServer = server;
             _deviceService = deviceService;
+            _logger = logger;
         }
         
         public Task HandleClientConnectedAsync(MqttServerClientConnectedEventArgs args)
@@ -61,7 +63,7 @@ namespace Hub
                 
             if (topic.EndsWith("/device"))
             {
-                Console.WriteLine($"{deviceId}: Message: '{message}'");
+                _logger.LogInformation("{String}: Message: '{String}'", deviceId, message);
             }
         } 
     }

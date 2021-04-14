@@ -1,8 +1,9 @@
-import 'package:curtains_client/devices-model.dart';
+import 'package:curtains_client/model/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'connection.dart';
+import 'device-detail.dart';
 
 class DeviceListWidget extends StatefulWidget {
   @override
@@ -54,8 +55,8 @@ class _DeviceListTileState extends State<DeviceListTile> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      DetailDevicePage(widget._deviceState)));
+                                  builder: (context) => DetailDevicePage(
+                                      widget._deviceState, connection)));
                         }
                       : null,
                   child: Padding(
@@ -67,7 +68,7 @@ class _DeviceListTileState extends State<DeviceListTile> {
                 ),
                 title: Row(
                   children: [
-                    Text(_getDeviceName()),
+                    Text(widget._deviceState.getDisplayName()),
                     Expanded(
                       child: Slider(
                         value: _currentSliderValue,
@@ -80,7 +81,9 @@ class _DeviceListTileState extends State<DeviceListTile> {
                             ? (double value) {
                                 setState(() {
                                   _currentSliderValue = value;
-                                  connection.setSpeed(_currentSliderValue);
+                                  connection.setSpeed(
+                                      widget._deviceState.deviceId,
+                                      _currentSliderValue);
                                 });
                               }
                             : null,
@@ -90,37 +93,5 @@ class _DeviceListTileState extends State<DeviceListTile> {
                 ),
               ),
             ));
-  }
-
-  _getDeviceNameByType(DeviceType type) {
-    switch (type) {
-      case DeviceType.Curtain:
-        return "Curtain";
-      default:
-        return 'Device';
-    }
-  }
-
-  _getDeviceName() {
-    return widget._deviceState.name ??
-        _getDeviceNameByType(widget._deviceState.type);
-  }
-}
-
-class DetailDevicePage extends StatelessWidget {
-  final DeviceState state;
-
-  DetailDevicePage(this.state);
-
-  @override
-  Widget build(BuildContext context) {
-    final appBar = AppBar(
-      title: Text(this.state.deviceId),
-    );
-
-    return Scaffold(
-      appBar: appBar,
-      body: Column(),
-    );
   }
 }

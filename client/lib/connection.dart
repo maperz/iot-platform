@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:curtains_client/api/api-methods.dart';
-import 'package:curtains_client/devices-model.dart';
-import 'package:curtains_client/endpoints.dart';
+import 'package:curtains_client/model/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:signalr_core/signalr_core.dart';
@@ -84,10 +82,13 @@ class Connection extends ChangeNotifier implements ApiMethods {
   }
 
   @override
-  Future setSpeed(double speed) async {
-    if (_connection == null) {
-      return;
-    }
-    await _connection?.send(methodName: "SetSpeed", args: [speed]);
+  Future setSpeed(String deviceId, double speed) async {
+    await _connection?.send(methodName: "SetSpeed", args: [deviceId, speed]);
+  }
+
+  @override
+  Future setDeviceName(String deviceId, String name) async {
+    await _connection
+        ?.send(methodName: "ChangeDeviceName", args: [deviceId, name]);
   }
 }
