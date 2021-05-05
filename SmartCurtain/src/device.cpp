@@ -10,6 +10,12 @@ String Device::getType()
     return "curtain";
 }
 
+String Device::getVersion()
+{
+    return "0.0.1";
+}
+
+
 String Device::getName()
 {
     char nameBuffer[STORAGE_MAX_NAME_LEN];

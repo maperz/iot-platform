@@ -91,7 +91,7 @@ bool ServiceDiscovery::discoveryCompleted()
         return true;
     }
 
-    if (ticks++ % 70000 == 0)
+    if (ticks++ % 100000 == 0)
     {
         sendQuery();
     }

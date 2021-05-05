@@ -35,7 +35,7 @@ namespace Hub
                 }
 
                 deviceState.Connected = true;
-                _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
+                BroadcastDeviceChange(deviceState);
             }
             finally
             {
@@ -55,8 +55,31 @@ namespace Hub
                     _logger.LogInformation("Client disconnected: {String}", deviceId);
 
                     deviceState.Connected = false;
-                    _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
+                    BroadcastDeviceChange(deviceState);
                 }
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+         
+            return Task.CompletedTask;
+        }
+
+        public Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
+                {
+                    _logger.LogWarning("Trying to set state of unknown device not found: {String}", deviceId);
+                    return Task.CompletedTask;
+                    ;
+                }
+
+                deviceState.Info = deviceInfo;
+                BroadcastDeviceChange(deviceState);
             }
             finally
             {
@@ -81,7 +104,7 @@ namespace Hub
                 if (deviceState.Speed == null || Math.Abs((double) (deviceState.Speed - state)) > double.Epsilon)
                 {
                     deviceState.Speed = state;
-                    _broadcaster.DeviceStateChanged(new List<DeviceState>() { deviceState });
+                    BroadcastDeviceChange(deviceState);
                 }
             }
             finally
@@ -97,12 +120,21 @@ namespace Hub
             _lock.EnterReadLock();
             try
             {
-                return Task.FromResult(_deviceStates.Values.ToList() as IEnumerable<DeviceState>);
+                return Task.FromResult(_deviceStates.Values.Where(x => x.Info != null).ToList() as IEnumerable<DeviceState>);
             }
             finally
             {
                 _lock.ExitReadLock();
             }
+        }
+
+        private Task BroadcastDeviceChange(DeviceState changedDevice)
+        {
+            if (changedDevice.Info == null)
+            {
+                return Task.CompletedTask;
+            }
+            return _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
         }
     }
 }

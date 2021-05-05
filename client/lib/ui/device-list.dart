@@ -1,9 +1,10 @@
-import 'package:curtains_client/model/devices-model.dart';
+import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'connection.dart';
+import '../connection/connection.dart';
 import 'device-detail.dart';
+import '../domain/device/device-state.dart';
 
 class DeviceListWidget extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class DeviceListWidget extends StatefulWidget {
 class _DeviceListWidgetState extends State<DeviceListWidget> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<DevicesModel>(
+    return Consumer<DeviceListModel>(
         builder: (context, devices, child) => ListView.builder(
               itemCount: devices.getDeviceStates().length,
               itemBuilder: (context, index) {

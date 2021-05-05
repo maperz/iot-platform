@@ -8,6 +8,8 @@ namespace Hub
     {
         public Task DeviceConnected(string deviceId);
         public Task DeviceDisconnected(string deviceId);
+
+        public Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo);
         
         public Task SetStateOfDevice(string deviceId, double state);
 

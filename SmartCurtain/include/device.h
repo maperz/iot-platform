@@ -9,6 +9,9 @@ public:
     static String getType();
 
     static String getName();
+
+    static String getVersion();
+
     static void setName(const String &name);
 };
 

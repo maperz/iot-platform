@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Server;
+using Newtonsoft.Json;
+using Shared;
 
 namespace Hub
 {
@@ -64,6 +66,9 @@ namespace Hub
             if (topic.EndsWith("/device"))
             {
                 _logger.LogInformation("{String}: Message: '{String}'", deviceId, message);
+
+                var deviceInfo = JsonConvert.DeserializeObject<DeviceInfo>(message);
+                await _deviceService.SetDeviceInfo(deviceId, deviceInfo);
             }
         } 
     }

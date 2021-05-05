@@ -1,44 +1,29 @@
-import 'package:curtains_client/connection.dart';
-import 'package:curtains_client/device-list.dart';
-import 'package:curtains_client/model/devices-model.dart';
-import 'package:curtains_client/discovery/hub-address.dart';
-import 'package:curtains_client/discovery/local-hub-discovery.dart';
-import 'package:curtains_client/discovery/remote-hub-discovery.dart';
+import 'package:curtains_client/connection/address-resolver.dart';
+import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/ui/device-list.dart';
+import 'package:curtains_client/domain/device/device-service.dart';
+import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-var localDiscovery = new LocalHubDiscovery();
-var remoteDiscovery = new RemoteHubDiscovery();
-Stream<HubAddress> getHubAddress() async* {
-  yield* localDiscovery.getHubAddresses();
-  yield* remoteDiscovery.getHubAddresses();
-}
-
 Future<Connection> createAndStartConnection() async {
-  Connection connection = new Connection();
-  var addressStream = getHubAddress();
-  await for (var address in addressStream) {
-    try {
-      var hubAddress = address.toString();
-      print("Found address at: " + hubAddress);
-      await connection.start(hubAddress);
-      print("Successfully started connection");
-      break;
-    } catch (e) {
-      print(e);
-    }
-  }
+  IAddressResolver resolver = new AddressResolver();
+  IConnection connection = new Connection(resolver);
+  connection.start();
   return connection;
 }
 
 void main() async {
-  var connection = await createAndStartConnection();
+  IConnection connection = await createAndStartConnection();
+  IDeviceListService deviceService = new DeviceListService(connection);
+  var deviceListModel = new DeviceListModel(deviceService);
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<Connection>(
       create: (context) => connection,
     ),
-    ChangeNotifierProvider<DevicesModel>(
-      create: (context) => connection.getDevicesModel(),
+    ChangeNotifierProvider<DeviceListModel>(
+      create: (context) => deviceListModel,
     )
   ], child: MyApp()));
 }
@@ -48,10 +33,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Curtains',
+      title: 'Smart Things',
       theme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(key: GlobalKey(), title: 'Curtains'),
+      home: MyHomePage(key: GlobalKey(), title: 'Smart Things'),
     );
   }
 }
@@ -96,18 +81,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: appBar,
       body: Consumer<Connection>(builder: (context, connection, child) {
-        if (!connection.isConnected())
-          return ConnectingPlaceholder(connection.getAddress());
-        return DeviceListWidget();
+        return StreamBuilder<bool>(
+          stream: connection.getConnectedState(),
+          builder: (context, connected) {
+            if (connected.hasData && connected.data) {
+              return DeviceListWidget();
+            }
+
+            return StreamBuilder(
+                stream: connection.getConnectionAddress(),
+                builder: (context, address) {
+                  return ConnectingPlaceholder(
+                      address.hasData ? address.data : null);
+                });
+          },
+        );
       }),
       bottomNavigationBar: bottomBar,
     );
   }
 }
 
-// TODO: Give some information on what is happening.. Host address etc..
 class ConnectingPlaceholder extends StatelessWidget {
-  String address;
+  final String address;
   ConnectingPlaceholder(this.address);
 
   @override
@@ -125,13 +121,14 @@ class ConnectingPlaceholder extends StatelessWidget {
               ),
             ),
             Text(
-              "Establishing connection",
+              address != null ? "Establishing connection" : "Discovering Hub",
               style: Theme.of(context).textTheme.headline5,
             ),
-            Text(
-              'Connecting to Hub at $address',
-              style: Theme.of(context).textTheme.caption,
-            )
+            if (address != null)
+              Text(
+                'Connecting to Hub at $address',
+                style: Theme.of(context).textTheme.caption,
+              )
           ],
         ),
       ),

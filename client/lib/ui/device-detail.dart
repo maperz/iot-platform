@@ -1,7 +1,7 @@
-import 'package:curtains_client/connection.dart';
+import 'package:curtains_client/connection/connection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'model/devices-model.dart';
+import '../domain/device/device-state.dart';
 
 class DetailDevicePage extends StatelessWidget {
   final DeviceState state;
@@ -25,14 +25,15 @@ class DetailDevicePage extends StatelessWidget {
         child: Column(
           children: [
             TextFormField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                hintText: "Some name",
-                labelText: 'Name:',
-              ),
-              onEditingComplete: () =>
-                  _changeDeviceName(this.nameController.text),
-            )
+                controller: nameController,
+                decoration: const InputDecoration(
+                  hintText: "Some name",
+                  labelText: 'Name:',
+                ),
+                onFieldSubmitted: (newName) async {
+                  await _changeDeviceName(newName);
+                  Navigator.pop(context);
+                })
           ],
         ),
       ),

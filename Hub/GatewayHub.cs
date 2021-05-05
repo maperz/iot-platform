@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hub.Domain;
 using MediatR;
@@ -7,7 +6,7 @@ using Shared;
 
 namespace Hub
 {
-    public class GatewayHub : Microsoft.AspNetCore.SignalR.Hub, IApiMethods, IApiListener
+    public class GatewayHub : Microsoft.AspNetCore.SignalR.Hub, IApiMethods
     {
         private readonly IMediator _mediator;
         private readonly IDeviceService _deviceService;
@@ -16,17 +15,21 @@ namespace Hub
         {
             _mediator = mediator;
             _deviceService = deviceService;
-
-            broadcaster.ConnectListener(this);
         }
         
         public override async Task OnConnectedAsync()
         {
             var currentStates = await _deviceService.GetDeviceStates();
-            await Clients.All.SendAsync(nameof(IApiListener.DeviceStateChanged), currentStates);
+            await Clients.Caller.SendAsync(nameof(IApiListener.DeviceStateChanged), currentStates);
         }
         
         // INPUT
+
+        public async Task GetDeviceList()
+        {
+            var currentStates = await _deviceService.GetDeviceStates();
+            await Clients.Caller.SendAsync(nameof(IApiListener.DeviceStateChanged), currentStates);
+        }
 
         public Task SetSpeed(string deviceId, double speed)
         {
@@ -39,11 +42,5 @@ namespace Hub
             return _mediator.Send(new SetNameRequest() { DeviceId = deviceId, Name = name });
         }
         
-        // OUTPUT
-        
-        public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
-        {
-            return Clients.All.SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
-        }
     }
 }

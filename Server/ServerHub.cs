@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,12 @@ namespace Server
         {
             _logger = logger;
         }
-        
+
+        public Task GetDeviceList()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task SetSpeed(string deviceId, double speed)
         {
             _logger.LogInformation("SetSpeed called wit [{Double}]", speed);

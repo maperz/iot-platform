@@ -145,6 +145,7 @@ namespace Connectivity
         StaticJsonDocument<200> document;
         document["name"] = Device::getName();
         document["type"] = Device::getType();
+        document["version"] = Device::getVersion();
 
         size_t size = serializeJson(document, sharedBuffer, SHARED_BUFFER_SIZE);
         mqtt.publish(topic.c_str(), sharedBuffer, size);
