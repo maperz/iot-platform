@@ -7,26 +7,25 @@ import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 abstract class IAddressResolver {
-  Stream<String> getHubUrl();
+  Stream<String?> getHubUrl();
 }
 
 class AddressResolver implements IAddressResolver {
   final localDiscovery = new LocalHubDiscovery();
   final remoteDiscovery = new RemoteHubDiscovery();
 
-  StreamSubscription _subscription;
-  BehaviorSubject<ConnectivityResult> _connectivity;
-  Stream<String> _hubUrlStream;
+  BehaviorSubject<ConnectivityResult>? _connectivity;
+  Stream<String?>? _hubUrlStream;
 
   Future init() async {
     if (_connectivity == null) {
       _connectivity =
           BehaviorSubject.seeded(await Connectivity().checkConnectivity());
       Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-        _connectivity.add(result);
+        _connectivity!.add(result);
       });
 
-      _hubUrlStream = _connectivity.switchMap((result) {
+      _hubUrlStream = _connectivity!.switchMap((result) {
         print("Connectivity changed to: " + result.toString());
         switch (result) {
           case ConnectivityResult.wifi:
@@ -45,12 +44,15 @@ class AddressResolver implements IAddressResolver {
   }
 
   @override
-  Stream<String> getHubUrl() {
-    return _hubUrlStream;
+  Stream<String?> getHubUrl() {
+    if (_hubUrlStream == null) {
+      throw Error();
+    }
+
+    return _hubUrlStream!;
   }
 
   dispose() {
-    _subscription.cancel();
     _connectivity?.close();
   }
 }

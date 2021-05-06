@@ -14,23 +14,23 @@ abstract class IConnection implements ApiMethods {
 
   Stream<bool> getConnectedState();
 
-  Stream<String> getConnectionAddress();
+  Stream<String?> getConnectionAddress();
 
-  void listenOn(String endpoint, Function(List<dynamic>) callback);
+  void listenOn(String endpoint, Function(List<dynamic>?) callback);
 }
 
 class ConnectionState {
   final bool shouldConnect;
-  final String address;
+  final String? address;
   ConnectionState(this.shouldConnect, this.address);
 }
 
 class Connection extends ChangeNotifier implements IConnection {
-  HubConnection _connection;
+  HubConnection? _connection;
 
   BehaviorSubject<bool> _isConnected = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> _startState = BehaviorSubject.seeded(false);
-  BehaviorSubject<String> _addressStream = new BehaviorSubject();
+  BehaviorSubject<String?> _addressStream = new BehaviorSubject();
 
   Connection(AddressResolver addressResolver) {
     addressResolver.getHubUrl().listen((address) {
@@ -40,7 +40,7 @@ class Connection extends ChangeNotifier implements IConnection {
     var connectionStream = CombineLatestStream.combine2(
         _startState.distinct(),
         _addressStream.distinct(),
-        (bool connect, String address) =>
+        (bool connect, String? address) =>
             new ConnectionState(connect, address));
 
     connectionStream.listen(
@@ -62,17 +62,17 @@ class Connection extends ChangeNotifier implements IConnection {
   }
 
   @override
-  Stream<String> getConnectionAddress() {
+  Stream<String?> getConnectionAddress() {
     return _addressStream;
   }
 
   @override
-  void listenOn(String endpoint, Function(List<dynamic>) callback) {
+  void listenOn(String endpoint, Function(List<dynamic>?) callback) {
     print("Listening on " + endpoint);
     _connection?.off(endpoint);
     _connection?.on(endpoint, (message) {
       try {
-        print('Endpoint: $endpoint - Received: ${message[0].toString()}');
+        print('Endpoint: $endpoint - Received: ${message![0].toString()}');
         callback(message[0]);
       } catch (e) {
         print(e);
@@ -83,12 +83,12 @@ class Connection extends ChangeNotifier implements IConnection {
   // API
 
   @override
-  Future setSpeed(String deviceId, double speed) async {
+  Future setSpeed(String? deviceId, double speed) async {
     await _connection?.send(methodName: "SetSpeed", args: [deviceId, speed]);
   }
 
   @override
-  Future setDeviceName(String deviceId, String name) async {
+  Future setDeviceName(String? deviceId, String name) async {
     await _connection
         ?.send(methodName: "ChangeDeviceName", args: [deviceId, name]);
   }
@@ -98,12 +98,12 @@ class Connection extends ChangeNotifier implements IConnection {
     await _connection?.send(methodName: "GetDeviceList", args: []);
   }
 
-  Future _handleConnection(bool connect, String address) async {
+  Future _handleConnection(bool connect, String? address) async {
     final isConnected = _isConnected.value;
 
-    if ((!connect || address == null) && isConnected) {
+    if ((!connect || address == null) && isConnected!) {
       print("Stopping connection");
-      await _connection.stop();
+      await _connection!.stop();
       _connection = null;
       _refreshConnectionState();
       return;
@@ -115,17 +115,17 @@ class Connection extends ChangeNotifier implements IConnection {
 
     final hubUrl = address + '/hub';
 
-    if (connect && !isConnected) {
+    if (connect && !isConnected!) {
       _createConnection(hubUrl);
       print('Starting connection at $hubUrl');
       await _connection?.start();
       _refreshConnectionState();
     }
 
-    if (connect && _connection.baseUrl != hubUrl) {
+    if (connect && _connection!.baseUrl != hubUrl) {
       _createConnection(address);
       print("Reconnecting to different url");
-      await _connection.stop();
+      await _connection!.stop();
       _connection = null;
       _refreshConnectionState();
       await _connection?.start();
@@ -140,20 +140,19 @@ class Connection extends ChangeNotifier implements IConnection {
         .withAutomaticReconnect()
         .build();
 
-    _connection.onreconnected((connectionId) {
+    _connection!.onreconnected((connectionId) {
       print("Reconnected");
       _refreshConnectionState();
     });
 
-    _connection.onclose((error) {
+    _connection!.onclose((error) {
       print("Connection Closed");
       _refreshConnectionState();
     });
   }
 
   void _refreshConnectionState() {
-    final isConnected =
-        _connection?.state == HubConnectionState.connected ?? false;
+    final isConnected = _connection?.state == HubConnectionState.connected;
 
     _isConnected.add(isConnected);
     notifyListeners();

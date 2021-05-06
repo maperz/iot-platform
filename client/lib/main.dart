@@ -6,25 +6,20 @@ import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-Future<Connection> createAndStartConnection() async {
-  AddressResolver resolver = new AddressResolver();
-  await resolver.init();
-
-  IConnection connection = new Connection(resolver);
-  connection.start();
-  return connection;
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  IConnection connection = await createAndStartConnection();
+  AddressResolver resolver = new AddressResolver();
+  await resolver.init();
+  IConnection connection = new Connection(resolver);
+  connection.start();
+
   IDeviceListService deviceService = new DeviceListService(connection);
   var deviceListModel = new DeviceListModel(deviceService);
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<Connection>(
-      create: (context) => connection,
+      create: (context) => connection as Connection,
     ),
     ChangeNotifierProvider<DeviceListModel>(
       create: (context) => deviceListModel,
@@ -46,8 +41,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -57,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text(widget.title),
+      title: Text(widget.title!),
     );
 
     final bottomBar = Container(
@@ -88,15 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
         return StreamBuilder<bool>(
           stream: connection.getConnectedState(),
           builder: (context, connected) {
-            if (connected.hasData && connected.data) {
+            if (connected.hasData && connected.data!) {
               return DeviceListWidget();
             }
 
             return StreamBuilder(
                 stream: connection.getConnectionAddress(),
                 builder: (context, address) {
-                  return ConnectingPlaceholder(
-                      address.hasData ? address.data : null);
+                  return ConnectingPlaceholder(address.data as String?);
                 });
           },
         );
@@ -107,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class ConnectingPlaceholder extends StatelessWidget {
-  final String address;
+  final String? address;
   ConnectingPlaceholder(this.address);
 
   @override

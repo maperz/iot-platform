@@ -27,7 +27,7 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
 class DeviceListTile extends StatefulWidget {
   const DeviceListTile(
     this._deviceState, {
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   final DeviceState _deviceState;
@@ -45,13 +45,13 @@ class _DeviceListTileState extends State<DeviceListTile> {
               child: ListTile(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                enabled: widget._deviceState.connected,
+                enabled: widget._deviceState.connected!,
                 leading: Icon(
                   Icons.sensor_window_rounded,
                   size: 48,
                 ),
                 trailing: InkWell(
-                  onTap: widget._deviceState.connected
+                  onTap: widget._deviceState.connected!
                       ? () {
                           Navigator.push(
                               context,
@@ -78,7 +78,7 @@ class _DeviceListTileState extends State<DeviceListTile> {
                         divisions: 40,
                         label: (_currentSliderValue * 100).round().toString() +
                             " Percent",
-                        onChanged: widget._deviceState.connected
+                        onChanged: widget._deviceState.connected!
                             ? (double value) {
                                 setState(() {
                                   _currentSliderValue = value;

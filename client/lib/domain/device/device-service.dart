@@ -23,7 +23,7 @@ class DeviceListService implements IDeviceListService {
 
   void _onConnected() {
     _connection.listenOn(Endpoints.DeviceStateChangedEndpoint, (updateList) {
-      var deviceList = updateList.map((json) => DeviceState.fromJson(json));
+      var deviceList = updateList!.map((json) => DeviceState.fromJson(json));
       _devices.add(deviceList);
     });
 

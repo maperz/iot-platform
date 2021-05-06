@@ -6,7 +6,7 @@ import 'package:multicast_dns/multicast_dns.dart';
 class LocalHubDiscovery implements HubDiscovery {
   static const String service = '_iothub._tcp';
 
-  HubAddress _cachedAddress;
+  HubAddress? _cachedAddress;
 
   @override
   Stream<HubAddress> getHubAddresses() async* {
@@ -25,11 +25,11 @@ class LocalHubDiscovery implements HubDiscovery {
     _cachedAddress = address;
   }
 
-  Future<HubAddress> _loadCachedAddress() async {
+  Future<HubAddress?> _loadCachedAddress() async {
     return _cachedAddress;
   }
 
-  Future<HubAddress> _discoverLocalAddressViaMDNS() async {
+  Future<HubAddress?> _discoverLocalAddressViaMDNS() async {
     print("Running mDNS discovery");
     final MDnsClient client = MDnsClient();
 

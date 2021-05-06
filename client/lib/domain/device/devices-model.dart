@@ -5,7 +5,7 @@ import 'device-state.dart';
 
 class DeviceListModel extends ChangeNotifier {
   final IDeviceListService _deviceListService;
-  final Map<String, DeviceState> _states = new Map();
+  final Map<String?, DeviceState> _states = new Map();
 
   DeviceListModel(this._deviceListService) {
     _deviceListService.getDeviceList().listen(_updateStates);

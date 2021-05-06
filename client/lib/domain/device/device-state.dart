@@ -1,18 +1,18 @@
 enum DeviceType { Unknown, Curtain }
 
 class DeviceInfo {
-  final String name;
+  final String? name;
   final String version;
   final DeviceType type;
   DeviceInfo(this.name, this.type, this.version);
 }
 
 class DeviceState {
-  final String deviceId;
+  final String? deviceId;
   final DeviceInfo info;
 
-  final bool connected;
-  final double speed;
+  final bool? connected;
+  final double? speed;
 
   DeviceState(this.deviceId, this.connected, this.speed, this.info);
 
