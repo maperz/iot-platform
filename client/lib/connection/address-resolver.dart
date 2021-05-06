@@ -1,6 +1,10 @@
-import 'package:curtains_client/discovery/hub-address.dart';
+import 'dart:async';
+
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 abstract class IAddressResolver {
   Stream<String> getHubUrl();
@@ -10,13 +14,43 @@ class AddressResolver implements IAddressResolver {
   final localDiscovery = new LocalHubDiscovery();
   final remoteDiscovery = new RemoteHubDiscovery();
 
-  @override
-  Stream<String> getHubUrl() {
-    return _getHubAddress().map((address) => address.toString());
+  StreamSubscription _subscription;
+  BehaviorSubject<ConnectivityResult> _connectivity;
+  Stream<String> _hubUrlStream;
+
+  Future init() async {
+    if (_connectivity == null) {
+      _connectivity =
+          BehaviorSubject.seeded(await Connectivity().checkConnectivity());
+      Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+        _connectivity.add(result);
+      });
+
+      _hubUrlStream = _connectivity.switchMap((result) {
+        print("Connectivity changed to: " + result.toString());
+        switch (result) {
+          case ConnectivityResult.wifi:
+            return localDiscovery
+                .getHubAddresses()
+                .map((address) => address.toString());
+          case ConnectivityResult.mobile:
+            return remoteDiscovery
+                .getHubAddresses()
+                .map((address) => address.toString());
+          default:
+            return Stream.value(null);
+        }
+      });
+    }
   }
 
-  Stream<HubAddress> _getHubAddress() async* {
-    yield* localDiscovery.getHubAddresses();
-    // yield* remoteDiscovery.getHubAddresses();
+  @override
+  Stream<String> getHubUrl() {
+    return _hubUrlStream;
+  }
+
+  dispose() {
+    _subscription.cancel();
+    _connectivity?.close();
   }
 }

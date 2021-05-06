@@ -1,9 +1,12 @@
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/hub-discovery.dart';
-import 'package:curtains_client/discovery/patched-mdns-client.dart';
+import 'package:multicast_dns/multicast_dns.dart';
+// import 'package:curtains_client/discovery/patched-mdns-client.dart';
 
 class LocalHubDiscovery implements HubDiscovery {
   static const String service = '_iothub._tcp';
+
+  HubAddress _cachedAddress;
 
   @override
   Stream<HubAddress> getHubAddresses() async* {
@@ -19,13 +22,11 @@ class LocalHubDiscovery implements HubDiscovery {
   }
 
   Future _saveAddressToCache(HubAddress address) async {
-    // TODO: Cache address
-    return null;
+    _cachedAddress = address;
   }
 
   Future<HubAddress> _loadCachedAddress() async {
-    // TODO: Return cached address
-    return null;
+    return _cachedAddress;
   }
 
   Future<HubAddress> _discoverLocalAddressViaMDNS() async {

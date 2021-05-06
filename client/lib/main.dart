@@ -7,13 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 Future<Connection> createAndStartConnection() async {
-  IAddressResolver resolver = new AddressResolver();
+  AddressResolver resolver = new AddressResolver();
+  await resolver.init();
+
   IConnection connection = new Connection(resolver);
   connection.start();
   return connection;
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   IConnection connection = await createAndStartConnection();
   IDeviceListService deviceService = new DeviceListService(connection);
   var deviceListModel = new DeviceListModel(deviceService);

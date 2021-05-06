@@ -101,11 +101,16 @@ class Connection extends ChangeNotifier implements IConnection {
   Future _handleConnection(bool connect, String address) async {
     final isConnected = _isConnected.value;
 
-    if (!connect && isConnected) {
+    if ((!connect || address == null) && isConnected) {
       print("Stopping connection");
       await _connection.stop();
       _connection = null;
       _refreshConnectionState();
+      return;
+    }
+
+    if (!connect || address == null) {
+      return;
     }
 
     final hubUrl = address + '/hub';
@@ -117,7 +122,7 @@ class Connection extends ChangeNotifier implements IConnection {
       _refreshConnectionState();
     }
 
-    if (connect && isConnected && _connection.baseUrl != hubUrl) {
+    if (connect && _connection.baseUrl != hubUrl) {
       _createConnection(address);
       print("Reconnecting to different url");
       await _connection.stop();
