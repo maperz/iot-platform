@@ -3,11 +3,14 @@ PODS:
     - Flutter
     - Reachability
   - Flutter (1.0.0)
+  - flutter_nsd (0.0.1):
+    - Flutter
   - Reachability (3.2)
 
 DEPENDENCIES:
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
   - Flutter (from `Flutter`)
+  - flutter_nsd (from `.symlinks/plugins/flutter_nsd/ios`)
 
 SPEC REPOS:
   trunk:
@@ -18,10 +21,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/connectivity/ios"
   Flutter:
     :path: Flutter
+  flutter_nsd:
+    :path: ".symlinks/plugins/flutter_nsd/ios"
 
 SPEC CHECKSUMS:
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_nsd: e945908005778ba9e7466b7d4dc9ea1c758022d4
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c

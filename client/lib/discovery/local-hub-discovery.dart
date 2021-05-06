@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/hub-discovery.dart';
-import 'package:multicast_dns/multicast_dns.dart';
-// import 'package:curtains_client/discovery/patched-mdns-client.dart';
+import 'package:curtains_client/discovery/mdns/dart-mdns-client.dart';
+import 'package:curtains_client/discovery/mdns/mdns-client.dart';
+import 'package:curtains_client/discovery/mdns/native-mdns-client.dart';
 
 class LocalHubDiscovery implements HubDiscovery {
-  static const String service = '_iothub._tcp';
+  static const String SERVICE_NAME = '_iothub._tcp';
 
   HubAddress? _cachedAddress;
 
@@ -30,35 +33,16 @@ class LocalHubDiscovery implements HubDiscovery {
   }
 
   Future<HubAddress?> _discoverLocalAddressViaMDNS() async {
-    print("Running mDNS discovery");
-    final MDnsClient client = MDnsClient();
+    IMDNSClient mdnsClient = (Platform.isIOS || Platform.isAndroid)
+        ? NativeMDNSClient()
+        : DartMDNSClient();
 
-    await client.start();
-    try {
-      await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
-          ResourceRecordQuery.serverPointer(service))) {
-        await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
-            ResourceRecordQuery.service(ptr.domainName))) {
-          String name = srv.target;
-          int port = srv.port;
-          await for (IPAddressResourceRecord record
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv4(name))) {
-            return new HubAddress("http", record.address.host, port);
-          }
+    var result = await mdnsClient.discoverService(SERVICE_NAME);
 
-          await for (IPAddressResourceRecord record
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv6(name))) {
-            return new HubAddress("http", record.address.host, port);
-          }
-        }
-      }
-    } finally {
-      print("Quitting discovery");
-      client.stop();
+    if (result == null) {
+      return null;
     }
 
-    return null;
+    return HubAddress("http", result.address, result.port);
   }
 }
