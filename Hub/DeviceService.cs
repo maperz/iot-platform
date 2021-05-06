@@ -21,7 +21,7 @@ namespace Hub
             _logger = logger;
         }
         
-        public Task DeviceConnected(string deviceId)
+        public async Task DeviceConnected(string deviceId)
         {
             _lock.EnterWriteLock();
             try
@@ -35,84 +35,74 @@ namespace Hub
                 }
 
                 deviceState.Connected = true;
-                BroadcastDeviceChange(deviceState);
+                await BroadcastDeviceChange(deviceState);
             }
             finally
             {
                 _lock.ExitWriteLock();
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task DeviceDisconnected(string deviceId)
+        public async Task DeviceDisconnected(string deviceId)
         {
             _lock.EnterWriteLock();
             try
             {
                 if (_deviceStates.TryGetValue(deviceId, out var deviceState))
                 {
-                    _logger.LogInformation("Client disconnected: {String}", deviceId);
+                    _logger.LogInformation("Client disconnected: {DeviceId}", deviceId);
 
                     deviceState.Connected = false;
-                    BroadcastDeviceChange(deviceState);
+                    await BroadcastDeviceChange(deviceState);
                 }
             }
             finally
             {
                 _lock.ExitWriteLock();
             }
-         
-            return Task.CompletedTask;
         }
 
-        public Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo)
+        public async Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo)
         {
             _lock.EnterWriteLock();
             try
             {
                 if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
                 {
-                    _logger.LogWarning("Trying to set state of unknown device not found: {String}", deviceId);
-                    return Task.CompletedTask;
-                    ;
+                    _logger.LogWarning("Trying to set state of unknown device not found: {DeviceId}", deviceId);
+                    return;
                 }
 
                 deviceState.Info = deviceInfo;
-                BroadcastDeviceChange(deviceState);
+                await BroadcastDeviceChange(deviceState);
             }
             finally
             {
                 _lock.ExitWriteLock();
             }
-         
-            return Task.CompletedTask;
         }
 
-        public Task SetStateOfDevice(string deviceId, double state)
+        public async Task SetStateOfDevice(string deviceId, double state)
         {
             _lock.EnterWriteLock();
             try
             {
                 if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
                 {
-                    _logger.LogWarning("Trying to set state of unknown device not found: {String}", deviceId);
-                    return Task.CompletedTask;
-                    ;
+                    _logger.LogWarning("Trying to set state of unknown device not found: {DeviceId}", deviceId);
+                    return;
                 } 
                 
                 if (deviceState.Speed == null || Math.Abs((double) (deviceState.Speed - state)) > double.Epsilon)
                 {
                     deviceState.Speed = state;
-                    BroadcastDeviceChange(deviceState);
+                    await BroadcastDeviceChange(deviceState);
                 }
             }
             finally
             {
                 _lock.ExitWriteLock();
             }
-         
-            return Task.CompletedTask;
         }
 
         public Task<IEnumerable<DeviceState>> GetDeviceStates()
@@ -134,6 +124,7 @@ namespace Hub
             {
                 return Task.CompletedTask;
             }
+            
             return _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
         }
     }

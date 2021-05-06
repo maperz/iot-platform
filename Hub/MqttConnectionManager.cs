@@ -65,7 +65,7 @@ namespace Hub
                 
             if (topic.EndsWith("/device"))
             {
-                _logger.LogInformation("{String}: Message: '{String}'", deviceId, message);
+                _logger.LogInformation("{DeviceId}: Message: '{Message}'", deviceId, message);
 
                 var deviceInfo = JsonConvert.DeserializeObject<DeviceInfo>(message);
                 await _deviceService.SetDeviceInfo(deviceId, deviceInfo);

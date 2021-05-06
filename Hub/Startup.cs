@@ -2,6 +2,7 @@ using Hub.Server;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.AspNetCore.Extensions;
@@ -11,6 +12,13 @@ namespace Hub
 {
     public class Startup
     {
+        private IConfiguration Configuration { get; }
+        
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services
@@ -23,7 +31,12 @@ namespace Hub
             services.AddSignalR();
 
             services.AddMediatR(typeof(Startup));
-
+            
+            services.Configure<AppSettings>(Configuration);
+            var appSettings = new AppSettings();
+            Configuration.Bind(appSettings);
+            services.AddSingleton(appSettings);
+            
             services.AddHostedService<ServerConnection>();
             services.AddHostedService<MqttConnectionManager>();
             services.AddHostedService<LocalServiceDiscovery>();
@@ -52,7 +65,7 @@ namespace Hub
                 endpoints.MapHub<GatewayHub>("/hub");
             });
 
-            app.UseMqttServer(server => { });
+            app.UseMqttServer(_ => { });
         }
     }
 }

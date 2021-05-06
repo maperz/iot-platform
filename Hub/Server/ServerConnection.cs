@@ -13,18 +13,19 @@ namespace Hub.Server
 {
     public class ServerConnection : BackgroundService, IServerConnection
     {
-        private readonly string ServerHubAddress = "http://localhost:4000/hub";
         private readonly HubConnection _hubConnection;
         private readonly ILogger<ServerConnection> _logger;
         private readonly IMediator _mediator;
 
-        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster)
+        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster, AppSettings appSettings)
         {
             _logger = logger;
             _mediator = mediator;
+
+            var serverAddress = appSettings.ServerAddress;
             
-            _logger.LogInformation("Creating server hub connection with address at {String}", ServerHubAddress);
-            _hubConnection = new HubConnectionBuilder().WithUrl(ServerHubAddress)
+            _logger.LogInformation("Creating server hub connection with address at {String}", serverAddress);
+            _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress)
                 .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(1) })
                 .Build();
 

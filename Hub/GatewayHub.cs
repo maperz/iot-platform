@@ -11,7 +11,7 @@ namespace Hub
         private readonly IMediator _mediator;
         private readonly IDeviceService _deviceService;
 
-        public GatewayHub(IMediator mediator, IDeviceService deviceService, IApiBroadcaster broadcaster)
+        public GatewayHub(IMediator mediator, IDeviceService deviceService)
         {
             _mediator = mediator;
             _deviceService = deviceService;
