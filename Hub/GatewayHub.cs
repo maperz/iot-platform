@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hub.Domain;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace Hub
@@ -10,25 +13,33 @@ namespace Hub
     {
         private readonly IMediator _mediator;
         private readonly IDeviceService _deviceService;
-
-        public GatewayHub(IMediator mediator, IDeviceService deviceService)
+        private readonly ILogger<GatewayHub> _logger;
+        
+        public GatewayHub(IMediator mediator, IDeviceService deviceService, ILogger<GatewayHub> logger)
         {
             _mediator = mediator;
             _deviceService = deviceService;
+            _logger = logger;
         }
-        
-        public override async Task OnConnectedAsync()
+
+        public override Task OnConnectedAsync()
         {
-            var currentStates = await _deviceService.GetDeviceStates();
-            await Clients.Caller.SendAsync(nameof(IApiListener.DeviceStateChanged), currentStates);
+            _logger.LogDebug("SignalR Client connected {ClientId}", Context.ConnectionId);
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            _logger.LogDebug("SignalR Client disconnected {ClientId}", Context.ConnectionId);
+            return base.OnDisconnectedAsync(exception);
         }
         
         // INPUT
 
-        public async Task GetDeviceList()
+        public async Task<IEnumerable<DeviceState>> GetDeviceList()
         {
             var currentStates = await _deviceService.GetDeviceStates();
-            await Clients.Caller.SendAsync(nameof(IApiListener.DeviceStateChanged), currentStates);
+            return currentStates;
         }
 
         public Task SetSpeed(string deviceId, double speed)

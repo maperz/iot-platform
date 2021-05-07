@@ -22,7 +22,9 @@ abstract class IConnection implements ApiMethods {
 class ConnectionState {
   final bool shouldConnect;
   final String? address;
-  ConnectionState(this.shouldConnect, this.address);
+  final Exception? connectionError;
+
+  ConnectionState(this.shouldConnect, this.address, this.connectionError);
 }
 
 class Connection extends ChangeNotifier implements IConnection {
@@ -30,6 +32,8 @@ class Connection extends ChangeNotifier implements IConnection {
 
   BehaviorSubject<bool> _isConnected = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> _startState = BehaviorSubject.seeded(false);
+  BehaviorSubject<Exception?> _connectionError = BehaviorSubject.seeded(null);
+
   BehaviorSubject<String?> _addressStream = new BehaviorSubject();
 
   Connection(AddressResolver addressResolver) {
@@ -37,14 +41,15 @@ class Connection extends ChangeNotifier implements IConnection {
       _addressStream.add(address);
     });
 
-    var connectionStream = CombineLatestStream.combine2(
+    var connectionStream = CombineLatestStream.combine3(
         _startState.distinct(),
         _addressStream.distinct(),
-        (bool connect, String? address) =>
-            new ConnectionState(connect, address));
+        _connectionError.distinct(),
+        (bool connect, String? address, Exception? error) =>
+            new ConnectionState(connect, address, error));
 
-    connectionStream.listen(
-        (state) async => _handleConnection(state.shouldConnect, state.address));
+    connectionStream.listen((state) async => _handleConnection(
+        state.shouldConnect, state.address, state.connectionError));
   }
   @override
   void start() {
@@ -84,21 +89,23 @@ class Connection extends ChangeNotifier implements IConnection {
 
   @override
   Future setSpeed(String? deviceId, double speed) async {
-    await _connection?.send(methodName: "SetSpeed", args: [deviceId, speed]);
+    await _connection?.invoke("SetSpeed", args: [deviceId, speed]);
   }
 
   @override
   Future setDeviceName(String? deviceId, String name) async {
-    await _connection
-        ?.send(methodName: "ChangeDeviceName", args: [deviceId, name]);
+    await _connection?.invoke("ChangeDeviceName", args: [deviceId, name]);
   }
 
   @override
-  Future getDeviceList() async {
-    await _connection?.send(methodName: "GetDeviceList", args: []);
+  Future<Iterable<dynamic>> getDeviceList() async {
+    var deviceList =
+        (await _connection?.invoke("GetDeviceList")) as Iterable<dynamic>;
+    return deviceList;
   }
 
-  Future _handleConnection(bool connect, String? address) async {
+  Future _handleConnection(
+      bool connect, String? address, Exception? connectionError) async {
     final isConnected = _isConnected.value;
 
     if ((!connect || address == null) && isConnected!) {
@@ -125,11 +132,8 @@ class Connection extends ChangeNotifier implements IConnection {
     if (connect && _connection!.baseUrl != hubUrl) {
       _createConnection(address);
       print("Reconnecting to different url");
-      await _connection!.stop();
-      _connection = null;
-      _refreshConnectionState();
-      await _connection?.start();
-      _refreshConnectionState();
+      stop();
+      start();
     }
   }
 
@@ -148,6 +152,7 @@ class Connection extends ChangeNotifier implements IConnection {
     _connection!.onclose((error) {
       print("Connection Closed");
       _refreshConnectionState();
+      _connectionError.add(error);
     });
   }
 

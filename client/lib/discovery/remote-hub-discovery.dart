@@ -2,9 +2,9 @@ import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/hub-discovery.dart';
 
 class RemoteHubDiscovery implements HubDiscovery {
-  static const String PUBLIC_SERVER_PROTOCOL = "http";
-  static const String PUBLIC_SERVER_HOST = "localhost";
-  static const int PUBLIC_SERVER_PORT = 4000;
+  static const String PUBLIC_SERVER_PROTOCOL = "https";
+  static const String PUBLIC_SERVER_HOST = "iot.perz.cloud";
+  static const int? PUBLIC_SERVER_PORT = null;
 
   @override
   Stream<HubAddress> getHubAddresses() async* {

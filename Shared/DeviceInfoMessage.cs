@@ -1,3 +1,5 @@
+#nullable disable
+
 namespace Shared
 {
     public class DeviceInfo

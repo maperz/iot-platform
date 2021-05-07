@@ -3,5 +3,5 @@ abstract class ApiMethods {
 
   Future setDeviceName(String deviceId, String name);
 
-  Future getDeviceList();
+  Future<Iterable<dynamic>> getDeviceList();
 }

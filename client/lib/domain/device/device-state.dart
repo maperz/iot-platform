@@ -1,4 +1,4 @@
-enum DeviceType { Unknown, Curtain }
+enum DeviceType { Unknown, Curtain, Lamp, Switch }
 
 class DeviceInfo {
   final String? name;
@@ -17,10 +17,6 @@ class DeviceState {
   DeviceState(this.deviceId, this.connected, this.speed, this.info);
 
   factory DeviceState.fromJson(Map<String, dynamic> json) {
-    if (json == null) {
-      throw FormatException("Null JSON provided to DeviceState");
-    }
-
     var speedJson = json['speed'];
     var speed = speedJson is int ? (speedJson).toDouble() : speedJson;
 
@@ -37,21 +33,28 @@ class DeviceState {
   }
 
   static DeviceType _parseType(String type) {
-    type = type.toLowerCase().trim();
-
-    if (type == 'curtain') {
-      return DeviceType.Curtain;
+    switch (type.toLowerCase().trim()) {
+      case "curtain":
+        return DeviceType.Curtain;
+      case "lamp":
+        return DeviceType.Lamp;
+      case "switch":
+        return DeviceType.Switch;
+      default:
+        return DeviceType.Unknown;
     }
-
-    return DeviceType.Unknown;
   }
 
   String _getTypeName(DeviceType type) {
     switch (type) {
       case DeviceType.Curtain:
         return "Curtain";
+      case DeviceType.Lamp:
+        return "Lamp";
+      case DeviceType.Switch:
+        return "Switch";
       default:
-        return 'Device';
+        return 'Unknown';
     }
   }
 }

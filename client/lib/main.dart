@@ -56,26 +56,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     final bottomBar = Container(
-        height: 50,
         child: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.analytics),
-                onPressed: () {},
-              ),
-            ],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () {},
           ),
-        ));
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.analytics),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    ));
 
     return Scaffold(
       appBar: appBar,
@@ -113,7 +112,7 @@ class ConnectingPlaceholder extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(bottom: 24),
               child: CircularProgressIndicator(
                 strokeWidth: 6,
               ),
@@ -123,9 +122,12 @@ class ConnectingPlaceholder extends StatelessWidget {
               style: Theme.of(context).textTheme.headline5,
             ),
             if (address != null)
-              Text(
-                'Connecting to Hub at $address',
-                style: Theme.of(context).textTheme.caption,
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text(
+                  'Connecting to Hub at $address',
+                  style: Theme.of(context).textTheme.caption,
+                ),
               )
           ],
         ),

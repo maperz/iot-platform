@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,20 @@ namespace Server
         {
             _logger = logger;
         }
+        
+        public override Task OnConnectedAsync()
+        {
+            _logger.LogDebug("SignalR Client connected {ClientId}", Context.ConnectionId);
+            return base.OnConnectedAsync();
+        }
 
-        public Task GetDeviceList()
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            _logger.LogDebug("SignalR Client disconnected {ClientId}", Context.ConnectionId);
+            return base.OnDisconnectedAsync(exception);
+        }
+        
+        public Task<IEnumerable<DeviceState>> GetDeviceList()
         {
             throw new NotImplementedException();
         }

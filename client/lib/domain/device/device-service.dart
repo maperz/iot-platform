@@ -21,13 +21,19 @@ class DeviceListService implements IDeviceListService {
     });
   }
 
-  void _onConnected() {
+  void _onConnected() async {
     _connection.listenOn(Endpoints.DeviceStateChangedEndpoint, (updateList) {
-      var deviceList = updateList!.map((json) => DeviceState.fromJson(json));
-      _devices.add(deviceList);
+      if (updateList != null) {
+        Iterable<DeviceState> updatedDevices =
+            updateList.map((json) => DeviceState.fromJson(json));
+        _devices.add(updatedDevices);
+      }
     });
 
-    _connection.getDeviceList();
+    var rawResponse = await _connection.getDeviceList();
+    var deviceList = rawResponse.map((json) => DeviceState.fromJson(json));
+
+    _devices.add(deviceList);
   }
 
   @override

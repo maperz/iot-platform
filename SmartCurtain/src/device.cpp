@@ -2,25 +2,28 @@
 #include "storage.h"
 #include "logger.h"
 
+// Configuration
+const String device_type = "curtain";
+const String device_version = "0.0.1";
+
 const size_t STORAGE_NAME_ADDRESS = 0;
 const size_t STORAGE_MAX_NAME_LEN = 50;
 
 String Device::getType()
 {
-    return "curtain";
+    return device_type;
 }
 
 String Device::getVersion()
 {
-    return "0.0.1";
+    return device_version;
 }
-
 
 String Device::getName()
 {
     char nameBuffer[STORAGE_MAX_NAME_LEN];
     Storage::read(STORAGE_NAME_ADDRESS, nameBuffer, STORAGE_MAX_NAME_LEN);
-    return String (nameBuffer);
+    return String(nameBuffer);
 }
 
 void Device::setName(const String &name)

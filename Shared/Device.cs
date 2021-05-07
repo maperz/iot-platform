@@ -1,4 +1,5 @@
 using System;
+#nullable disable
 
 namespace Shared
 {
@@ -10,12 +11,13 @@ namespace Shared
 
         public Device(string id)
         {
-            this.Id = id;
+            Id = id;
         }
-
+        
+#nullable enable
         public bool Equals(Device? other)
         {
-            return other != null && this.Id.Equals(other.Id);
+            return other != null && Id.Equals(other.Id);
         }
 
         public override int GetHashCode()
