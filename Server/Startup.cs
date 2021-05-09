@@ -10,6 +10,8 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+
+            services.AddSingleton<IGatewayConnectionManager, GatewayConnectionManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.RequestReply;
+using GetDeviceListRequest = Shared.RequestReply.GetDeviceListRequest;
 
 namespace Hub.Server
 {
@@ -37,6 +39,22 @@ namespace Hub.Server
 
         private void RegisterListeners()
         {
+            _hubConnection.On<RawMessage>(
+                "request",
+                (msg) =>
+                {
+                    if (msg?.Payload == null)
+                    {
+                        return;
+                    }
+                    
+                    if (msg.Payload.GetType() == typeof(GetDeviceListRequest))
+                    {
+                        var deviceList = _mediator.Send(new GetDeviceListRequest());
+                        _hubConnection.SendAsync(nameof(IServerMethods.Reply), new RawMessage() { Id = msg.Id, Payload = deviceList });
+                    }
+                });
+            
             _hubConnection.On<double>(
                 nameof(IApiMethods.SetSpeed), 
                 (speed) => _mediator.Send(new SetSpeedRequest() { Speed = speed }));
@@ -60,6 +78,9 @@ namespace Hub.Server
                 {
                     await _hubConnection.StartAsync(cancellationToken);
                     _logger.LogInformation("Connected to Server");
+                    
+                    await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
+                    
                     return true;
                 }
                 catch when (cancellationToken.IsCancellationRequested)

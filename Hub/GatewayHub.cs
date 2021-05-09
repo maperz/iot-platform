@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hub.Domain;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Shared;
 
@@ -12,13 +11,11 @@ namespace Hub
     public class GatewayHub : Microsoft.AspNetCore.SignalR.Hub, IApiMethods
     {
         private readonly IMediator _mediator;
-        private readonly IDeviceService _deviceService;
         private readonly ILogger<GatewayHub> _logger;
         
-        public GatewayHub(IMediator mediator, IDeviceService deviceService, ILogger<GatewayHub> logger)
+        public GatewayHub(IMediator mediator, ILogger<GatewayHub> logger)
         {
             _mediator = mediator;
-            _deviceService = deviceService;
             _logger = logger;
         }
 
@@ -38,13 +35,13 @@ namespace Hub
 
         public async Task<IEnumerable<DeviceState>> GetDeviceList()
         {
-            var currentStates = await _deviceService.GetDeviceStates();
-            return currentStates;
+            var deviceList = await _mediator.Send(new GetDeviceListRequest());
+
+            return deviceList;
         }
 
         public Task SetSpeed(string deviceId, double speed)
         {
-            // TODO: Get actual device id
             return _mediator.Send(new SetSpeedRequest() { DeviceId = deviceId, Speed = speed });
         }
 

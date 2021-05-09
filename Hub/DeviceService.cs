@@ -10,7 +10,7 @@ namespace Hub
 {
     public class DeviceService : IDeviceService
     {
-        private readonly ReaderWriterLockSlim _lock = new();
+        private readonly SemaphoreSlim _lock = new (1);
         private readonly Dictionary<string, DeviceState> _deviceStates = new();
         private readonly IApiBroadcaster _broadcaster;
         private readonly ILogger<DeviceService> _logger;
@@ -23,7 +23,7 @@ namespace Hub
         
         public async Task DeviceConnected(string deviceId)
         {
-            _lock.EnterWriteLock();
+            await _lock.WaitAsync();
             try
             {
                 _logger.LogInformation("Client connected: {String}", deviceId);
@@ -39,13 +39,13 @@ namespace Hub
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _lock.Release();
             }
         }
 
         public async Task DeviceDisconnected(string deviceId)
         {
-            _lock.EnterWriteLock();
+            await _lock.WaitAsync();
             try
             {
                 if (_deviceStates.TryGetValue(deviceId, out var deviceState))
@@ -58,13 +58,13 @@ namespace Hub
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _lock.Release();
             }
         }
 
         public async Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo)
         {
-            _lock.EnterWriteLock();
+            await _lock.WaitAsync();
             try
             {
                 if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
@@ -78,13 +78,13 @@ namespace Hub
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _lock.Release();
             }
         }
 
         public async Task SetStateOfDevice(string deviceId, double state)
         {
-            _lock.EnterWriteLock();
+            await _lock.WaitAsync();
             try
             {
                 if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
@@ -101,31 +101,26 @@ namespace Hub
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _lock.Release();
             }
         }
 
-        public Task<IEnumerable<DeviceState>> GetDeviceStates()
+        public async Task<IEnumerable<DeviceState>> GetDeviceStates()
         {
-            _lock.EnterReadLock();
+            await _lock.WaitAsync();
             try
             {
-                return Task.FromResult(_deviceStates.Values.Where(x => x.Info != null).ToList() as IEnumerable<DeviceState>);
+                return _deviceStates.Values.Where(x => x.Info != null);
             }
             finally
             {
-                _lock.ExitReadLock();
+                _lock.Release();
             }
         }
 
         private Task BroadcastDeviceChange(DeviceState changedDevice)
         {
-            if (changedDevice.Info == null)
-            {
-                return Task.CompletedTask;
-            }
-            
-            return _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
+            return changedDevice.Info == null ? Task.CompletedTask : _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
         }
     }
 }
