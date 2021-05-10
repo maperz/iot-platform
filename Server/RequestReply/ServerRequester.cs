@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Shared.RequestReply;
@@ -18,43 +21,67 @@ namespace Server.RequestReply
         private readonly string _connectionId;
         private readonly IHubContext<ServerHub> _context;
         private readonly Dictionary<Guid, OpenRequest> _openRequests = new();
-
+        private readonly SemaphoreSlim _lock = new(1);
         public ServerRequester(string connectionId, IHubContext<ServerHub> context)
         {
             _connectionId = connectionId;
             _context = context;
         }
         
-            
-        public async Task<TResponse> Request<TRequest, TResponse>(ServerRequest<TRequest, TResponse> request)
+        public async  Task<TResponse> Request<TResponse>(ServerRequest<TResponse> request)
         {
+            var requestGuid = Guid.NewGuid();
 
-            var requestGuid = new Guid();
-            var message = new RawMessage() { Id = requestGuid };
+            var payload = JsonSerializer.Serialize(request);
+            var message = new RawMessage { Id = requestGuid, Payload = payload, PayloadType = request.GetType().Name };
             TaskCompletionSource<dynamic> completionSource = new();
-            _openRequests[requestGuid] = new OpenRequest() { ResponseType = typeof(TResponse), CompletionSource = completionSource};
+
+            await _lock.WaitAsync();
+            try
+            {
+                _openRequests[requestGuid] = new OpenRequest()
+                    {ResponseType = typeof(TResponse), CompletionSource = completionSource};
+            }
+            finally
+            {
+                _lock.Release();
+            }
             
             await _context.Clients.Client(_connectionId).SendAsync("request", message);
             
             return await completionSource.Task;
         }
 
-        public void OnRequestReply(Guid requestId, object message)
+        public void OnRequestReply(RawMessage rawMessage)
         {
-            if (!_openRequests.ContainsKey(requestId))
-            {
-                return;
-            }
+            var requestId = rawMessage.Id;
             
-            var openRequest = _openRequests[requestId];
+            _lock.Wait();
+            try
+            {
+                if (!_openRequests.ContainsKey(requestId))
+                {
+                    return;
+                }
 
-            if (message.GetType() != openRequest.ResponseType)
-            {
-                return;
+                var openRequest = _openRequests[requestId];
+
+                if (!string.IsNullOrEmpty(rawMessage.Payload))
+                {
+                    var parsedObject = JsonSerializer.Deserialize(rawMessage.Payload, openRequest.ResponseType, null);
+                    openRequest.CompletionSource.SetResult(parsedObject);
+                }
+                else
+                {
+                    openRequest.CompletionSource.SetResult(null);
+                }
+                
+                _openRequests.Remove(requestId);
             }
-            
-            openRequest.CompletionSource.SetResult(message);
-            _openRequests.Remove(requestId);
+            finally
+            {
+                _lock.Release();
+            }
         }
     }
 }

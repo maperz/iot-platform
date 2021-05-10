@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Hub.Domain;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
 using Shared.RequestReply;
-using GetDeviceListRequest = Shared.RequestReply.GetDeviceListRequest;
 
 namespace Hub.Server
 {
@@ -41,27 +41,44 @@ namespace Hub.Server
         {
             _hubConnection.On<RawMessage>(
                 "request",
-                (msg) =>
+                async (msg) =>
                 {
-                    if (msg?.Payload == null)
+                    try
                     {
-                        return;
+                        _logger.LogInformation("Request received");
+                        if (msg.PayloadType == nameof(DeviceListRequest))
+                        {
+                            _logger.LogInformation("GetDeviceListRequest request received");
+                            var deviceList = await _mediator.Send(new GetDeviceListRequest());
+                            var payload = JsonSerializer.Serialize(deviceList);
+
+                            await _hubConnection.SendAsync(nameof(IServerMethods.Reply),
+                                new RawMessage()
+                                {
+                                    Id = msg.Id, Payload = payload, PayloadType = deviceList.GetType().Name
+                                });
+                        }
                     }
-                    
-                    if (msg.Payload.GetType() == typeof(GetDeviceListRequest))
+                    catch (Exception err)
                     {
-                        var deviceList = _mediator.Send(new GetDeviceListRequest());
-                        _hubConnection.SendAsync(nameof(IServerMethods.Reply), new RawMessage() { Id = msg.Id, Payload = deviceList });
+                        // ignored
+                        _logger.LogError("Request error occured {Error}", err);
                     }
                 });
             
-            _hubConnection.On<double>(
+            _hubConnection.On<string, double>(
                 nameof(IApiMethods.SetSpeed), 
-                (speed) => _mediator.Send(new SetSpeedRequest() { Speed = speed }));
-            
+                async (deviceId, speed) =>
+                {
+                    await _mediator.Send(new SetSpeedRequest() { DeviceId = deviceId, Speed = speed});
+                });
+
             _hubConnection.On<string, string>(
-                nameof(IApiMethods.ChangeDeviceName), 
-                (deviceId, name) => _mediator.Send(new SetNameRequest() { DeviceId = deviceId, Name = name}));
+                nameof(IApiMethods.ChangeDeviceName),
+                async (deviceId, name) =>
+                {
+                    await _mediator.Send(new SetNameRequest() {DeviceId = deviceId, Name = name});
+                });
         }
 
         public Task<bool> IsConnected()

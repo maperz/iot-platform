@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -24,8 +23,7 @@ namespace Server
         
         public async Task<IEnumerable<DeviceState>> GetDeviceList()
         {
-            var request = new ServerRequest<Empty, IEnumerable<DeviceState>> { RequestId = new Guid() };
-            
+            var request = new DeviceListRequest();
             return await _serverRequester.Request(request);
         }
 

@@ -13,8 +13,7 @@ namespace Server
         private readonly ILogger<ServerHub> _logger;
         private readonly IGatewayConnectionManager _connectionManager;
 
-        // For now this is the only gateway connection that exists
-        private const string SingleTestConnectionId = "SingleTestId";
+        private static string SingleTestConnectionId;
         
         public ServerHub(ILogger<ServerHub> logger, IGatewayConnectionManager connectionManager)
         {
@@ -24,17 +23,17 @@ namespace Server
         
         public override Task OnConnectedAsync()
         {
-            _logger.LogDebug("SignalR Client connected {ClientId}", Context.ConnectionId);
+            _logger.LogInformation("SignalR Client connected {ClientId}", Context.ConnectionId);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            _logger.LogDebug("SignalR Client disconnected {ClientId}", Context.ConnectionId);
+            _logger.LogInformation("SignalR Client disconnected {ClientId}", Context.ConnectionId);
             
             // TODO: Support multiple gateways
-            const string  connectionId = SingleTestConnectionId;
-            // const string connectionId = Context.ConnectionId;
+            
+            var connectionId = Context.ConnectionId;
             _connectionManager.RemoveConnection(connectionId);
             
             return base.OnDisconnectedAsync(exception);
@@ -44,8 +43,9 @@ namespace Server
         public Task<IEnumerable<DeviceState>> GetDeviceList()
         {
             _logger.LogInformation("GetDeviceList called");
+            
             // TODO: Support multiple gateways
-            const string  connectionId = SingleTestConnectionId;
+            var  connectionId = SingleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             return connection?.GetDeviceList();
         }
@@ -53,9 +53,9 @@ namespace Server
         public Task SetSpeed(string deviceId, double speed)
         {
             _logger.LogInformation("SetSpeed called with [{Double}]", speed);
-            // TODO: Find correct client - for now send it to all connected
             
-            const string connectionId = SingleTestConnectionId;
+            // TODO: Support multiple gateways
+            var connectionId = SingleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             return connection?.SetSpeed(deviceId, speed);
         }
@@ -64,26 +64,31 @@ namespace Server
         {
             _logger.LogInformation("ChangeDeviceName called with [{DeviceId}, {Name}]", deviceId, name);
 
-            const string connectionId = SingleTestConnectionId;
+            var connectionId = SingleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             return connection?.ChangeDeviceName(deviceId, name);
         }
 
         public Task RegisterAsGateway()
         {
-            // TODO: Support multiple gateways
-            const string  connectionId = SingleTestConnectionId;
-            // const string connectionId = Context.ConnectionId;
+            _logger.LogInformation("Gateway registered with {ConnectionId}", Context.ConnectionId);
+
+            var connectionId = Context.ConnectionId;
             _connectionManager.AddConnection(connectionId);
+
+            SingleTestConnectionId = connectionId;
+            
             return Task.CompletedTask;
         }
 
         public Task Reply(RawMessage rawMessage)
         {
-            const string connectionId = SingleTestConnectionId;
+            _logger.LogInformation("Received Reply for type {Type}", rawMessage.PayloadType);
+
+            var connectionId = SingleTestConnectionId;
             // const string connectionId = Context.ConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
-            connection?.RequestSink.OnRequestReply(rawMessage.Id, rawMessage.Payload);
+            connection?.RequestSink.OnRequestReply(rawMessage);
             return Task.CompletedTask;
         }
     }

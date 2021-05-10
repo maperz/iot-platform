@@ -1,9 +1,10 @@
 using System;
+using Shared.RequestReply;
 
 namespace Server.RequestReply
 {
     public interface IServerRequesterSink
     {
-        void OnRequestReply(Guid requestId, object message);
+        public void OnRequestReply(RawMessage rawMessage);
     }
 }

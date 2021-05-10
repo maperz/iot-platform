@@ -1,6 +1,6 @@
 namespace Shared.RequestReply
 {
-    public class Empty
+    public class DeDeviceListREqueequest
     {
     }
 }

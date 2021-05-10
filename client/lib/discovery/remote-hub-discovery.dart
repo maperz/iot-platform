@@ -6,6 +6,10 @@ class RemoteHubDiscovery implements HubDiscovery {
   static const String PUBLIC_SERVER_HOST = "iot.perz.cloud";
   static const int? PUBLIC_SERVER_PORT = null;
 
+  // static const String PUBLIC_SERVER_PROTOCOL = "http";
+  // static const String PUBLIC_SERVER_HOST = "localhost";
+  // static const int? PUBLIC_SERVER_PORT = 4000;
+
   @override
   Stream<HubAddress> getHubAddresses() async* {
     print("Accessing global hub address");

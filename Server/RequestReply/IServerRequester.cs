@@ -5,6 +5,6 @@ namespace Server.RequestReply
 {
     public interface IServerRequester
     {
-        Task<TResponse> Request<TRequest, TResponse>(ServerRequest<TRequest, TResponse> request);
+        Task<TResponse> Request<TResponse>(ServerRequest<TResponse> request);
     }
 }
