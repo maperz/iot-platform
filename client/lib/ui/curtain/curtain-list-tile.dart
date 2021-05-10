@@ -98,8 +98,12 @@ class DeviceIcon extends StatelessWidget {
     switch (deviceType) {
       case DeviceType.Curtain:
         return "assets/icons/curtain.svg";
-      default:
+      case DeviceType.Lamp:
         return "assets/icons/lamp.svg";
+      case DeviceType.Switch:
+        return "assets/icons/switch.svg";
+      default:
+        return "assets/icons/unknown.svg";
     }
   }
 }

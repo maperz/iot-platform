@@ -1,7 +1,6 @@
 #include "connectivity.h"
 #include "logger.h"
 #include "Arduino.h"
-#include "motor.h"
 #include "utils.h"
 #include "device.h"
 
@@ -14,6 +13,8 @@ namespace Connectivity
     WiFiUDP udp;
     WiFiClient client;
     PubSubClient mqtt(client);
+
+    BaseController *controller;
 
     void setupSoftAccesspoint()
     {
@@ -56,28 +57,6 @@ namespace Connectivity
 
     void topicCallback(char *topic, byte *payload, unsigned int length);
 
-    String getClientId()
-    {
-        String clientId = String("SC_") + getUniqueDeviceId();
-        return clientId;
-    }
-
-    String getDeviceChannel(String channelName)
-    {
-        return getClientId() + "/" + channelName;
-    }
-
-    String getRequestChannel(String channelName)
-    {
-        return getClientId() + "/r/" + channelName;
-    }
-
-    double getState()
-    {
-        // TODO: Get actual speed
-        return 11.11;
-    }
-
     void setupMqtt(const String &address, uint16 port)
     {
         mqtt.setServer(address.c_str(), port);
@@ -102,7 +81,7 @@ namespace Connectivity
         }
 
         sendDeviceInfo();
-        sendStateUpdate(getState());
+        controller->sendStateUpdate(controller->getState());
     }
 
     void topicCallback(char *topicBytes, byte *rawPayload, unsigned int length)
@@ -114,16 +93,6 @@ namespace Connectivity
         payload[length] = 0;
 
         String topic(topicBytes);
-        if (topic.equals(getRequestChannel("speed")))
-        {
-            double speed = strtod(payload, NULL);
-            sendStateUpdate(speed);
-
-            speed = max(-1.0, min(1.0, speed));
-            auto direction = speed >= 0.0 ? Direction::Forward : Direction::Backward;
-            driveMotor(fabs(speed), direction);
-            return;
-        }
 
         if (topic.equals(getRequestChannel("name")))
         {
@@ -134,9 +103,11 @@ namespace Connectivity
 
         if (topic.equals(getRequestChannel("info")))
         {
-            sendStateUpdate(getState());
+            controller->sendStateUpdate(controller->getState());
             return;
         }
+
+        controller->onRequest(topic, payload, length);
     }
 
     void sendDeviceInfo()
@@ -149,12 +120,5 @@ namespace Connectivity
 
         size_t size = serializeJson(document, sharedBuffer, SHARED_BUFFER_SIZE);
         mqtt.publish(topic.c_str(), sharedBuffer, size);
-    }
-
-    void sendStateUpdate(double speed)
-    {
-        String topic = getDeviceChannel("state");
-        String speedString(speed);
-        mqtt.publish(topic.c_str(), speedString.c_str(), speedString.length());
     }
 } // namespace Connectivity

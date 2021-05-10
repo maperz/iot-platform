@@ -3,6 +3,7 @@
 #include "logger.h"
 
 // Configuration
+// "curtain", "lamp", "switch"
 const String device_type = "curtain";
 const String device_version = "0.0.1";
 

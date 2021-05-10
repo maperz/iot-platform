@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "motor.h"
 #include "connectivity.h"
 #include "logger.h"
 #include "secrets.h"
@@ -7,12 +6,21 @@
 #include "storage.h"
 #include "utils.h"
 
+#include "domain/motor/motor-controller.h"
+#include "domain/lamp/lamp-controller.h"
+
+void setupController()
+{
+  Connectivity::controller = new MotorController(&Connectivity::mqtt);
+  //Connectivity::controller = new LampController(&Connectivity::mqtt);
+}
+
 void setup()
 {
   Serial.begin(115200);
   Storage::init();
   printf("\n\n");
-  initMotor();
+  setupController();
 }
 
 bool forward = true;
@@ -38,5 +46,5 @@ void loop()
   }
 
   Connectivity::mqtt.loop();
-  motorLoop();
+  Connectivity::controller->loop();
 }

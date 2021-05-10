@@ -9,3 +9,19 @@ String getUniqueDeviceId()
     id.replace(":", "");
     return id;
 }
+
+String getClientId()
+{
+    String clientId = String("SC_") + getUniqueDeviceId();
+    return clientId;
+}
+
+String getDeviceChannel(String channelName)
+{
+    return getClientId() + "/" + channelName;
+}
+
+String getRequestChannel(String channelName)
+{
+    return getClientId() + "/r/" + channelName;
+}

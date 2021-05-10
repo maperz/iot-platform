@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <PubSubClient.h>
+#include "domain/base-controller.h"
 
 namespace Connectivity
 {
@@ -11,6 +12,8 @@ namespace Connectivity
     extern IPAddress serverIP;
     extern WiFiUDP udp;
     extern PubSubClient mqtt;
+    
+    extern BaseController* controller;
 
     bool isWifiConnected();
 

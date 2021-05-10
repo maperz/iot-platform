@@ -26,10 +26,6 @@ class AddressResolver implements IAddressResolver {
       });
 
       _hubUrlStream = _connectivity!.switchMap((result) {
-        return remoteDiscovery
-            .getHubAddresses()
-            .map((address) => address.toString());
-
         print("Connectivity changed to: " + result.toString());
         switch (result) {
           case ConnectivityResult.wifi:

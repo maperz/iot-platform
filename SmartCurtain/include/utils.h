@@ -6,6 +6,8 @@
 #define SHARED_BUFFER_SIZE 512
 extern byte sharedBuffer[SHARED_BUFFER_SIZE];
 
-String getUniqueDeviceId();
+String getClientId();
+String getDeviceChannel(String channelName);
+String getRequestChannel(String channelName);
 
 #endif // UTILS_H_GUARD
