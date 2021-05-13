@@ -66,13 +66,13 @@ namespace Hub.Server
                     }
                 });
             
-            _hubConnection.On<string, double>(
-                nameof(IApiMethods.SetSpeed), 
-                async (deviceId, speed) =>
+            _hubConnection.On<string, string, string>(
+                nameof(IApiMethods.SendRequest), 
+                async (deviceId, name, payload) =>
                 {
-                    await _mediator.Send(new SetSpeedRequest() { DeviceId = deviceId, Speed = speed});
+                    await _mediator.Send(new SendDeviceRequest() { DeviceId = deviceId, Name = name, Payload = payload});
                 });
-
+            
             _hubConnection.On<string, string>(
                 nameof(IApiMethods.ChangeDeviceName),
                 async (deviceId, name) =>

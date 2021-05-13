@@ -1,12 +1,12 @@
 #ifndef LAMP_CONTROLLER_H_GUARD
 #define LAMP_CONTROLLER_H_GUARD
 
-#include "domain/base-controller.h"
+#include "controller.h"
 
-class LampController : public BaseController
+class LampController : public Controller
 {
 public:
-    LampController(PubSubClient *client) : BaseController(client)
+    LampController(PubSubClient *client) : Controller(client)
     {
         setup();
     };
@@ -15,8 +15,11 @@ public:
 
     virtual void loop();
 
-    virtual void onRequest(const String &request, char *payload, size_t plength);
+    virtual bool onRequest(const String &request, char *payload, size_t plength);
     virtual String getState();
+
+    virtual String getType() { return "lamp"; }
+    virtual String getVersion() { return "1.0.0"; }
 
 private:
     bool isOn;

@@ -14,7 +14,7 @@ namespace Connectivity
     WiFiClient client;
     PubSubClient mqtt(client);
 
-    BaseController *controller;
+    Controller *controller;
 
     void setupSoftAccesspoint()
     {
@@ -81,7 +81,7 @@ namespace Connectivity
         }
 
         sendDeviceInfo();
-        controller->sendStateUpdate(controller->getState());
+        controller->sendStateUpdate();
     }
 
     void topicCallback(char *topicBytes, byte *rawPayload, unsigned int length)
@@ -103,11 +103,14 @@ namespace Connectivity
 
         if (topic.equals(getRequestChannel("info")))
         {
-            controller->sendStateUpdate(controller->getState());
+            controller->sendStateUpdate();
             return;
         }
 
-        controller->onRequest(topic, payload, length);
+        if (controller->onRequest(topic, payload, length))
+        {
+            controller->sendStateUpdate();
+        }
     }
 
     void sendDeviceInfo()
@@ -115,8 +118,8 @@ namespace Connectivity
         String topic = getDeviceChannel("device");
         StaticJsonDocument<200> document;
         document["name"] = Device::getName();
-        document["type"] = Device::getType();
-        document["version"] = Device::getVersion();
+        document["type"] = controller->getType();
+        document["version"] = controller->getVersion();
 
         size_t size = serializeJson(document, sharedBuffer, SHARED_BUFFER_SIZE);
         mqtt.publish(topic.c_str(), sharedBuffer, size);

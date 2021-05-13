@@ -88,12 +88,12 @@ class Connection extends ChangeNotifier implements IConnection {
   // API
 
   @override
-  Future setSpeed(String? deviceId, double speed) async {
-    await _connection?.invoke("SetSpeed", args: [deviceId, speed]);
+  Future sendRequest(String deviceId, String name, String payload) async {
+    await _connection?.invoke("SendRequest", args: [deviceId, name, payload]);
   }
 
   @override
-  Future setDeviceName(String? deviceId, String name) async {
+  Future setDeviceName(String deviceId, String name) async {
     await _connection?.invoke("ChangeDeviceName", args: [deviceId, name]);
   }
 
@@ -138,8 +138,17 @@ class Connection extends ChangeNotifier implements IConnection {
   }
 
   void _createConnection(String hubUrl) {
+    final options = new HttpConnectionOptions(
+      // Workaround to fix a bug that currently happens when connecting
+      // to the server
+      transport: hubUrl.contains("iot.perz.cloud")
+          ? HttpTransportType.serverSentEvents
+          : null,
+      //logging: (level, message) => print(message)
+    );
+
     _connection = HubConnectionBuilder()
-        .withUrl(hubUrl)
+        .withUrl(hubUrl, options)
         .withHubProtocol(JsonHubProtocol())
         .withAutomaticReconnect()
         .build();

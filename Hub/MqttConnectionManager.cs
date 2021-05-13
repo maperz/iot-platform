@@ -59,6 +59,8 @@ namespace Hub
         {
             if (topic.EndsWith("/state"))
             {
+                _logger.LogInformation("{DeviceId}: State changed", deviceId);
+
                 var state = double.Parse(message);
                 await _deviceService.SetStateOfDevice(deviceId, state);
             }

@@ -8,7 +8,7 @@ class DeviceInfo {
 }
 
 class DeviceState {
-  final String? deviceId;
+  final String deviceId;
   final DeviceInfo info;
 
   final bool? connected;

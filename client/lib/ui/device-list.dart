@@ -1,5 +1,6 @@
 import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:curtains_client/ui/curtain/curtain-list-tile.dart';
+import 'package:curtains_client/ui/lamp/lamp-list-tile.dart';
 import 'package:curtains_client/ui/unknown-list-tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,8 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                 switch (type) {
                   case DeviceType.Curtain:
                     return CurtainListTile(deviceState);
+                  case DeviceType.Lamp:
+                    return LampListTile(deviceState);
                   default:
                     return UnknownListTile(deviceState);
                 }

@@ -1,5 +1,6 @@
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,8 +8,8 @@ import 'package:provider/provider.dart';
 
 import '../device-detail.dart';
 
-class CurtainListTile extends StatefulWidget {
-  const CurtainListTile(
+class LampListTile extends StatefulWidget {
+  const LampListTile(
     this._deviceState, {
     Key? key,
   }) : super(key: key);
@@ -16,11 +17,12 @@ class CurtainListTile extends StatefulWidget {
   final DeviceState _deviceState;
 
   @override
-  _CurtainListTileState createState() => _CurtainListTileState();
+  _LampListTileState createState() => _LampListTileState();
 }
 
-class _CurtainListTileState extends State<CurtainListTile> {
-  double _currentSliderValue = 0;
+class _LampListTileState extends State<LampListTile> {
+  _LampListTileState();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<Connection>(
@@ -54,30 +56,23 @@ class _CurtainListTileState extends State<CurtainListTile> {
                   children: [
                     Text(widget._deviceState.getDisplayName()),
                     Expanded(
-                      child: Slider(
-                        value: _currentSliderValue,
-                        min: -1.0,
-                        max: 1.0,
-                        divisions: 40,
-                        label: (_currentSliderValue * 100).round().toString() +
-                            " Percent",
-                        onChanged: widget._deviceState.connected!
-                            ? (double value) {
-                                setState(() => setSpeed(connection, value));
-                              }
-                            : null,
-                      ),
-                    ),
+                        child: Switch(
+                      value: (widget._deviceState.speed ?? 0) > 0,
+                      onChanged: widget._deviceState.connected!
+                          ? (bool value) {
+                              setState(() => setSwitchState(connection, value));
+                            }
+                          : null,
+                    )),
                   ],
                 ),
               ),
             ));
   }
 
-  void setSpeed(Connection connection, double value) {
-    _currentSliderValue = value;
+  void setSwitchState(Connection connection, bool value) {
     connection.sendRequest(
-        widget._deviceState.deviceId, "speed", value.toStringAsPrecision(2));
+        widget._deviceState.deviceId, "switch", value ? "1.0" : "0.0");
   }
 }
 

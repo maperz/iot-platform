@@ -1,7 +1,8 @@
-#include "domain/base-controller.h"
+#include "controller.h"
 
-void BaseController::sendStateUpdate(const String &state)
+void Controller::sendStateUpdate()
 {
+    String state = getState();
     String topic = getDeviceChannel("state");
     client->publish(topic.c_str(), state.c_str(), state.length());
 }

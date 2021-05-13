@@ -27,11 +27,11 @@ namespace Server
             return await _serverRequester.Request(request);
         }
 
-        public Task SetSpeed(string deviceId, double speed)
+        public Task SendRequest(string deviceId, string name, string payload)
         {
-            return _context.Clients.Client(_connectionId).SendAsync(nameof(IApiMethods.SetSpeed), deviceId, speed);
+            return _context.Clients.Client(_connectionId).SendAsync(nameof(IApiMethods.SendRequest), deviceId, name, payload);
         }
-
+        
         public Task ChangeDeviceName(string deviceId, string name)
         {
             return _context.Clients.Client(_connectionId).SendAsync(nameof(IApiMethods.ChangeDeviceName), deviceId, name);

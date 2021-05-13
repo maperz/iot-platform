@@ -2,23 +2,8 @@
 #include "storage.h"
 #include "logger.h"
 
-// Configuration
-// "curtain", "lamp", "switch"
-const String device_type = "curtain";
-const String device_version = "0.0.1";
-
 const size_t STORAGE_NAME_ADDRESS = 0;
 const size_t STORAGE_MAX_NAME_LEN = 50;
-
-String Device::getType()
-{
-    return device_type;
-}
-
-String Device::getVersion()
-{
-    return device_version;
-}
 
 String Device::getName()
 {

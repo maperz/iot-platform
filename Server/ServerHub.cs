@@ -8,12 +8,12 @@ using Shared.RequestReply;
 
 namespace Server
 {
-    public class ServerHub : Hub, IApiMethods, IServerMethods
+    public class ServerHub : Hub, IApiMethods, IApiListener, IServerMethods
     {
         private readonly ILogger<ServerHub> _logger;
         private readonly IGatewayConnectionManager _connectionManager;
 
-        private static string SingleTestConnectionId;
+        private static string _singleTestConnectionId;
         
         public ServerHub(ILogger<ServerHub> logger, IGatewayConnectionManager connectionManager)
         {
@@ -23,19 +23,21 @@ namespace Server
         
         public override Task OnConnectedAsync()
         {
-            _logger.LogInformation("SignalR Client connected {ClientId}", Context.ConnectionId);
+            var connectionId = Context.ConnectionId;
+            _logger.LogInformation("SignalR Client connected {ClientId}", connectionId);
+            Groups.AddToGroupAsync(connectionId, "clients");
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            _logger.LogInformation("SignalR Client disconnected {ClientId}", Context.ConnectionId);
+            var connectionId = Context.ConnectionId;
+
+            _logger.LogInformation("SignalR Client disconnected {ClientId}", connectionId);
             
             // TODO: Support multiple gateways
             
-            var connectionId = Context.ConnectionId;
             _connectionManager.RemoveConnection(connectionId);
-            
             return base.OnDisconnectedAsync(exception);
         }
         
@@ -45,26 +47,26 @@ namespace Server
             _logger.LogInformation("GetDeviceList called");
             
             // TODO: Support multiple gateways
-            var  connectionId = SingleTestConnectionId;
+            var  connectionId = _singleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             return connection?.GetDeviceList();
         }
 
-        public Task SetSpeed(string deviceId, double speed)
+        public Task SendRequest(string deviceId, string name, string payload)
         {
-            _logger.LogInformation("SetSpeed called with [{Double}]", speed);
+            _logger.LogInformation("SendRequest called with [{DeviceId}, {Name}]", deviceId, name);
             
             // TODO: Support multiple gateways
-            var connectionId = SingleTestConnectionId;
+            var connectionId = _singleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
-            return connection?.SetSpeed(deviceId, speed);
+            return connection?.SendRequest(deviceId, name, payload);
         }
 
         public Task ChangeDeviceName(string deviceId, string name)
         {
             _logger.LogInformation("ChangeDeviceName called with [{DeviceId}, {Name}]", deviceId, name);
 
-            var connectionId = SingleTestConnectionId;
+            var connectionId = _singleTestConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             return connection?.ChangeDeviceName(deviceId, name);
         }
@@ -76,8 +78,10 @@ namespace Server
             var connectionId = Context.ConnectionId;
             _connectionManager.AddConnection(connectionId);
 
-            SingleTestConnectionId = connectionId;
-            
+            _singleTestConnectionId = connectionId;
+            Groups.RemoveFromGroupAsync(connectionId, "clients");
+            Groups.AddToGroupAsync(connectionId, "gateways");
+
             return Task.CompletedTask;
         }
 
@@ -85,11 +89,16 @@ namespace Server
         {
             _logger.LogInformation("Received Reply for type {Type}", rawMessage.PayloadType);
 
-            var connectionId = SingleTestConnectionId;
+            var connectionId = _singleTestConnectionId;
             // const string connectionId = Context.ConnectionId;
             var connection = _connectionManager.GetConnection(connectionId);
             connection?.RequestSink.OnRequestReply(rawMessage);
             return Task.CompletedTask;
+        }
+
+        public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
+        {
+            return Clients.Group("clients").SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
         }
     }
 }

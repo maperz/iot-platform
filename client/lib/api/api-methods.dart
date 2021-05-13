@@ -1,5 +1,5 @@
 abstract class ApiMethods {
-  Future setSpeed(String deviceId, double speed);
+  Future sendRequest(String deviceId, String name, String payload);
 
   Future setDeviceName(String deviceId, String name);
 

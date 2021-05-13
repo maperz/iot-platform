@@ -39,10 +39,10 @@ namespace Hub
 
             return deviceList;
         }
-
-        public Task SetSpeed(string deviceId, double speed)
+        
+        public Task SendRequest(string deviceId, string name, string payload)
         {
-            return _mediator.Send(new SetSpeedRequest() { DeviceId = deviceId, Speed = speed });
+            return _mediator.Send(new SendDeviceRequest() { DeviceId = deviceId, Name = name, Payload = payload});
         }
 
         public Task ChangeDeviceName(string deviceId, string name)

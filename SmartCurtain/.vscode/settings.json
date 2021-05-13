@@ -18,6 +18,8 @@
     "peacock.color": "#215732",
     "files.associations": {
         "random": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.tcc": "cpp",
+        "algorithm": "cpp"
     }
 }

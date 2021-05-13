@@ -7,8 +7,8 @@ namespace Shared
     {
         public Task<IEnumerable<DeviceState>> GetDeviceList();
         
-        public Task SetSpeed(string deviceId, double speed);
-        
+        public Task SendRequest(string deviceId, string name, string payload);
+
         public Task ChangeDeviceName(string deviceId, string name);
     }
 }
