@@ -32,10 +32,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Smart Things',
+      title: 'Home Controller',
       theme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(key: GlobalKey(), title: 'Smart Things'),
+      home: MyHomePage(key: GlobalKey(), title: 'Home Controller'),
     );
   }
 }
