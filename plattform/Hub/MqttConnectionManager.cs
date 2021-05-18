@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,14 +54,12 @@ namespace Hub
             return Task.CompletedTask;
         }
 
-        private async Task OnDeviceMessageReceived(String deviceId, String topic, String message)
+        private async Task OnDeviceMessageReceived(string deviceId, string topic, string message)
         {
             if (topic.EndsWith("/state"))
             {
                 _logger.LogInformation("{DeviceId}: State changed", deviceId);
-
-                var state = double.Parse(message);
-                await _deviceService.SetStateOfDevice(deviceId, state);
+                await _deviceService.SetStateOfDevice(deviceId, message);
             }
                 
             if (topic.EndsWith("/device"))

@@ -11,7 +11,7 @@ namespace Hub
 
         public Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo);
         
-        public Task SetStateOfDevice(string deviceId, double state);
+        public Task SetStateOfDevice(string deviceId, string state);
 
         public Task<IEnumerable<DeviceState>> GetDeviceStates();
     }

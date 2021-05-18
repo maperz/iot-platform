@@ -12,20 +12,21 @@ class DeviceState {
   final DeviceInfo info;
 
   final bool? connected;
-  final double? speed;
+  final String state;
+  final DateTime lastUpdate;
 
-  DeviceState(this.deviceId, this.connected, this.speed, this.info);
+  DeviceState(
+      this.deviceId, this.connected, this.state, this.info, this.lastUpdate);
 
   factory DeviceState.fromJson(Map<String, dynamic> json) {
-    var speedJson = json['speed'];
-    var speed = speedJson is int ? (speedJson).toDouble() : speedJson;
-
+    var state = json['state'];
     var name = json['info']['name'];
     var type = _parseType(json['info']['type']);
     var version = json['info']['version'] ?? "";
+    var lastUpdate = DateTime.parse(json['lastUpdate']);
 
-    return DeviceState(json['deviceId'], json['connected'], speed,
-        new DeviceInfo(name, type, version));
+    return DeviceState(json['deviceId'], json['connected'], state,
+        new DeviceInfo(name, type, version), lastUpdate);
   }
 
   String getDisplayName() {

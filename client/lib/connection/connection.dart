@@ -44,7 +44,7 @@ class Connection extends ChangeNotifier implements IConnection {
     var connectionStream = CombineLatestStream.combine3(
         _startState.distinct(),
         _addressStream.distinct(),
-        _connectionError.distinct(),
+        _connectionError,
         (bool connect, String? address, Exception? error) =>
             new ConnectionState(connect, address, error));
 
@@ -127,6 +127,7 @@ class Connection extends ChangeNotifier implements IConnection {
       print('Starting connection at $hubUrl');
       await _connection?.start();
       _refreshConnectionState();
+      return;
     }
 
     if (connect && _connection!.baseUrl != hubUrl) {
@@ -160,8 +161,8 @@ class Connection extends ChangeNotifier implements IConnection {
 
     _connection!.onclose((error) {
       print("Connection Closed");
-      _refreshConnectionState();
       _connectionError.add(error);
+      _refreshConnectionState();
     });
   }
 

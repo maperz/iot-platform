@@ -9,20 +9,29 @@ import 'package:provider/provider.dart';
 import '../device-detail.dart';
 
 class LampListTile extends StatefulWidget {
-  const LampListTile(
-    this._deviceState, {
-    Key? key,
-  }) : super(key: key);
+  late LampState lampState;
+  final DeviceState deviceState;
 
-  final DeviceState _deviceState;
+  LampListTile(
+    this.deviceState, {
+    Key? key,
+  }) : super(key: key) {
+    this.lampState = LampState(this.deviceState.state);
+  }
 
   @override
   _LampListTileState createState() => _LampListTileState();
 }
 
-class _LampListTileState extends State<LampListTile> {
-  _LampListTileState();
+class LampState {
+  late bool isOn;
 
+  LampState(String deviceState) {
+    isOn = int.parse(deviceState) > 0;
+  }
+}
+
+class _LampListTileState extends State<LampListTile> {
   @override
   Widget build(BuildContext context) {
     return Consumer<Connection>(
@@ -30,19 +39,19 @@ class _LampListTileState extends State<LampListTile> {
               child: ListTile(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                enabled: widget._deviceState.connected!,
+                enabled: widget.deviceState.connected!,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: DeviceIcon(widget._deviceState),
+                  child: DeviceIcon(widget.deviceState),
                 ),
                 trailing: InkWell(
-                  onTap: widget._deviceState.connected!
+                  onTap: widget.deviceState.connected!
                       ? () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DetailDevicePage(
-                                      widget._deviceState, connection)));
+                                      widget.deviceState, connection)));
                         }
                       : null,
                   child: Padding(
@@ -54,11 +63,11 @@ class _LampListTileState extends State<LampListTile> {
                 ),
                 title: Row(
                   children: [
-                    Text(widget._deviceState.getDisplayName()),
+                    Text(widget.deviceState.getDisplayName()),
                     Expanded(
                         child: Switch(
-                      value: (widget._deviceState.speed ?? 0) > 0,
-                      onChanged: widget._deviceState.connected!
+                      value: widget.lampState.isOn,
+                      onChanged: widget.deviceState.connected!
                           ? (bool value) {
                               setState(() => setSwitchState(connection, value));
                             }
@@ -72,7 +81,7 @@ class _LampListTileState extends State<LampListTile> {
 
   void setSwitchState(Connection connection, bool value) {
     connection.sendRequest(
-        widget._deviceState.deviceId, "switch", value ? "1.0" : "0.0");
+        widget.deviceState.deviceId, "switch", value ? "1.0" : "0.0");
   }
 }
 

@@ -5,28 +5,32 @@ import 'mdns-client.dart';
 class DartMDNSClient implements IMDNSClient {
   @override
   Future<MDNSResult?> discoverService(String serviceName) async {
-    print("Running mDNS discovery");
     final MDnsClient client = MDnsClient();
+
+    print("Running mDNS discovery");
     await client.start();
     try {
-      await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
-          ResourceRecordQuery.serverPointer(serviceName))) {
-        await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
-            ResourceRecordQuery.service(ptr.domainName))) {
-          String name = srv.target;
-          int port = srv.port;
-          await for (IPAddressResourceRecord record
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv4(name))) {
-            return new MDNSResult(record.address.host, port);
-          }
+      while (true) {
+        await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
+            ResourceRecordQuery.serverPointer(serviceName))) {
+          await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
+              ResourceRecordQuery.service(ptr.domainName))) {
+            String name = srv.target;
+            int port = srv.port;
+            await for (IPAddressResourceRecord record
+                in client.lookup<IPAddressResourceRecord>(
+                    ResourceRecordQuery.addressIPv4(name))) {
+              return new MDNSResult(record.address.host, port);
+            }
 
-          await for (IPAddressResourceRecord record
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv6(name))) {
-            return new MDNSResult(record.address.host, port);
+            await for (IPAddressResourceRecord record
+                in client.lookup<IPAddressResourceRecord>(
+                    ResourceRecordQuery.addressIPv6(name))) {
+              return new MDNSResult(record.address.host, port);
+            }
           }
         }
+        await Future.delayed(Duration(seconds: 1));
       }
     } finally {
       print("Quitting discovery");

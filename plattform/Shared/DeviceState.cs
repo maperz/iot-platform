@@ -1,3 +1,5 @@
+using System;
+
 #nullable disable
 namespace Shared
 {
@@ -8,6 +10,9 @@ namespace Shared
         public DeviceInfo Info { get; set; }
         
         public bool Connected { get; set; }
-        public double? Speed { get; set; }
+        
+        public string State { get; set; }
+        
+        public DateTime LastUpdate { get; set; }
     }
 }

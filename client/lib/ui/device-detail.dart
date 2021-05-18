@@ -23,6 +23,7 @@ class DetailDevicePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
                 controller: nameController,
@@ -33,7 +34,53 @@ class DetailDevicePage extends StatelessWidget {
                 onFieldSubmitted: (newName) async {
                   await _changeDeviceName(newName);
                   Navigator.pop(context);
-                })
+                }),
+            Container(
+              height: 20,
+            ),
+            Text(
+              "Device Id",
+              style: TextStyle(color: Colors.white54),
+            ),
+            Text(
+              this.state.deviceId.toString(),
+              style:
+                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+            ),
+            const Divider(),
+            Text(
+              "Device Type",
+              style: TextStyle(color: Colors.white54),
+            ),
+            Text(
+              this.state.info.type.toString(),
+              style:
+                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+            ),
+            const Divider(),
+            Text(
+              "Device Id",
+              style: TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+            Text(
+              this.state.info.version,
+              style:
+                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+            ),
+            const Divider(),
+            Text(
+              "Last Update",
+              style: TextStyle(
+                color: Colors.white54,
+              ),
+            ),
+            Text(
+              this.state.lastUpdate.toLocal().toString(),
+              style:
+                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
+            )
           ],
         ),
       ),

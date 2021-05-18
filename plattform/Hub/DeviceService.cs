@@ -82,7 +82,7 @@ namespace Hub
             }
         }
 
-        public async Task SetStateOfDevice(string deviceId, double state)
+        public async Task SetStateOfDevice(string deviceId, string state)
         {
             await _lock.WaitAsync();
             try
@@ -91,13 +91,11 @@ namespace Hub
                 {
                     _logger.LogWarning("Trying to set state of unknown device not found: {DeviceId}", deviceId);
                     return;
-                } 
-                
-                if (deviceState.Speed == null || Math.Abs((double) (deviceState.Speed - state)) > double.Epsilon)
-                {
-                    deviceState.Speed = state;
-                    await BroadcastDeviceChange(deviceState);
                 }
+
+                deviceState.State = state;
+                deviceState.LastUpdate = DateTime.UtcNow;
+                await BroadcastDeviceChange(deviceState);
             }
             finally
             {
