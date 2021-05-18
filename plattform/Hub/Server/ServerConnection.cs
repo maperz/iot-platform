@@ -27,10 +27,10 @@ namespace Hub.Server
             var serverAddress = appSettings.ServerAddress;
             
             _logger.LogInformation("Creating server hub connection with address at {String}", serverAddress);
+            
             _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress)
-                .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(1) })
+                .WithAutomaticReconnect(new ServerRetryPolicy())
                 .Build();
-
 
             apiBroadcaster.ConnectListener(this);
             
@@ -79,6 +79,11 @@ namespace Hub.Server
                 {
                     await _mediator.Send(new SetNameRequest() {DeviceId = deviceId, Name = name});
                 });
+
+
+            _hubConnection.Reconnecting += (s => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
+            _hubConnection.Reconnected += (s => Task.Run(() => _logger.LogInformation("Reconnected to Server")));
+            _hubConnection.Closed += (s => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
         }
 
         public Task<bool> IsConnected()
@@ -95,7 +100,6 @@ namespace Hub.Server
                 {
                     await _hubConnection.StartAsync(cancellationToken);
                     _logger.LogInformation("Connected to Server");
-                    
                     await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
                     
                     return true;
