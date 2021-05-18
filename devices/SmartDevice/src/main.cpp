@@ -11,8 +11,8 @@
 
 void setupController()
 {
-  // Connectivity::controller = new MotorController(&Connectivity::mqtt);
-  Connectivity::controller = new LampController(&Connectivity::mqtt);
+  Connectivity::controller = new MotorController(&Connectivity::mqtt);
+  // Connectivity::controller = new LampController(&Connectivity::mqtt);
 }
 
 void setup()

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import 'curtain/curtain-list-tile.dart';
 import 'device-detail.dart';
+import 'device-icon.dart';
 
 class UnknownListTile extends StatelessWidget {
   final DeviceState _deviceState;
@@ -19,13 +19,13 @@ class UnknownListTile extends StatelessWidget {
               child: ListTile(
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                  enabled: _deviceState.connected!,
+                  enabled: _deviceState.connected,
                   leading: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DeviceIcon(_deviceState),
                   ),
                   trailing: InkWell(
-                    onTap: _deviceState.connected!
+                    onTap: _deviceState.connected
                         ? () {
                             Navigator.push(
                                 context,

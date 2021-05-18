@@ -1,4 +1,5 @@
 #include "domain/lamp/lamp-controller.h"
+#include <ArduinoJson.h>
 
 void LampController::setup()
 {
@@ -31,6 +32,9 @@ void LampController::loop()
 
 String LampController::getState()
 {
-    // TODO
-    return isOn ? "1" : "0";
+    StaticJsonDocument<200> json;
+    json["isOn"] = isOn;
+    json["color"] = "#8870FF";
+    serializeJson(json, sharedBuffer, SHARED_BUFFER_SIZE);
+    return String((char *)sharedBuffer);
 }

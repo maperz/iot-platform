@@ -11,7 +11,7 @@ class DeviceState {
   final String deviceId;
   final DeviceInfo info;
 
-  final bool? connected;
+  final bool connected;
   final String state;
   final DateTime lastUpdate;
 

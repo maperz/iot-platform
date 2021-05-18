@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:flutter/material.dart';
@@ -6,17 +8,38 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../device-detail.dart';
+import '../device-icon.dart';
 
 class CurtainListTile extends StatefulWidget {
-  const CurtainListTile(
-    this._deviceState, {
-    Key? key,
-  }) : super(key: key);
+  final DeviceState deviceState;
+  late CurtainState curtainState;
 
-  final DeviceState _deviceState;
+  CurtainListTile(
+    this.deviceState, {
+    Key? key,
+  }) : super(key: key) {
+    this.curtainState = CurtainState(this.deviceState.state);
+  }
 
   @override
   _CurtainListTileState createState() => _CurtainListTileState();
+}
+
+class CurtainState {
+  /* Example curtain state
+   * {
+   *  speed: "1.0",
+   * }
+   */
+
+  late double progress;
+
+  CurtainState(String jsonEncode) {
+    final state = json.decode(jsonEncode);
+
+    var speedJson = state['speed'];
+    progress = speedJson is int ? (speedJson).toDouble() : speedJson;
+  }
 }
 
 class _CurtainListTileState extends State<CurtainListTile> {
@@ -28,19 +51,19 @@ class _CurtainListTileState extends State<CurtainListTile> {
               child: ListTile(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                enabled: widget._deviceState.connected!,
+                enabled: widget.deviceState.connected,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: DeviceIcon(widget._deviceState),
+                  child: DeviceIcon(widget.deviceState),
                 ),
                 trailing: InkWell(
-                  onTap: widget._deviceState.connected!
+                  onTap: widget.deviceState.connected
                       ? () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DetailDevicePage(
-                                      widget._deviceState, connection)));
+                                      widget.deviceState, connection)));
                         }
                       : null,
                   child: Padding(
@@ -52,7 +75,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                 ),
                 title: Row(
                   children: [
-                    Text(widget._deviceState.getDisplayName()),
+                    Text(widget.deviceState.getDisplayName()),
                     Expanded(
                       child: Slider(
                         value: _currentSliderValue,
@@ -61,7 +84,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                         divisions: 40,
                         label: (_currentSliderValue * 100).round().toString() +
                             " Percent",
-                        onChanged: widget._deviceState.connected!
+                        onChanged: widget.deviceState.connected
                             ? (double value) {
                                 setState(() => setSpeed(connection, value));
                               }
@@ -77,34 +100,6 @@ class _CurtainListTileState extends State<CurtainListTile> {
   void setSpeed(Connection connection, double value) {
     _currentSliderValue = value;
     connection.sendRequest(
-        widget._deviceState.deviceId, "speed", value.toStringAsPrecision(2));
-  }
-}
-
-class DeviceIcon extends StatelessWidget {
-  final DeviceState state;
-  DeviceIcon(this.state);
-
-  @override
-  Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      _getIconForType(state.info.type),
-      width: 36,
-      height: 36,
-      color: Colors.white,
-    );
-  }
-
-  String _getIconForType(DeviceType deviceType) {
-    switch (deviceType) {
-      case DeviceType.Curtain:
-        return "assets/icons/curtain.svg";
-      case DeviceType.Lamp:
-        return "assets/icons/lamp.svg";
-      case DeviceType.Switch:
-        return "assets/icons/switch.svg";
-      default:
-        return "assets/icons/unknown.svg";
-    }
+        widget.deviceState.deviceId, "speed", value.toStringAsPrecision(2));
   }
 }

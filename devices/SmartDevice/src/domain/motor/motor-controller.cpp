@@ -1,5 +1,6 @@
 #include "domain/motor/motor-controller.h"
 #include "motor.h"
+#include <ArduinoJson.h>
 
 bool MotorController::onRequest(const String &request, char *payload, size_t plength)
 {
@@ -36,5 +37,8 @@ void MotorController::loop()
 
 String MotorController::getState()
 {
-    return String(_currentSpeed);
+    StaticJsonDocument<200> json;
+    json["speed"] = _currentSpeed;
+    serializeJson(json, sharedBuffer, SHARED_BUFFER_SIZE);
+    return String((char *)sharedBuffer);
 }
