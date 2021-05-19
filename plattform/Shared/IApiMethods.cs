@@ -10,5 +10,7 @@ namespace Shared
         public Task SendRequest(string deviceId, string name, string payload);
 
         public Task ChangeDeviceName(string deviceId, string name);
+
+        public Task<ConnectionInfo> GetConnectionInfo();
     }
 }

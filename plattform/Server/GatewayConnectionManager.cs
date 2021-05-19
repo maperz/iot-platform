@@ -34,12 +34,12 @@ namespace Server
             }
         }
 
-        public void RemoveConnection(string connectionId)
+        public bool RemoveConnection(string connectionId)
         {
             _lock.EnterWriteLock();
             try
             {
-                _connections.Remove(connectionId);
+                return _connections.Remove(connectionId);
             }
             finally
             {
@@ -47,13 +47,13 @@ namespace Server
             }
         }
 
-        public IGatewayConnection GetConnection(string connectionId)
+        public IGatewayConnection? GetConnection(string connectionId)
         {
             
             _lock.EnterReadLock();
             try
             {
-                return _connections[connectionId];
+                return _connections.GetValueOrDefault(connectionId);
             }
             finally
             {

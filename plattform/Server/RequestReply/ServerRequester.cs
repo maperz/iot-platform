@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -11,11 +10,12 @@ namespace Server.RequestReply
 {
     class OpenRequest
     {
+        #nullable disable
         public Type ResponseType { get; set; }
         public TaskCompletionSource<dynamic> CompletionSource { get; set; }
         
         public CancellationTokenSource CancellationSource { get; set; }
-
+        #nullable enable
     }
     
     public class ServerRequester : IServerRequester, IServerRequesterSink
@@ -78,7 +78,7 @@ namespace Server.RequestReply
                 }
 
                 var openRequest = _openRequests[requestId];
-                HandleRequestReply(openRequest, rawMessage.Payload, null);
+                HandleRequestReply(openRequest, rawMessage.Payload);
             
                 _openRequests.Remove(requestId);
             }
@@ -108,7 +108,7 @@ namespace Server.RequestReply
             }
         }
 
-        private void HandleRequestReply(OpenRequest openRequest, string message, Exception exception = null)
+        private void HandleRequestReply(OpenRequest openRequest, string? message, Exception? exception = null)
         {
             openRequest.CancellationSource.Dispose();
 
@@ -120,7 +120,7 @@ namespace Server.RequestReply
             
             if (!string.IsNullOrEmpty(message))
             {
-                var parsedObject = JsonSerializer.Deserialize(message, openRequest.ResponseType, null);
+                var parsedObject = JsonSerializer.Deserialize(message, openRequest.ResponseType);
                 openRequest.CompletionSource.SetResult(parsedObject);
             }
             else

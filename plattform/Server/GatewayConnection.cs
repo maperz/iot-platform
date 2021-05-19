@@ -37,6 +37,11 @@ namespace Server
             return _context.Clients.Client(_connectionId).SendAsync(nameof(IApiMethods.ChangeDeviceName), deviceId, name);
         }
 
+        public Task<ConnectionInfo> GetConnectionInfo()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public IServerRequesterSink RequestSink {
             get => _serverRequester;
         }

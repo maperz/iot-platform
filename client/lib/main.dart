@@ -1,16 +1,21 @@
 import 'package:curtains_client/connection/address-resolver.dart';
 import 'package:curtains_client/connection/connection.dart';
-import 'package:curtains_client/ui/device-list.dart';
 import 'package:curtains_client/domain/device/device-service.dart';
 import 'package:curtains_client/domain/device/devices-model.dart';
+import 'package:curtains_client/ui/screens/connection-info-screen.dart';
+import 'package:curtains_client/ui/screens/main-screen.dart';
+import 'package:curtains_client/utils/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  AddressResolver resolver = new AddressResolver();
+  IAddressResolver resolver =
+      PlatformInfo.isWeb() ? new WebAddressResolver() : new AddressResolver();
+
   await resolver.init();
+
   IConnection connection = new Connection(resolver);
   connection.start();
 
@@ -49,6 +54,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _showMainScreen = true;
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -62,15 +69,15 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
-            onPressed: () {},
+            onPressed: () => setState(() => _showMainScreen = true),
           ),
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: () {},
+            onPressed: () => setState(() => _showMainScreen = true),
           ),
           IconButton(
             icon: Icon(Icons.analytics),
-            onPressed: () {},
+            onPressed: () => setState(() => _showMainScreen = false),
           ),
         ],
       ),
@@ -78,60 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: appBar,
-      body: Consumer<Connection>(builder: (context, connection, child) {
-        return StreamBuilder<bool>(
-          stream: connection.getConnectedState(),
-          builder: (context, connected) {
-            if (connected.hasData && connected.data!) {
-              return DeviceListWidget();
-            }
-
-            return StreamBuilder(
-                stream: connection.getConnectionAddress(),
-                builder: (context, address) {
-                  return ConnectingPlaceholder(address.data as String?);
-                });
-          },
-        );
-      }),
+      body: _showMainScreen ? MainScreen() : ConnectionInfoScreen(),
       bottomNavigationBar: bottomBar,
-    );
-  }
-}
-
-class ConnectingPlaceholder extends StatelessWidget {
-  final String? address;
-  ConnectingPlaceholder(this.address);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: CircularProgressIndicator(
-                strokeWidth: 6,
-              ),
-            ),
-            Text(
-              address != null ? "Establishing connection" : "Discovering Hub",
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            if (address != null)
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Text(
-                  'Connecting to Hub at $address',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              )
-          ],
-        ),
-      ),
     );
   }
 }

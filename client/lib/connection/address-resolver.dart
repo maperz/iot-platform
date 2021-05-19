@@ -3,11 +3,26 @@ import 'dart:async';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:curtains_client/utils/platform.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 abstract class IAddressResolver {
   Stream<String?> getHubUrl();
+  Future init();
+}
+
+class WebAddressResolver implements IAddressResolver {
+  final remoteDiscovery = new RemoteHubDiscovery();
+
+  @override
+  Stream<String?> getHubUrl() {
+    return remoteDiscovery
+        .getHubAddresses()
+        .map((address) => address.toString());
+  }
+
+  Future init() async {}
 }
 
 class AddressResolver implements IAddressResolver {
@@ -47,7 +62,7 @@ class AddressResolver implements IAddressResolver {
   @override
   Stream<String?> getHubUrl() {
     if (_hubUrlStream == null) {
-      throw Error();
+      throw new Error();
     }
 
     return _hubUrlStream!;

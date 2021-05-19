@@ -10,6 +10,8 @@ namespace Server
     { 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+
             services.AddSignalR();
 
             services.AddSingleton<IGatewayConnectionManager, GatewayConnectionManager>();
@@ -21,11 +23,16 @@ namespace Server
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+            
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
             
             app.UseRouting();
 

@@ -6,8 +6,8 @@ namespace Server
     {
         public void AddConnection(string connectionId);
 
-        public void RemoveConnection(string connectionId);
+        public bool RemoveConnection(string connectionId);
 
-        public IGatewayConnection GetConnection(string connectionId);
+        public IGatewayConnection? GetConnection(string connectionId);
     }
 }
