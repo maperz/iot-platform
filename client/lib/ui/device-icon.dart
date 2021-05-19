@@ -25,6 +25,8 @@ class DeviceIcon extends StatelessWidget {
         return "assets/icons/lamp.svg";
       case DeviceType.Switch:
         return "assets/icons/switch.svg";
+      case DeviceType.Thermo:
+        return "assets/icons/thermo.svg";
       default:
         return "assets/icons/unknown.svg";
     }

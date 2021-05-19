@@ -82,13 +82,20 @@ namespace Hub.Server
 
 
             _hubConnection.Reconnecting += (s => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
-            _hubConnection.Reconnected += (s => Task.Run(() => _logger.LogInformation("Reconnected to Server")));
+            _hubConnection.Reconnected += (s => OnConnectionEstablished());
             _hubConnection.Closed += (s => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
         }
 
         public Task<bool> IsConnected()
         {
             return Task.FromResult(_hubConnection.State == HubConnectionState.Connected);
+        }
+
+        private async Task OnConnectionEstablished(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Connected to Server");
+            await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
+
         }
         
         public async Task<bool> Connect(CancellationToken cancellationToken = default)
@@ -99,9 +106,7 @@ namespace Hub.Server
                 try
                 {
                     await _hubConnection.StartAsync(cancellationToken);
-                    _logger.LogInformation("Connected to Server");
-                    await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
-                    
+                    await OnConnectionEstablished(cancellationToken);
                     return true;
                 }
                 catch when (cancellationToken.IsCancellationRequested)

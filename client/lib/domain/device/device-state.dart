@@ -1,4 +1,4 @@
-enum DeviceType { Unknown, Curtain, Lamp, Switch }
+enum DeviceType { Unknown, Curtain, Lamp, Thermo, Switch }
 
 class DeviceInfo {
   final String? name;
@@ -41,6 +41,8 @@ class DeviceState {
         return DeviceType.Lamp;
       case "switch":
         return DeviceType.Switch;
+      case "thermo":
+        return DeviceType.Thermo;
       default:
         return DeviceType.Unknown;
     }
@@ -54,6 +56,8 @@ class DeviceState {
         return "Lamp";
       case DeviceType.Switch:
         return "Switch";
+      case DeviceType.Thermo:
+        return "Thermometer";
       default:
         return 'Unknown';
     }

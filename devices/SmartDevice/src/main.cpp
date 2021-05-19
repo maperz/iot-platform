@@ -8,11 +8,13 @@
 
 #include "domain/motor/motor-controller.h"
 #include "domain/lamp/lamp-controller.h"
+#include "domain/thermometer/thermo-controller.h"
 
 void setupController()
 {
-  Connectivity::controller = new MotorController(&Connectivity::mqtt);
+  //Connectivity::controller = new MotorController(&Connectivity::mqtt);
   // Connectivity::controller = new LampController(&Connectivity::mqtt);
+  Connectivity::controller = new ThermoController(&Connectivity::mqtt);
 }
 
 void setup()

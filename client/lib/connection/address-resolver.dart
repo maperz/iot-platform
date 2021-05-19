@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:curtains_client/utils/platform.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
