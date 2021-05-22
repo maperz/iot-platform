@@ -4,7 +4,6 @@ import 'package:curtains_client/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
@@ -12,7 +11,7 @@ import '../device-detail.dart';
 import '../device-icon.dart';
 
 class LampListTile extends StatefulWidget {
-  late LampState lampState;
+  late final LampState lampState;
   final DeviceState deviceState;
 
   LampListTile(

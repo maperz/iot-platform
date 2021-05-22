@@ -47,6 +47,9 @@ void loop()
     Connectivity::setupMqtt(host.address, host.port);
   }
 
-  Connectivity::mqtt.loop();
-  Connectivity::controller->loop();
+  if (Connectivity::mqtt.connected())
+  {
+    Connectivity::mqtt.loop();
+    Connectivity::controller->loop();
+  }
 }

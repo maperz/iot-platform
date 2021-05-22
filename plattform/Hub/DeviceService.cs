@@ -118,7 +118,8 @@ namespace Hub
 
         private Task BroadcastDeviceChange(DeviceState changedDevice)
         {
-            return changedDevice.Info == null ? Task.CompletedTask : _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
+            return changedDevice.Info == null || changedDevice.Connected && changedDevice.State == null 
+                ? Task.CompletedTask : _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
         }
     }
 }

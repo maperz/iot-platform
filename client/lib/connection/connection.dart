@@ -176,7 +176,7 @@ class Connection extends ChangeNotifier implements IConnection {
       // to the server
       transport: hubUrl.contains("iot.perz.cloud")
           ? HttpTransportType.serverSentEvents
-          : null,
+          : HttpTransportType.webSockets,
       //logging: (level, message) => print(message)
     );
 

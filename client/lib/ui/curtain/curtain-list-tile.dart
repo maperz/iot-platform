@@ -11,7 +11,7 @@ import '../device-icon.dart';
 
 class CurtainListTile extends StatefulWidget {
   final DeviceState deviceState;
-  late CurtainState curtainState;
+  late final CurtainState curtainState;
 
   CurtainListTile(
     this.deviceState, {

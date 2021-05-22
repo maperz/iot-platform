@@ -11,7 +11,7 @@ import '../device-icon.dart';
 
 class ThermoListTile extends StatefulWidget {
   final DeviceState deviceState;
-  late ThermoState thermoState;
+  late final ThermoState thermoState;
 
   ThermoListTile(
     this.deviceState, {
