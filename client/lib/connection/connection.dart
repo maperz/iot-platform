@@ -20,21 +20,24 @@ abstract class IConnection implements ApiMethods {
 }
 
 class ConnectionInfo {
+  String targetAddress;
   bool isConnected;
   bool isProxy;
   String? proxiedAddress;
   String version;
 
-  ConnectionInfo(
-      this.isConnected, this.isProxy, this.proxiedAddress, this.version);
+  ConnectionInfo(this.targetAddress, this.isConnected, this.isProxy,
+      this.proxiedAddress, this.version);
 
-  factory ConnectionInfo.fromJson(Map<String, dynamic> json) {
+  factory ConnectionInfo.fromJson(
+      String targetAddress, Map<String, dynamic> json) {
     var isConnected = json['isConnected'];
     var isProxy = json['isProxy'];
     var proxiedAddress = json['proxiedAddress'];
     var version = json['version'];
 
-    return ConnectionInfo(isConnected, isProxy, proxiedAddress, version);
+    return ConnectionInfo(
+        targetAddress, isConnected, isProxy, proxiedAddress, version);
   }
 }
 
@@ -199,7 +202,7 @@ class Connection extends ChangeNotifier implements IConnection {
 
     _connection!.on("ConnectionInfo", (message) {
       if (message != null && message.length > 0) {
-        var info = ConnectionInfo.fromJson(message[0]);
+        var info = ConnectionInfo.fromJson(hubUrl, message[0]);
         _connectionInfo.add(info);
       }
     });

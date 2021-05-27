@@ -1,3 +1,4 @@
+using System;
 using Hub.Server;
 using MediatR;
 using Microsoft.AspNetCore.Builder;

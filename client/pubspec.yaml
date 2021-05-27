@@ -29,6 +29,7 @@ dependencies:
   cupertino_icons: ^1.0.3
   signalr_core: ^1.1.1
   multicast_dns: ^0.3.0
+  intl: ^0.17.0
   provider: ^5.0.0
   rxdart: ^0.26.0
   connectivity: ^3.0.3

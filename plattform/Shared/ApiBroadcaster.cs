@@ -10,12 +10,17 @@ namespace Shared
         private readonly List<IApiListener> _listeners = new(); 
         private readonly ReaderWriterLockSlim _lock = new();
 
-        public async Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
+        public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
         {
             _lock.EnterReadLock();
             try
             {
-                await Task.WhenAll(_listeners.Select(l => l.DeviceStateChanged(deviceStates)));
+                foreach (var listener in _listeners)
+                {
+                    _ = listener.DeviceStateChanged(deviceStates);
+                }
+
+                return Task.CompletedTask;
             }
             finally
             {

@@ -4,6 +4,7 @@ import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../device-detail.dart';
@@ -100,9 +101,8 @@ class _ThermoListTileState extends State<ThermoListTile> {
                           Row(
                             children: [
                               Text(
-                                widget.deviceState.lastUpdate
-                                    .toLocal()
-                                    .toString(),
+                                DateFormat.yMEd()
+                                    .format(widget.deviceState.lastUpdate),
                                 style: TextStyle(fontSize: 12),
                               )
                             ],

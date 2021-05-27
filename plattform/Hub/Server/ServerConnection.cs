@@ -93,9 +93,8 @@ namespace Hub.Server
 
         private async Task OnConnectionEstablished(CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation("Connected to Server");
             await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
-
+            _logger.LogInformation("Connected to Server");
         }
         
         public async Task<bool> Connect(CancellationToken cancellationToken = default)

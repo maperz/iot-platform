@@ -32,6 +32,10 @@ void ThermoController::loop()
 
 String ThermoController::getState()
 {
+    if (!_initialized) {
+        return "";
+    }
+    
     StaticJsonDocument<200> json;
     json["temp"] = _lastMeasuredTemp;
     json["hum"] = _lastMeasuredHum;

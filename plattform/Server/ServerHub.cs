@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Threading;
+using MediatR;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Server.Domain;
 using Shared;
 using Shared.RequestReply;
 
@@ -21,12 +23,14 @@ namespace Server
     {
         private readonly ILogger<ServerHub> _logger;
         private readonly IGatewayConnectionManager _connectionManager;
-
+        private readonly IMediator _mediator;
+        
         private static readonly SemaphoreSlim Lock = new(1);
         private static HubConnectionInfo? _singleConnectionInfo;
-        public ServerHub(ILogger<ServerHub> logger, IGatewayConnectionManager connectionManager)
+        public ServerHub(ILogger<ServerHub> logger, IMediator mediator, IGatewayConnectionManager connectionManager)
         {
             _logger = logger;
+            _mediator = mediator;
             _connectionManager = connectionManager;
         }
         
@@ -48,73 +52,33 @@ namespace Server
             _logger.LogInformation("SignalR Client disconnected {ClientId}", connectionId);
 
             // TODO: Support multiple gateways
-
-            await Lock.WaitAsync();
-            try
+            if (_connectionManager.RemoveConnection(connectionId))
             {
-                if (_connectionManager.RemoveConnection(connectionId))
-                {
-                    await SetHubConnectionInfo(null, null);
-                    await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
-                }
-            }
-            finally
-            {
-                Lock.Release();
+                await SetHubConnectionInfo(null, null);
+                await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
             }
             
             await base.OnDisconnectedAsync(exception);
         }
         
-        
         public async Task<IEnumerable<DeviceState>> GetDeviceList()
         {
-            _logger.LogInformation("GetDeviceList called");
-            
-            // TODO: Support multiple gateways
             var connectionInfo = await GetConnectionIdForUser();
-
-            var connection = _connectionManager.GetConnection(connectionInfo.Id);
-            
-            if (connection == null)
-            {
-                throw new NoConnectionException();
-            }
-            
-            return await connection.GetDeviceList();
+            return await _mediator.Send(new GetDeviceListRequest() {HubId = connectionInfo.Id});
         }
 
         public async Task SendRequest(string deviceId, string name, string payload)
         {
-            _logger.LogInformation("SendRequest called with [{DeviceId}, {Name}]", deviceId, name);
-            
-            // TODO: Support multiple gateways
             var connectionInfo = await GetConnectionIdForUser();
-
-            var connection = _connectionManager.GetConnection(connectionInfo.Id);
-            
-            if (connection == null)
-            {
-                throw new NoConnectionException();
-            }
-            
-            await connection.SendRequest(deviceId, name, payload);
+            await _mediator.Send(new SendHubDeviceRequest()
+                {HubId = connectionInfo.Id, DeviceId = deviceId, Name = name, Payload = payload});
         }
 
         public async Task ChangeDeviceName(string deviceId, string name)
         {
-            _logger.LogInformation("ChangeDeviceName called with [{DeviceId}, {Name}]", deviceId, name);
-
             var connectionInfo = await GetConnectionIdForUser();
-
-            var connection = _connectionManager.GetConnection(connectionInfo.Id);
-            
-            if (connection == null)
-            {
-                throw new NoConnectionException();
-            }
-            
-            await connection.ChangeDeviceName(deviceId, name);
+            await _mediator.Send(new SetNameRequest()
+                {HubId = connectionInfo.Id, DeviceId = deviceId, Name = name});
         }
 
         public async Task<ConnectionInfo> GetConnectionInfo()
@@ -131,12 +95,16 @@ namespace Server
                 proxiedAddress = connection != null ? connectionInfo.Address : null;
             }
             
+            var version = GetType()
+                .Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "";
+            
             var info = new ConnectionInfo()
             {
                 IsConnected = isConnected,
                 IsProxy = true,
                 ProxiedAddress = proxiedAddress,
-                Version = GetVersion()
+                Version = version
             };
 
             return info;
@@ -150,20 +118,15 @@ namespace Server
             var ip = Context.Features.Get<IHttpConnectionFeature>().RemoteIpAddress;
             
             _connectionManager.AddConnection(connectionId);
-
             await SetHubConnectionInfo(connectionId, ip?.ToString());
-            
             await Groups.RemoveFromGroupAsync(connectionId, "clients");
             await Groups.AddToGroupAsync(connectionId, "gateways");
-
             await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
         }
 
         public async Task Reply(RawMessage rawMessage)
         {
             _logger.LogInformation("Received Reply for type {Type}", rawMessage.PayloadType);
-
-            
             var connectionInfo = await GetConnectionIdForUser();
           
             // const string connectionId = Context.ConnectionId;
@@ -176,14 +139,7 @@ namespace Server
             _logger.LogInformation("Sending Device State change to clients");
             return Clients.Group("clients").SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
         }
-
-        private string GetVersion()
-        {
-            return GetType()
-                .Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "";
-        }
-
+        
         private async Task<HubConnectionInfo> GetConnectionIdForUser()
         {
             var info = await TryGetConnectionInfo();
@@ -207,6 +163,7 @@ namespace Server
                 Lock.Release();
             }
         }
+        
         
         private async Task SetHubConnectionInfo(string? connectionId, string? ip)
         {

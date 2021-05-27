@@ -116,10 +116,15 @@ namespace Hub
             }
         }
 
-        private Task BroadcastDeviceChange(DeviceState changedDevice)
+        private async Task BroadcastDeviceChange(DeviceState changedDevice)
         {
-            return changedDevice.Info == null || changedDevice.Connected && changedDevice.State == null 
-                ? Task.CompletedTask : _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
+
+            if (changedDevice.Info == null || (changedDevice.Connected && changedDevice.State == null))
+            {
+                return;
+            }
+            
+            await _broadcaster.DeviceStateChanged(new List<DeviceState>() { changedDevice });
         }
     }
 }

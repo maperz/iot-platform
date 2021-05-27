@@ -1,3 +1,5 @@
+using System;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -13,8 +15,10 @@ namespace Server
             services.AddCors();
 
             services.AddSignalR();
-
+            
             services.AddSingleton<IGatewayConnectionManager, GatewayConnectionManager>();
+            
+            services.AddMediatR(typeof(Startup));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
