@@ -1,7 +1,8 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace EmpoweredSignalR
 {
@@ -20,31 +21,36 @@ namespace EmpoweredSignalR
                 }
                 
                 var parameterInfos = methodInfo.GetParameters();
-                Task<object>? resultObject = null;
+                Task resultTask;
                 
                 if (parameterInfos.Length == 0)
                 {
                     object[] parameters = new object[] {  };
-                    resultObject = methodInfo.Invoke(this, parameters) as Task<object>;
+                    resultTask = (Task) methodInfo.Invoke(this, parameters)!;
                 }
                 else if (parameterInfos.Length == 1)
                 {
-                    object[] parameters = new object[] {  };
-                    resultObject = methodInfo.Invoke(this, parameters) as Task<object>;;
+                    object[] parameters = new object[] { JsonConvert.DeserializeObject(request.Payload, parameterInfos[0].GetType()) };
+                    resultTask = (Task) methodInfo.Invoke(this, parameters)!;
+                }
+                else
+                {
+                    return;
                 }
                 
-                if (resultObject != null)
-                {
-                    var result = await resultObject;
-                    var type = result.GetType();
-                    var payload = JsonSerializer.Serialize(result);
-                    
-                    await connection.SendAsync(nameof(EmpoweredHub.OnBidirectionalReply),
-                        new BidirectionalMessage()
-                        {
-                            Id = request.Id, Payload = payload, PayloadType = type.Name
-                        });
-                }
+                await resultTask.ConfigureAwait(false);
+                var resultObject = resultTask.GetType().GetProperty("Result")?.GetValue(resultTask);
+
+                object result = resultObject ?? new EmptyObject();
+                
+                var payload = JsonSerializer.Serialize(result);
+                
+                await connection.SendAsync(nameof(EmpoweredHub.OnBidirectionalReply),
+                    new BidirectionalMessage()
+                    {
+                        Id = request.Id, Payload = payload
+                    });     
+             
             }
             catch (Exception)
             {

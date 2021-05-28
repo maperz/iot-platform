@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EmpoweredSignalR;
 using Microsoft.AspNetCore.SignalR;
-using Server.RequestReply;
 using Shared;
-using Shared.RequestReply;
 
 namespace Server
 {
@@ -11,20 +10,16 @@ namespace Server
     {
         private readonly string _connectionId;
         private readonly IHubContext<ServerHub> _context;
-        private readonly ServerRequester _serverRequester;
         
         public GatewayConnection(string connectionId, IHubContext<ServerHub> context)
         {
             _connectionId = connectionId;
             _context = context;
-            
-            _serverRequester = new ServerRequester(connectionId, context);
         }
         
-        public async Task<IEnumerable<DeviceState>> GetDeviceList()
+        public Task<IEnumerable<DeviceState>> GetDeviceList()
         {
-            var request = new DeviceListRequest();
-            return await _serverRequester.Request(request);
+            return _context.Clients.Client(_connectionId).InvokeBidirectional<IEnumerable<DeviceState>>("GetDeviceStates");
         }
 
         public Task SendRequest(string deviceId, string name, string payload)
@@ -40,10 +35,6 @@ namespace Server
         public Task<ConnectionInfo> GetConnectionInfo()
         {
             throw new System.NotImplementedException();
-        }
-
-        public IServerRequesterSink RequestSink {
-            get => _serverRequester;
         }
     }
 }
