@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using EmpoweredSignalR;
 using Hub.Domain;
 using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
-using Shared.RequestReply;
 
 namespace Hub.Server
 {
@@ -39,32 +37,7 @@ namespace Hub.Server
 
         private void RegisterListeners()
         {
-            _hubConnection.On<RawMessage>(
-                "request",
-                async (msg) =>
-                {
-                    try
-                    {
-                        _logger.LogInformation("Request received");
-                        if (msg.PayloadType == nameof(DeviceListRequest))
-                        {
-                            _logger.LogInformation("GetDeviceListRequest request received");
-                            var deviceList = await _mediator.Send(new GetDeviceListRequest());
-                            var payload = JsonSerializer.Serialize(deviceList);
-
-                            await _hubConnection.SendAsync(nameof(IServerMethods.Reply),
-                                new RawMessage()
-                                {
-                                    Id = msg.Id, Payload = payload, PayloadType = deviceList.GetType().Name
-                                });
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        // ignored
-                        _logger.LogError("Request error occured {Error}", err);
-                    }
-                });
+            _hubConnection.AddBidirectionalReceiver(new ServerReceiver(_mediator, _logger));
             
             _hubConnection.On<string, string, string>(
                 nameof(IApiMethods.SendRequest), 
@@ -79,11 +52,10 @@ namespace Hub.Server
                 {
                     await _mediator.Send(new SetNameRequest() {DeviceId = deviceId, Name = name});
                 });
-
-
-            _hubConnection.Reconnecting += (s => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
-            _hubConnection.Reconnected += (s => OnConnectionEstablished());
-            _hubConnection.Closed += (s => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
+            
+            _hubConnection.Reconnecting += (_ => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
+            _hubConnection.Reconnected += (_ => OnConnectionEstablished());
+            _hubConnection.Closed += (_ => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
         }
 
         public Task<bool> IsConnected()

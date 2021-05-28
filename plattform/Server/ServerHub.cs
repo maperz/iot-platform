@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Threading;
+using EmpoweredSignalR;
 using MediatR;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Server.Domain;
 using Shared;
-using Shared.RequestReply;
 
 namespace Server
 {
@@ -19,7 +19,7 @@ namespace Server
         public string Address { get; set; } = "";
     }
     
-    public class ServerHub : Hub, IApiMethods, IApiListener, IServerMethods
+    public class ServerHub : EmpoweredHub, IApiMethods, IApiListener, IServerMethods
     {
         private readonly ILogger<ServerHub> _logger;
         private readonly IGatewayConnectionManager _connectionManager;
@@ -122,16 +122,6 @@ namespace Server
             await Groups.RemoveFromGroupAsync(connectionId, "clients");
             await Groups.AddToGroupAsync(connectionId, "gateways");
             await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
-        }
-
-        public async Task Reply(RawMessage rawMessage)
-        {
-            _logger.LogInformation("Received Reply for type {Type}", rawMessage.PayloadType);
-            var connectionInfo = await GetConnectionIdForUser();
-          
-            // const string connectionId = Context.ConnectionId;
-            var connection = _connectionManager.GetConnection(connectionInfo.Id);
-            connection?.RequestSink.OnRequestReply(rawMessage);
         }
 
         public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)

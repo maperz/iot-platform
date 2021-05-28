@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
-using Shared.RequestReply;
 
-namespace Server.RequestReply
+namespace EmpoweredSignalR
 {
     class OpenRequest
     {
@@ -18,36 +16,32 @@ namespace Server.RequestReply
         #nullable enable
     }
     
-    public class ServerRequester : IServerRequester, IServerRequesterSink
+    public class OpenRequestManager 
     {
-
-        private readonly string _connectionId;
-        private readonly IHubContext<ServerHub> _context;
         private readonly Dictionary<Guid, OpenRequest> _openRequests = new();
         private readonly SemaphoreSlim _lock = new(1);
-
         private readonly TimeSpan _defaultTimeOut = TimeSpan.FromSeconds(5);
+        private static OpenRequestManager? _instance;
         
-        public ServerRequester(string connectionId, IHubContext<ServerHub> context)
-        {
-            _connectionId = connectionId;
-            _context = context;
-        }
+        public static OpenRequestManager Instance {  
+            get {  
+                if (_instance == null) {  
+                    _instance = new OpenRequestManager();  
+                }  
+                return _instance;  
+            }  
+        }  
         
-        public async Task<TResponse> Request<TResponse>(ServerRequest<TResponse> request, TimeSpan? timeOut = null)
+        public async Task<TResponse> CreateOpenRequest<TResponse>(BidirectionalMessage request, TimeSpan? timeOut = null)
         {
-            var requestGuid = Guid.NewGuid();
-
-            var payload = JsonSerializer.Serialize(request);
-            var message = new RawMessage { Id = requestGuid, Payload = payload, PayloadType = request.GetType().Name };
             TaskCompletionSource<dynamic> completionSource = new();
             var cts = new CancellationTokenSource(timeOut.GetValueOrDefault(_defaultTimeOut));
-            cts.Token.Register(() => OnTimeOut(requestGuid));
+            cts.Token.Register(() => OnTimeOut(request.Id));
             
             await _lock.WaitAsync();
             try
             {
-                _openRequests[requestGuid] = new OpenRequest()
+                _openRequests[request.Id] = new OpenRequest()
                 {
                     ResponseType = typeof(TResponse), 
                     CompletionSource = completionSource,
@@ -58,16 +52,13 @@ namespace Server.RequestReply
             {
                 _lock.Release();
             }
-            
-            await _context.Clients.Client(_connectionId).SendAsync("request", message);
-            
+
             return await completionSource.Task;
         }
         
-        
-        public void OnRequestReply(RawMessage rawMessage)
+        public void OnRequestReply(BidirectionalMessage bidirectionalMessage)
         {
-            var requestId = rawMessage.Id;
+            var requestId = bidirectionalMessage.Id;
             
             _lock.Wait();
             try
@@ -78,7 +69,7 @@ namespace Server.RequestReply
                 }
 
                 var openRequest = _openRequests[requestId];
-                HandleRequestReply(openRequest, rawMessage.Payload);
+                HandleRequestReply(openRequest, bidirectionalMessage.Payload);
             
                 _openRequests.Remove(requestId);
             }
