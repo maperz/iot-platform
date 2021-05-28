@@ -186,8 +186,13 @@ class Connection extends ChangeNotifier implements IConnection {
     _connection = HubConnectionBuilder()
         .withUrl(hubUrl, options)
         .withHubProtocol(JsonHubProtocol())
-        .withAutomaticReconnect()
+        .withAutomaticReconnect(new CustomRetryPolicy())
         .build();
+
+    _connection!.onreconnecting((connectionId) {
+      print("Reconnecting");
+      _connectionInfo.add(null);
+    });
 
     _connection!.onreconnected((connectionId) {
       print("Reconnected");
@@ -206,5 +211,27 @@ class Connection extends ChangeNotifier implements IConnection {
         _connectionInfo.add(info);
       }
     });
+  }
+}
+
+class CustomRetryPolicy extends RetryPolicy {
+  final List<Duration> intervals = [
+    Duration(seconds: 1),
+    Duration(seconds: 5),
+    Duration(seconds: 10),
+    Duration(seconds: 15),
+    Duration(seconds: 15),
+    Duration(seconds: 30),
+  ];
+
+  @override
+  int? nextRetryDelayInMilliseconds(RetryContext retryContext) {
+    int previousRetries = retryContext.previousRetryCount ?? 0;
+
+    if (previousRetries < intervals.length) {
+      return intervals[previousRetries].inMilliseconds;
+    }
+
+    return intervals.last.inMilliseconds;
   }
 }

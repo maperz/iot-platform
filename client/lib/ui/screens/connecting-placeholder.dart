@@ -39,11 +39,7 @@ class ConnectingPlaceholder extends StatelessWidget {
   }
 
   String _getTitleMessage(ConnectionInfo? info) {
-    if (info == null) {
-      return "Searching for endpoint";
-    }
-
-    if (info.isProxy && info.proxiedAddress == null) {
+    if (info != null && info.isProxy && info.proxiedAddress == null) {
       return "Hub offline";
     }
 

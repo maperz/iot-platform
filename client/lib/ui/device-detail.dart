@@ -28,9 +28,9 @@ class DetailDevicePage extends StatelessWidget {
             TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  hintText: "Some name",
-                  labelText: 'Name:',
-                ),
+                    hintText: "Device Name",
+                    labelText: 'Name:',
+                    helperText: "Change the name of the device"),
                 onFieldSubmitted: (newName) async {
                   await _changeDeviceName(newName);
                   Navigator.pop(context);
@@ -38,49 +38,34 @@ class DetailDevicePage extends StatelessWidget {
             Container(
               height: 20,
             ),
-            Text(
-              "Device Id",
-              style: TextStyle(color: Colors.white54),
-            ),
-            Text(
-              this.state.deviceId.toString(),
-              style:
-                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
-            ),
-            const Divider(),
-            Text(
-              "Device Type",
-              style: TextStyle(color: Colors.white54),
-            ),
-            Text(
-              this.state.info.type.toString(),
-              style:
-                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
-            ),
-            const Divider(),
-            Text(
-              "Device Id",
-              style: TextStyle(
-                color: Colors.white54,
+            TextFormField(
+              enabled: false,
+              initialValue: this.state.deviceId.toString(),
+              decoration: const InputDecoration(
+                labelText: "Device Id",
               ),
             ),
-            Text(
-              this.state.info.version,
-              style:
-                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
-            ),
-            const Divider(),
-            Text(
-              "Last Update",
-              style: TextStyle(
-                color: Colors.white54,
+            TextFormField(
+              enabled: false,
+              initialValue: this.state.info.type.toString(),
+              decoration: const InputDecoration(
+                labelText: "Device Type",
               ),
             ),
-            Text(
-              this.state.lastUpdate.toLocal().toString(),
-              style:
-                  TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8)),
-            )
+            TextFormField(
+              enabled: false,
+              initialValue: this.state.info.version,
+              decoration: const InputDecoration(
+                labelText: "Device Version",
+              ),
+            ),
+            TextFormField(
+              enabled: false,
+              initialValue: this.state.lastUpdate.toLocal().toString(),
+              decoration: const InputDecoration(
+                labelText: "Last Update",
+              ),
+            ),
           ],
         ),
       ),

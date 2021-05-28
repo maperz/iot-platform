@@ -9,12 +9,11 @@ class DeviceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      _getIconForType(state.info.type),
-      width: 36,
-      height: 36,
-      color: Colors.white.withOpacity(state.connected ? 1 : 0.3),
-    );
+    final asset = _getIconForType(state.info.type);
+    final width = 36.0;
+    final color = Colors.white.withOpacity(state.connected ? 1 : 0.3);
+
+    return SvgPicture.asset(asset, width: width, color: color);
   }
 
   String _getIconForType(DeviceType deviceType) {
