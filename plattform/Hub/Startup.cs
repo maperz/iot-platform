@@ -30,14 +30,21 @@ namespace Hub
 
             services.AddCors();
             
-            services.AddSignalR();
-
             services.AddMediatR(typeof(Startup));
             
             services.Configure<AppSettings>(Configuration);
             var appSettings = new AppSettings();
             Configuration.Bind(appSettings);
             services.AddSingleton(appSettings);
+            
+            services.AddSignalR(
+                options =>
+                {                    
+                    options.EnableDetailedErrors = true;
+                    options.HandshakeTimeout = TimeSpan.FromSeconds(appSettings.HandshakeTimeout);
+                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(2 * appSettings.KeepAliveTimeout);
+                    options.KeepAliveInterval = TimeSpan.FromSeconds(appSettings.KeepAliveTimeout);
+                });
             
             services.AddHostedService<ServerConnection>();
             services.AddHostedService<MqttConnectionManager>();

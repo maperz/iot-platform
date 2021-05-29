@@ -1,8 +1,7 @@
-namespace Hub
+namespace Server
 {
     public class AppSettings
     {
-        public string ServerAddress { get; set; } = "";
         public int KeepAliveTimeout { get; set; }
         public int HandshakeTimeout { get; set; }
     }
