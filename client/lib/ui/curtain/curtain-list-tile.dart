@@ -42,7 +42,6 @@ class CurtainState {
 }
 
 class _CurtainListTileState extends State<CurtainListTile> {
-  double _currentSliderValue = 0;
   @override
   Widget build(BuildContext context) {
     return Consumer<Connection>(
@@ -77,11 +76,13 @@ class _CurtainListTileState extends State<CurtainListTile> {
                     Text(widget.deviceState.getDisplayName()),
                     Expanded(
                       child: Slider(
-                        value: _currentSliderValue,
+                        value: widget.curtainState.progress,
                         min: -1.0,
                         max: 1.0,
                         divisions: 40,
-                        label: (_currentSliderValue * 100).round().toString() +
+                        label: (widget.curtainState.progress * 100)
+                                .round()
+                                .toString() +
                             " Percent",
                         onChanged: widget.deviceState.connected
                             ? (double value) {
@@ -97,7 +98,6 @@ class _CurtainListTileState extends State<CurtainListTile> {
   }
 
   void setSpeed(Connection connection, double value) {
-    _currentSliderValue = value;
     connection.sendRequest(
         widget.deviceState.deviceId, "speed", value.toStringAsPrecision(2));
   }

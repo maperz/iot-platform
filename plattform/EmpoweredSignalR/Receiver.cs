@@ -15,7 +15,7 @@ namespace EmpoweredSignalR
                 var methodInfo = GetType().GetMethod(request.Endpoint);
                 if (methodInfo == null)
                 {
-                    throw new Exception("Method does not exist");
+                    throw new Exception($"Method not found on Receiver with name '{request.Endpoint}'");
                 }
                 
                 var parameterInfos = methodInfo.GetParameters();
