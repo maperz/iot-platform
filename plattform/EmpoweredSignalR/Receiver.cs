@@ -15,27 +15,24 @@ namespace EmpoweredSignalR
                 var methodInfo = GetType().GetMethod(request.Endpoint);
                 if (methodInfo == null)
                 {
-                    // TODO
-                    // No method found that is called this way - should handle errors somehow later
-                    return;
+                    throw new Exception("Method does not exist");
                 }
                 
                 var parameterInfos = methodInfo.GetParameters();
                 Task resultTask;
-                
-                if (parameterInfos.Length == 0)
+                switch (parameterInfos.Length)
                 {
-                    object[] parameters = new object[] {  };
-                    resultTask = (Task) methodInfo.Invoke(this, parameters)!;
-                }
-                else if (parameterInfos.Length == 1)
-                {
-                    object[] parameters = new object[] { JsonConvert.DeserializeObject(request.Payload, parameterInfos[0].GetType()) };
-                    resultTask = (Task) methodInfo.Invoke(this, parameters)!;
-                }
-                else
-                {
-                    return;
+                    case 0:
+                        resultTask = (Task) methodInfo.Invoke(this, Array.Empty<object>())!;
+                        break;
+                    case 1:
+                    {
+                        object[] parameters = new[] { JsonConvert.DeserializeObject(request.Payload, parameterInfos[0].GetType()) };
+                        resultTask = (Task) methodInfo.Invoke(this, parameters)!;
+                        break;
+                    }
+                    default:
+                        throw new Exception("Only method with 0 or 1 arguments supported");
                 }
                 
                 await resultTask.ConfigureAwait(false);
@@ -49,12 +46,15 @@ namespace EmpoweredSignalR
                     new BidirectionalMessage()
                     {
                         Id = request.Id, Payload = payload
-                    });     
-             
+                    });
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                // ignored
+                await connection.SendAsync(nameof(EmpoweredHub.OnBidirectionalReply),
+                    new BidirectionalMessage()
+                    {
+                        Id = request.Id, Exception = exception
+                    });
             }
         }
     }

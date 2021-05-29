@@ -7,5 +7,7 @@ namespace EmpoweredSignalR
         public Guid Id { get; set; }
         public string Endpoint { get; set; } = "";
         public string Payload { get; set; } = "";
+        
+        public Exception? Exception { get; set; }
     }
 }

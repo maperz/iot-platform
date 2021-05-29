@@ -19,7 +19,7 @@ namespace Server
         
         public Task<IEnumerable<DeviceState>> GetDeviceList()
         {
-            return _context.Clients.Client(_connectionId).InvokeBidirectional<IEnumerable<DeviceState>>("GetDeviceStates");
+            return _context.Clients.InvokeBidirectional<IEnumerable<DeviceState>>(_connectionId, "GetDeviceStates");
         }
 
         public Task SendRequest(string deviceId, string name, string payload)

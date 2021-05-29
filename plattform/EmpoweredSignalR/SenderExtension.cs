@@ -7,12 +7,12 @@ namespace EmpoweredSignalR
 {
     public static class SenderExtension
     {
-        public static Task<TResponse> InvokeBidirectional<TResponse>(this IClientProxy client, String endpoint, TimeSpan? timeOut = null)
+        public static Task<TResponse> InvokeBidirectional<TResponse>(this IHubClients clients, String connectionId, String endpoint, TimeSpan? timeOut = null)
         {
-            return client.InvokeBidirectional<TResponse>(endpoint, new EmptyObject(), timeOut);
+            return clients.InvokeBidirectional<TResponse>(connectionId, endpoint, new EmptyObject(), timeOut);
         }
         
-        public static async Task<TResponse> InvokeBidirectional<TResponse>(this IClientProxy client, String endpoint, object arg, TimeSpan? timeOut = null)
+        public static async Task<TResponse> InvokeBidirectional<TResponse>(this IHubClients clients, String connectionId, String endpoint, object arg, TimeSpan? timeOut = null)
         {
             var requestGuid = Guid.NewGuid();
             var payload = JsonSerializer.Serialize(arg);
@@ -21,9 +21,9 @@ namespace EmpoweredSignalR
             
             var manager = OpenRequestManager.Instance;
             
-            var resultTask = manager.CreateOpenRequest<TResponse>(request, timeOut);
+            var resultTask = manager.CreateOpenRequest<TResponse>(connectionId, request, timeOut);
 
-            await client.SendAsync(nameof(Receiver.OnBidirectionalRequest), request);
+            await clients.Client(connectionId).SendAsync(nameof(Receiver.OnBidirectionalRequest), request);
 
             return await resultTask;
         }
