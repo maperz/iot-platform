@@ -28,14 +28,14 @@ namespace EmpoweredSignalR.Tests.Client
             await _hubConnection.StopAsync();
         }
 
-        public Task MakePingRequest()
+        public async Task MakePingRequest()
         {
-            return _hubConnection.InvokeAsync(nameof(ExampleHub.MakePingRequest));
+            await _hubConnection.InvokeAsync(nameof(ExampleHub.MakePingRequest));
         }
         
-        public Task<string> MakeToUpperRequest(string text)
+        public async Task<string> MakeToUpperRequest(string text)
         {
-            return _hubConnection.InvokeAsync<string>(nameof(ExampleHub.MakeToUpperRequest), text);
+            return await _hubConnection.InvokeAsync<string>(nameof(ExampleHub.MakeToUpperRequest), text);
         }
 
         public async ValueTask DisposeAsync()

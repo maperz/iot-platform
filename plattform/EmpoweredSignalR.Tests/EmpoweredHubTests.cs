@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EmpoweredSignalR.Tests.Client;
 using EmpoweredSignalR.Tests.Hub;
@@ -27,7 +29,7 @@ namespace EmpoweredSignalR.Tests
                 }
             }
         }
-        
+
         [Fact]
         private async Task TestSingleParameterCall()
         {
@@ -37,6 +39,7 @@ namespace EmpoweredSignalR.Tests
             {
                 MockReceiver receiver = new();
                 ExampleClient client = new(receiver);
+
                 await client.Start();
                 await using (client)
                 {

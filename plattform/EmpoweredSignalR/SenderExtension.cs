@@ -39,7 +39,7 @@ namespace EmpoweredSignalR
             
             var resultTask = manager.CreateOpenRequest<TResponse>(connectionId, request, timeOut);
 
-            await client.SendAsync(nameof(Receiver.OnBidirectionalRequest), request);
+            await client.SendAsync(nameof(Receiver.OnBidirectionalRequest), request).ConfigureAwait(false);
 
             return await resultTask;
         }

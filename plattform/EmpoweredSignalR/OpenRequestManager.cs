@@ -57,7 +57,7 @@ namespace EmpoweredSignalR
                 _lock.Release();
             }
 
-            return await completionSource.Task;
+            return await completionSource.Task.ConfigureAwait(false);
         }
         
         public void OnRequestReply(BidirectionalMessage message)
