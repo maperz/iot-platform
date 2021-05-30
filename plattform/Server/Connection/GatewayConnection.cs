@@ -4,7 +4,7 @@ using EmpoweredSignalR;
 using Microsoft.AspNetCore.SignalR;
 using Shared;
 
-namespace Server
+namespace Server.Connection
 {
     public class GatewayConnection : IGatewayConnection
     {

@@ -1,6 +1,6 @@
 using Shared;
 
-namespace Server
+namespace Server.Connection
 {
     public interface IGatewayConnection : IApiMethods
     {

@@ -4,6 +4,6 @@ namespace Shared
 {
     public interface IServerMethods
     {
-        public Task RegisterAsGateway();
+        public Task RegisterAsGateway(string id);
     }
 }

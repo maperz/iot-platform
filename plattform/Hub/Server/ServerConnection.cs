@@ -16,11 +16,14 @@ namespace Hub.Server
         private readonly HubConnection _hubConnection;
         private readonly ILogger<ServerConnection> _logger;
         private readonly IMediator _mediator;
+        
+        private readonly string _hubId;
 
         public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster, AppSettings appSettings)
         {
             _logger = logger;
             _mediator = mediator;
+            _hubId = appSettings.HubId;
 
             var serverAddress = appSettings.ServerAddress;
             
@@ -65,7 +68,7 @@ namespace Hub.Server
 
         private async Task OnConnectionEstablished(CancellationToken cancellationToken = default)
         {
-            await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), cancellationToken);
+            await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), _hubId, cancellationToken);
             _logger.LogInformation("Connected to Server");
         }
         

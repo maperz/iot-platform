@@ -1,6 +1,6 @@
 using System;
 
-namespace Server
+namespace Server.Connection
 {
     public class NoConnectionException : Exception
     {

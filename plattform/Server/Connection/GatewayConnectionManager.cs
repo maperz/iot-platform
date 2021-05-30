@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Server
+namespace Server.Connection
 {
     public class GatewayConnectionManager : IGatewayConnectionManager
     {

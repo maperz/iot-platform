@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Server.Connection;
 using Server.Domain;
 using Shared;
 
@@ -110,9 +111,9 @@ namespace Server
             return info;
         }
 
-        public async Task RegisterAsGateway()
+        public async Task RegisterAsGateway(string id)
         {
-            _logger.LogInformation("Gateway registered with {ConnectionId}", Context.ConnectionId);
+            _logger.LogInformation("Gateway registered with Id: {Id}, and CId: {ConnectionId}", id, Context.ConnectionId);
             var connectionId = Context.ConnectionId;
             
             var ip = Context.Features.Get<IHttpConnectionFeature>().RemoteIpAddress;
