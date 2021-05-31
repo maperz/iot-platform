@@ -1,7 +1,6 @@
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
 
 class DeviceIcon extends StatelessWidget {
   final DeviceState state;
@@ -13,21 +12,21 @@ class DeviceIcon extends StatelessWidget {
     final width = 36.0;
     final color = Colors.white.withOpacity(state.connected ? 1 : 0.3);
 
-    return SvgPicture.asset(asset, width: width, color: color);
+    return Image.asset("assets/icons/$asset", width: width, color: color);
   }
 
   String _getIconForType(DeviceType deviceType) {
     switch (deviceType) {
       case DeviceType.Curtain:
-        return "assets/icons/curtain.svg";
+        return "curtain.png";
       case DeviceType.Lamp:
-        return "assets/icons/lamp.svg";
+        return "lamp.png";
       case DeviceType.Switch:
-        return "assets/icons/switch.svg";
+        return "switch.png";
       case DeviceType.Thermo:
-        return "assets/icons/thermo.svg";
+        return "thermo.png";
       default:
-        return "assets/icons/unknown.svg";
+        return "unknown.png";
     }
   }
 }

@@ -15,19 +15,32 @@
 
     <meta charset="UTF-8" />
     <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
-    <meta name="description" content="Smart Home Controller by maperz." />
+    <meta name="description" content="Home Controller by maperz." />
 
     <!-- iOS meta tags & icons -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="curtains_client" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Home Controller" />
     <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+
+    <!-- Android Status Bar -->
+    <meta name="theme-color" content="#212121" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png" />
 
     <title>Home Controller</title>
     <link rel="manifest" href="manifest.json" />
+
+    <!-- Background color for status bar on PWA iOS-->
+    <style>
+      body {
+        background-color: #212121;
+      }
+    </style>
   </head>
   <body>
     <!-- This script installs service_worker.js to provide PWA functionality to
