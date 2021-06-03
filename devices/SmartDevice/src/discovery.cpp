@@ -69,6 +69,8 @@ void answerCallback(const mdns::Answer *answer)
 
 ServiceDiscovery::ServiceDiscovery(byte *buffer, int bufferSize) : mdnsClient(NULL, NULL, answerCallback, buffer, bufferSize)
 {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void ServiceDiscovery::reset()
@@ -91,11 +93,10 @@ bool ServiceDiscovery::discoveryCompleted()
         return true;
     }
 
-    if (ticks++ % 100000 == 0)
+    if (ticks++ % 150000 == 0)
     {
         sendQuery();
     }
-
     return false;
 }
 
@@ -107,12 +108,13 @@ void ServiceDiscovery::sendQuery()
     query.qtype = MDNS_TYPE_PTR;
     query.qclass = 1; // Internet
     query.unicast_response = 0;
-
+    digitalWrite(LED_BUILTIN, LOW);
     mdnsClient.Clear();
     mdnsClient.AddQuery(query);
     mdnsClient.Send();
-
     log(LogLevel::Info, "ServiceDiscovery: mDNS discovery packet sent for '%s'\n", query.qname_buffer);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);
 }
 
 MSDNHost ServiceDiscovery::getHost()

@@ -12,9 +12,9 @@
 
 void setupController()
 {
-  //Connectivity::controller = new MotorController(&Connectivity::mqtt);
-  // Connectivity::controller = new LampController(&Connectivity::mqtt);
-  Connectivity::controller = new ThermoController(&Connectivity::mqtt);
+  Connectivity::controller = new MotorController(&Connectivity::mqtt);
+  //Connectivity::controller = new LampController(&Connectivity::mqtt);
+  //Connectivity::controller = new ThermoController(&Connectivity::mqtt);
 }
 
 void setup()
@@ -39,6 +39,7 @@ void loop()
   if (!discoveryCompleted)
   {
     serviceDiscovery.loop();
+    return;
   }
 
   if (!Connectivity::mqtt.connected() && discoveryCompleted)

@@ -16,8 +16,25 @@ class ConnectionInfoScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Connection Info"),
-                ..._createStatusWidget(info),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 32.0, horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Connection Info",
+                        style: TextStyle(
+                            fontSize: 32, fontWeight: FontWeight.w500),
+                      ),
+                      Container(
+                        height: 32,
+                      ),
+                      ..._createStatusWidget(info),
+                    ],
+                  ),
+                ),
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomRight,
@@ -36,20 +53,30 @@ class ConnectionInfoScreen extends StatelessWidget {
   }
 
   List<Widget> _createStatusWidget(ConnectionInfo? info) {
-    final notConnectedText =
-        Text("Not connected", style: TextStyle(color: Color(0xFF725F)));
-    final connectedText =
-        Text("Connected", style: TextStyle(color: Color(0xA5FF5F)));
+    final commonStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 18);
+
+    final notConnectedText = Text("Not connected",
+        style: commonStyle.copyWith(color: Color(0xFFFF725F)));
 
     if (info == null || !info.isConnected) {
       return [notConnectedText];
     }
 
+    final connectedText = Text("Connected",
+        style: commonStyle.copyWith(color: Color(0xFFA5FF5F)));
+
+    final spacer = Container(
+      height: 6,
+    );
+
     return [
       connectedText,
+      spacer,
       Text(
           "${info.isProxy ? "Proxied" : "Directly"} via ${info.isProxy ? info.proxiedAddress : info.targetAddress} ",
-          style: TextStyle(color: Color(0xA5FF5F)))
+          style: commonStyle),
+      spacer,
+      Text("Version: ${info.version}", style: commonStyle)
     ];
   }
 }
