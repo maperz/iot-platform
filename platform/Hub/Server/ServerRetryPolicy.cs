@@ -13,13 +13,12 @@ namespace Hub.Server
             TimeSpan.FromSeconds(10),
             TimeSpan.FromSeconds(15),
             TimeSpan.FromSeconds(15),
-            TimeSpan.FromSeconds(30),
             TimeSpan.FromSeconds(30)
         };
         
         public TimeSpan? NextRetryDelay(RetryContext retryContext)
         {
-            return retryContext.PreviousRetryCount > _intervals.Length ? _intervals.Last() : _intervals[retryContext.PreviousRetryCount];
+            return retryContext.PreviousRetryCount >= _intervals.Length ? _intervals.Last() : _intervals[retryContext.PreviousRetryCount];
         }
     }
 }
