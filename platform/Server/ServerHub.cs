@@ -113,16 +113,25 @@ namespace Server
 
         public async Task RegisterAsGateway(string id)
         {
-            _logger.LogInformation("Gateway registered with Id: {Id}, and CId: {ConnectionId}", id, Context.ConnectionId);
-            var connectionId = Context.ConnectionId;
-            
-            var ip = Context.Features.Get<IHttpConnectionFeature>().RemoteIpAddress;
-            
-            _connectionManager.AddConnection(connectionId);
-            await SetHubConnectionInfo(connectionId, ip?.ToString());
-            await Groups.RemoveFromGroupAsync(connectionId, "clients");
-            await Groups.AddToGroupAsync(connectionId, "gateways");
-            await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
+            _logger.LogInformation("Gateway registering with Id: {Id}, and CId: {ConnectionId} ...", id, Context.ConnectionId);
+            try
+            {
+                var connectionId = Context.ConnectionId;
+                var ip = Context.Features.Get<IHttpConnectionFeature>().RemoteIpAddress;
+
+                _connectionManager.AddConnection(connectionId);
+                await SetHubConnectionInfo(connectionId, ip?.ToString() ?? "No Info");
+                await Groups.RemoveFromGroupAsync(connectionId, "clients");
+                await Groups.AddToGroupAsync(connectionId, "gateways");
+                await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
+                _logger.LogInformation("Gateway successfully registered with Id: {Id}, and CId: {ConnectionId}!", id,
+                    Context.ConnectionId);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError("Failed to register Gateway with Id: {Id}, and CId: {ConnectionId}, {Error}", id,
+                    Context.ConnectionId, e.Message);
+            }
         }
 
         public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
