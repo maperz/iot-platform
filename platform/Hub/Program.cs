@@ -15,13 +15,14 @@ namespace Hub
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseKestrel(
+                    webBuilder.UseUrls()
+                    .UseKestrel(
                         o =>
                         {
                             o.ListenAnyIP(1883, l => l.UseMqtt());
                             o.ListenAnyIP(5000);
-                        });
-                    webBuilder.UseStartup<Startup>();
+                        })
+                    .UseStartup<Startup>();
                 });
     }
 }

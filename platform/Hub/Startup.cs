@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using MQTTnet.AspNetCore.Extensions;
 using Shared;
 
@@ -28,10 +29,15 @@ namespace Hub
                 .AddMqttConnectionHandler()
                 .AddConnections();
 
+            services.AddRouting(options => options.LowercaseUrls = true);
+
             services.AddCors();
             
             services.AddMediatR(typeof(Startup));
-            
+            services.AddSwaggerGen(c =>
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "IoT Hub - API", Version = "v1" })             
+            );
+
             services.Configure<AppSettings>(Configuration);
             var appSettings = new AppSettings();
             Configuration.Bind(appSettings);
@@ -53,6 +59,8 @@ namespace Hub
 
             services.AddSingleton<IDeviceService, DeviceService>();
             services.AddSingleton<IApiBroadcaster, ApiBroadcaster>();
+
+            services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,14 +76,18 @@ namespace Hub
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
-                
+             
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
-            
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapHub<GatewayHub>("/hub");
             });
 
