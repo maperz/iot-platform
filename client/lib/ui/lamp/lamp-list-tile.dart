@@ -4,6 +4,7 @@ import 'package:curtains_client/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
@@ -85,10 +86,11 @@ class _LampListTileState extends State<LampListTile> {
                         ),
                       ),
                     ),
-                    title: Row(
-                      children: [
-                        Text(widget.deviceState.getDisplayName()),
-                      ],
+                    title: Text(widget.deviceState.getDisplayName()),
+                    subtitle: Text(
+                      DateFormat("H:mm:ss d.M.y")
+                          .format(widget.deviceState.lastUpdate.toLocal()),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ),
                 ),

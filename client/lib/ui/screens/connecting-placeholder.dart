@@ -1,4 +1,5 @@
 import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/ui/helper/skeleton-tile.dart';
 import 'package:flutter/material.dart';
 
 class ConnectingPlaceholder extends StatelessWidget {
@@ -14,19 +15,13 @@ class ConnectingPlaceholder extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: CircularProgressIndicator(
-                strokeWidth: 6,
-              ),
-            ),
             Text(
               _getTitleMessage(info),
               style: Theme.of(context).textTheme.headline5,
             ),
             if (info != null)
               Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Text(
                   _getStatusMessage(info!),
                   style: Theme.of(context).textTheme.caption,
@@ -52,5 +47,25 @@ class ConnectingPlaceholder extends StatelessWidget {
     }
 
     return "Connecting to ${info.targetAddress}";
+  }
+}
+
+class ConnectingListPlaceholder extends StatelessWidget {
+  final ConnectionInfo? info;
+
+  ConnectingListPlaceholder(this.info);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final heightOfTile = 98;
+    int count = (height / heightOfTile).floor();
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return SkeletonTile();
+      },
+      itemCount: count,
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:curtains_client/connection/connection.dart';
-import 'package:curtains_client/ui/screens/connection-info-screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +19,10 @@ class MainScreen extends StatelessWidget {
           return StreamBuilder(
               stream: connection.getConnectionAddress(),
               builder: (context, address) {
-                return ConnectingPlaceholder(info);
+                return Stack(children: [
+                  ConnectingListPlaceholder(info),
+                  ConnectingPlaceholder(info)
+                ]);
               });
         },
       );

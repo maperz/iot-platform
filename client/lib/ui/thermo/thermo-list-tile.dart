@@ -37,7 +37,6 @@ class ThermoState {
   late double hum;
 
   ThermoState(String jsonEncode) {
-    print(jsonEncode);
     final state = json.decode(jsonEncode);
 
     var tempJson = state['temp'] ?? "0.0";
@@ -98,18 +97,14 @@ class _ThermoListTileState extends State<ThermoListTile> {
                               Text(widget.thermoState.hum.toString() + "%"),
                             ],
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                DateFormat.yMEd()
-                                    .format(widget.deviceState.lastUpdate),
-                                style: TextStyle(fontSize: 12),
-                              )
-                            ],
-                          )
                         ],
                       )
                     ],
+                  ),
+                  subtitle: Text(
+                    DateFormat("H:mm:ss d.M.y")
+                        .format(widget.deviceState.lastUpdate.toLocal()),
+                    style: TextStyle(fontSize: 12),
                   ),
                 ),
               ),

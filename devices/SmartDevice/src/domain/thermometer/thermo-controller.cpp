@@ -12,7 +12,8 @@ bool ThermoController::onRequest(const String &request, char *payload, size_t pl
 {
     if (request.equals(getRequestChannel("temperature")))
     {
-        return measureTemperature();
+        measureTemperature();
+        return true;
     }
     return false;
 }
