@@ -6,7 +6,9 @@
 class ThermoController : public Controller
 {
 public:
-    ThermoController(PubSubClient *client) : Controller(client) {}
+    ThermoController(PubSubClient *client) : Controller(client) {
+        measureTemperature();
+    }
 
     virtual void loop();
     virtual bool onRequest(const String &request, char *payload, size_t plength);

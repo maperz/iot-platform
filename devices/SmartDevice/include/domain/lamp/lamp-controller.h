@@ -22,7 +22,7 @@ public:
     virtual String getVersion() { return "1.0.0"; }
 
 private:
-    bool isOn;
+    bool isOn = false;
 };
 
 #endif // LAMP_CONTROLLER_H_GUARD

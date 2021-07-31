@@ -23,25 +23,7 @@ namespace Connectivity
         log(LogLevel::Info, "Created SoftAccessPoint!");
         serverIP = WiFi.softAPIP();
     }
-
-    bool isWifiConnected()
-    {
-        return WiFi.status() == WL_CONNECTED;
-    }
-
-    void setupLocalWifi(const char *ssid, const char *password)
-    {
-        WiFi.begin(ssid, password);
-        log(LogLevel::Info, "Trying to connect to Wifi ");
-        while (WiFi.status() != WL_CONNECTED)
-        {
-            delay(500);
-            log(LogLevel::Info, ".");
-        }
-        log(LogLevel::Info, "[Connected]\n");
-        serverIP = WiFi.localIP();
-    }
-
+    
     void setupServer()
     {
         server.begin();

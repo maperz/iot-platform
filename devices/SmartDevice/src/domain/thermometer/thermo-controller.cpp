@@ -6,6 +6,8 @@
 
 DHT dht(D1, DHT22);
 
+const unsigned long measureInterval = 60000; // [ms]
+
 bool ThermoController::onRequest(const String &request, char *payload, size_t plength)
 {
     if (request.equals(getRequestChannel("temperature")))
@@ -18,9 +20,8 @@ bool ThermoController::onRequest(const String &request, char *payload, size_t pl
 void ThermoController::loop()
 {
     unsigned long timeMs = millis();
-    const int deltaMs = 60000; 
 
-    if (timeMs - _lastTime >= deltaMs)
+    if (timeMs - _lastTime >= measureInterval)
     {
         if (measureTemperature())
         {
@@ -31,11 +32,7 @@ void ThermoController::loop()
 }
 
 String ThermoController::getState()
-{
-    if (!_initialized) {
-        return "";
-    }
-    
+{    
     StaticJsonDocument<200> json;
     json["temp"] = _lastMeasuredTemp;
     json["hum"] = _lastMeasuredHum;
