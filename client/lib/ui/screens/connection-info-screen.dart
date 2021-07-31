@@ -5,51 +5,48 @@ import 'package:provider/provider.dart';
 class ConnectionInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Consumer<Connection>(builder: (context, connection, child) {
-        return StreamBuilder<ConnectionInfo?>(
-          stream: connection.getConnectionInfo(),
-          builder: (context, infoSnapShot) {
-            ConnectionInfo? info = infoSnapShot.data;
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Connectivity Info'),
+        ),
+        body: Center(
+          child: Consumer<Connection>(builder: (context, connection, child) {
+            return StreamBuilder<ConnectionInfo?>(
+              stream: connection.getConnectionInfo(),
+              builder: (context, infoSnapShot) {
+                ConnectionInfo? info = infoSnapShot.data;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 32.0, horizontal: 24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Connection Info",
-                        style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.w500),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 32.0, horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ..._createStatusWidget(info),
+                        ],
                       ),
-                      Container(
-                        height: 32,
-                      ),
-                      ..._createStatusWidget(info),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Image.asset("assets/icons/connection-icon.png"),
                     ),
-                  ),
-                )
-              ],
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child:
+                              Image.asset("assets/icons/connection-icon.png"),
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
             );
-          },
-        );
-      }),
-    );
+          }),
+        ));
   }
 
   List<Widget> _createStatusWidget(ConnectionInfo? info) {

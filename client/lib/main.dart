@@ -2,6 +2,7 @@ import 'package:curtains_client/connection/address-resolver.dart';
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-service.dart';
 import 'package:curtains_client/domain/device/devices-model.dart';
+import 'package:curtains_client/ui/helper/connection-info-icon.dart';
 import 'package:curtains_client/ui/screens/connection-info-screen.dart';
 import 'package:curtains_client/ui/screens/main-screen.dart';
 import 'package:curtains_client/utils/platform.dart';
@@ -45,48 +46,36 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
-  final String? title;
+class MyHomePage extends StatelessWidget {
+  late final String title;
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  bool _showMainScreen = true;
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text(widget.title!),
+      title: Text(this.title),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 20.0),
+          child: IconButton(
+            icon: const ConnectionInfoIcon(),
+            tooltip: 'Show connectivity info',
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute<void>(
+                builder: (BuildContext context) {
+                  return ConnectionInfoScreen();
+                },
+              ));
+            },
+          ),
+        )
+      ],
     );
-
-    final bottomBar = Container(
-        child: BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () => setState(() => _showMainScreen = true),
-          ),
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () => setState(() => _showMainScreen = true),
-          ),
-          IconButton(
-            icon: Icon(Icons.analytics),
-            onPressed: () => setState(() => _showMainScreen = false),
-          ),
-        ],
-      ),
-    ));
 
     return Scaffold(
       appBar: appBar,
-      body: _showMainScreen ? MainScreen() : ConnectionInfoScreen(),
-      bottomNavigationBar: bottomBar,
+      body: MainScreen(),
     );
   }
 }
