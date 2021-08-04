@@ -5,12 +5,19 @@ import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:curtains_client/ui/helper/connection-info-icon.dart';
 import 'package:curtains_client/ui/screens/connection-info-screen.dart';
 import 'package:curtains_client/ui/screens/main-screen.dart';
+import 'package:curtains_client/utils/build-info.dart';
 import 'package:curtains_client/utils/platform.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Logger.root.level = BuildInfo.isRelease() ? Level.INFO : Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('[${record.level.name}]: ${record.time}: ${record.message}');
+  });
 
   IAddressResolver resolver =
       PlatformInfo.isWeb() ? new WebAddressResolver() : new AddressResolver();

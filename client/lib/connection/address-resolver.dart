@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -27,6 +28,7 @@ class WebAddressResolver implements IAddressResolver {
 class AddressResolver implements IAddressResolver {
   final localDiscovery = new LocalHubDiscovery();
   final remoteDiscovery = new RemoteHubDiscovery();
+  final logger = new Logger("AddressResolver");
 
   BehaviorSubject<ConnectivityResult>? _connectivity;
   Stream<String?>? _hubUrlStream;
@@ -40,8 +42,7 @@ class AddressResolver implements IAddressResolver {
       });
 
       _hubUrlStream = _connectivity!.switchMap((result) {
-        print("Connectivity changed to: " + result.toString());
-
+        logger.info('Connectivity changed to: $result');
         switch (result) {
           case ConnectivityResult.wifi:
             return localDiscovery

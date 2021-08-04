@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:curtains_client/api/api-methods.dart';
 import 'package:curtains_client/connection/address-resolver.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:signalr_core/signalr_core.dart';
@@ -50,6 +51,8 @@ class ConnectionState {
 }
 
 class Connection extends ChangeNotifier implements IConnection {
+  final logger = Logger('Connection');
+
   HubConnection? _connection;
 
   late Stream<bool> _isConnected;
@@ -109,14 +112,15 @@ class Connection extends ChangeNotifier implements IConnection {
 
   @override
   void listenOn(String endpoint, Function(List<dynamic>?) callback) {
-    print("Listening on " + endpoint);
+    logger.info('Listening on Endpoint: "$endpoint"');
     _connection?.off(endpoint);
     _connection?.on(endpoint, (message) {
       try {
-        print('Endpoint: $endpoint - Received: ${message![0].toString()}');
+        logger
+            .fine('Endpoint: $endpoint - Received: ${message![0].toString()}');
         callback(message[0]);
       } catch (e) {
-        print(e);
+        logger.severe('Caught error listening on "$endpoint"', e);
       }
     });
   }
@@ -145,7 +149,7 @@ class Connection extends ChangeNotifier implements IConnection {
     final isConnected = _connection?.state == HubConnectionState.connected;
 
     if ((!connect || address == null) && isConnected) {
-      print("Stopping connection");
+      logger.info('Stopping connection');
       await _connection!.stop();
       _connection = null;
       _connectionInfo.add(null);
@@ -160,14 +164,15 @@ class Connection extends ChangeNotifier implements IConnection {
 
     if (connect && !isConnected) {
       _createConnection(hubUrl);
-      print('Starting connection at $hubUrl');
+      logger.info('Starting connection at $hubUrl ...');
       await _connection?.start();
+      logger.info('Connection established at $hubUrl!');
       return;
     }
 
     if (connect && _connection!.baseUrl != hubUrl) {
       _createConnection(address);
-      print("Reconnecting to different url");
+      logger.info('Reconnecting to a different url at $hubUrl ...');
       stop();
       start();
     }
@@ -189,18 +194,26 @@ class Connection extends ChangeNotifier implements IConnection {
         .withAutomaticReconnect(new CustomRetryPolicy())
         .build();
 
-    _connection!.onreconnecting((connectionId) {
-      print("Reconnecting");
+    _connection!.onreconnecting((error) {
+      logger.severe(
+          error != null ? 'Reconnecting with error' : 'Reconnecting ...',
+          error);
+
       _connectionInfo.add(null);
     });
 
     _connection!.onreconnected((connectionId) {
-      print("Reconnected");
+      logger.info("Reconnected successfully");
       _connectionInfo.add(null);
     });
 
     _connection!.onclose((error) {
-      print("Connection Closed");
+      logger.log(
+          error != null ? Level.SEVERE : Level.INFO,
+          error != null
+              ? 'Connection closed with error: ${error.toString()}'
+              : 'Connection closed');
+
       _connectionError.add(error);
       _connectionInfo.add(null);
     });

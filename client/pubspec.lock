@@ -178,7 +178,7 @@ packages:
     source: hosted
     version: "0.6.3"
   logging:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: logging
       url: "https://pub.dartlang.org"
@@ -260,7 +260,7 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.26.0"
+    version: "0.27.1"
   signalr_core:
     dependency: "direct main"
     description:

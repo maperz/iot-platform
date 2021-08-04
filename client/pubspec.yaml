@@ -31,9 +31,10 @@ dependencies:
   multicast_dns: ^0.3.0
   intl: ^0.17.0
   provider: ^5.0.0
-  rxdart: ^0.26.0
+  rxdart: ^0.27.1
   connectivity: ^3.0.3
   flutter_nsd: ^1.1.0
+  logging: ^1.0.1
 
 dev_dependencies:
   flutter_test:
