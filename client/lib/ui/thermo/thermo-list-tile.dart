@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
+import 'package:curtains_client/ui/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../device-detail.dart';
@@ -55,58 +55,53 @@ class _ThermoListTileState extends State<ThermoListTile> {
               child: InkWell(
                 onTap: () => requestMeasurement(connection),
                 child: ListTile(
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                  enabled: widget.deviceState.connected,
-                  leading: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DeviceIcon(widget.deviceState),
-                  ),
-                  trailing: InkWell(
-                    onTap: widget.deviceState.connected
-                        ? () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DetailDevicePage(
-                                        widget.deviceState, connection)));
-                          }
-                        : null,
-                    child: Padding(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    enabled: widget.deviceState.connected,
+                    leading: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.more_vert_rounded,
+                      child: DeviceIcon(widget.deviceState),
+                    ),
+                    trailing: InkWell(
+                      onTap: widget.deviceState.connected
+                          ? () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DetailDevicePage(
+                                          widget.deviceState, connection)));
+                            }
+                          : null,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.more_vert_rounded,
+                        ),
                       ),
                     ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(widget.deviceState.getDisplayName()),
-                      Container(
-                        width: 20,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(widget.thermoState.temp.toString() + "°C"),
-                              Container(
-                                width: 10,
-                              ),
-                              Text(widget.thermoState.hum.toString() + "%"),
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  subtitle: Text(
-                    DateFormat("H:mm:ss d.M.y")
-                        .format(widget.deviceState.lastUpdate.toLocal()),
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
+                    title: Row(
+                      children: [
+                        Text(widget.deviceState.getDisplayName()),
+                        Container(
+                          width: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(widget.thermoState.temp.toString() + "°C"),
+                                Container(
+                                  width: 10,
+                                ),
+                                Text(widget.thermoState.hum.toString() + "%"),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    subtitle: LastUpdateText(widget.deviceState.lastUpdate)),
               ),
             ));
   }

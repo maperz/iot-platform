@@ -1,10 +1,10 @@
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
+import 'package:curtains_client/ui/helper/last-update-text.dart';
 import 'package:curtains_client/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
@@ -62,37 +62,32 @@ class _LampListTileState extends State<LampListTile> {
                   onTap: () => setState(
                       () => setSwitchState(connection, !widget.lampState.isOn)),
                   child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                    enabled: widget.deviceState.connected,
-                    leading: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DeviceIcon(widget.deviceState),
-                    ),
-                    trailing: InkWell(
-                      onTap: widget.deviceState.connected
-                          ? () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DetailDevicePage(
-                                          widget.deviceState, connection)));
-                            }
-                          : null,
-                      child: Padding(
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                      enabled: widget.deviceState.connected,
+                      leading: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          Icons.more_vert_rounded,
+                        child: DeviceIcon(widget.deviceState),
+                      ),
+                      trailing: InkWell(
+                        onTap: widget.deviceState.connected
+                            ? () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => DetailDevicePage(
+                                            widget.deviceState, connection)));
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.more_vert_rounded,
+                          ),
                         ),
                       ),
-                    ),
-                    title: Text(widget.deviceState.getDisplayName()),
-                    subtitle: Text(
-                      DateFormat("H:mm:ss d.M.y")
-                          .format(widget.deviceState.lastUpdate.toLocal()),
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ),
+                      title: Text(widget.deviceState.getDisplayName()),
+                      subtitle: LastUpdateText(widget.deviceState.lastUpdate)),
                 ),
               ),
             ));

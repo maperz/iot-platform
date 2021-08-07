@@ -35,6 +35,8 @@ dependencies:
   connectivity: ^3.0.3
   flutter_nsd: ^1.1.0
   logging: ^1.0.1
+  firebase_auth: ^3.0.1
+  firebase_core: ^1.4.0
 
 dev_dependencies:
   flutter_test:

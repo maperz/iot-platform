@@ -53,7 +53,7 @@ namespace Server
             _logger.LogInformation("SignalR Client disconnected {ClientId}", connectionId);
 
             // TODO: Support multiple gateways
-            if (_connectionManager.RemoveConnection(connectionId))
+            if (_connectionManager.RemoveConnection(connectionId) && (await TryGetConnectionInfo())?.Id == connectionId)
             {
                 await SetHubConnectionInfo(null, null);
                 await Clients.Group("clients").SendAsync(nameof(ConnectionInfo), await GetConnectionInfo());
@@ -136,7 +136,7 @@ namespace Server
 
         public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
         {
-            _logger.LogInformation("Sending Device State change to clients");
+            // _logger.LogInformation("Sending Device State change to clients");
             return Clients.Group("clients").SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
         }
         

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
+import 'package:curtains_client/ui/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -47,53 +48,53 @@ class _CurtainListTileState extends State<CurtainListTile> {
     return Consumer<Connection>(
         builder: (context, connection, child) => Card(
               child: ListTile(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                enabled: widget.deviceState.connected,
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DeviceIcon(widget.deviceState),
-                ),
-                trailing: InkWell(
-                  onTap: widget.deviceState.connected
-                      ? () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DetailDevicePage(
-                                      widget.deviceState, connection)));
-                        }
-                      : null,
-                  child: Padding(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                  enabled: widget.deviceState.connected,
+                  leading: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.more_vert_rounded,
-                    ),
+                    child: DeviceIcon(widget.deviceState),
                   ),
-                ),
-                title: Row(
-                  children: [
-                    Text(widget.deviceState.getDisplayName()),
-                    Expanded(
-                      child: Slider(
-                        value: widget.curtainState.progress,
-                        min: -1.0,
-                        max: 1.0,
-                        divisions: 40,
-                        label: (widget.curtainState.progress * 100)
-                                .round()
-                                .toString() +
-                            " Percent",
-                        onChanged: widget.deviceState.connected
-                            ? (double value) {
-                                setState(() => setSpeed(connection, value));
-                              }
-                            : null,
+                  trailing: InkWell(
+                    onTap: widget.deviceState.connected
+                        ? () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DetailDevicePage(
+                                        widget.deviceState, connection)));
+                          }
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.more_vert_rounded,
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                  title: Row(
+                    children: [
+                      Text(widget.deviceState.getDisplayName()),
+                      Expanded(
+                        child: Slider(
+                          value: widget.curtainState.progress,
+                          min: -1.0,
+                          max: 1.0,
+                          divisions: 40,
+                          label: (widget.curtainState.progress * 100)
+                                  .round()
+                                  .toString() +
+                              " Percent",
+                          onChanged: widget.deviceState.connected
+                              ? (double value) {
+                                  setState(() => setSpeed(connection, value));
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  subtitle: LastUpdateText(widget.deviceState.lastUpdate)),
             ));
   }
 

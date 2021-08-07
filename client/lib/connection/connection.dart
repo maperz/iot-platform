@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:curtains_client/api/api-methods.dart';
+import 'package:curtains_client/auth/auth-service.dart';
 import 'package:curtains_client/connection/address-resolver.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,8 +12,8 @@ import 'package:signalr_core/signalr_core.dart';
 
 abstract class IConnection implements ApiMethods {
   void start();
-
   void stop();
+  void restart();
 
   Stream<bool> getConnectedState();
 
@@ -63,9 +65,16 @@ class Connection extends ChangeNotifier implements IConnection {
 
   BehaviorSubject<String?> _addressStream = new BehaviorSubject();
 
-  Connection(IAddressResolver addressResolver) {
+  Connection(IAddressResolver addressResolver, IAuthService authService) {
     addressResolver.getHubUrl().listen((address) {
       _addressStream.add(address);
+    });
+
+    authService.currentUser().listen((user) {
+      final isConnected = _connection?.state != HubConnectionState.disconnected;
+      if (isConnected) {
+        this.restart();
+      }
     });
 
     var connectionStream = CombineLatestStream.combine3(
@@ -75,12 +84,15 @@ class Connection extends ChangeNotifier implements IConnection {
         (bool connect, String? address, Exception? error) =>
             new ConnectionState(connect, address, error));
 
+    connectionStream.listen((state) async => _handleConnection(
+        state.shouldConnect,
+        state.address,
+        state.connectionError,
+        authService));
+
     _isConnected = _connectionInfo
         .map((info) => info != null && info.isConnected)
         .distinct();
-
-    connectionStream.listen((state) async => _handleConnection(
-        state.shouldConnect, state.address, state.connectionError));
 
     _isConnected.listen((event) {
       notifyListeners();
@@ -94,6 +106,12 @@ class Connection extends ChangeNotifier implements IConnection {
   @override
   void stop() {
     _startState.sink.add(false);
+  }
+
+  @override
+  void restart() {
+    this.stop();
+    this.start();
   }
 
   @override
@@ -144,9 +162,14 @@ class Connection extends ChangeNotifier implements IConnection {
     return deviceList;
   }
 
-  Future _handleConnection(
-      bool connect, String? address, Exception? connectionError) async {
+  Future _handleConnection(bool connect, String? address,
+      Exception? connectionError, IAuthService authService) async {
+    final user = await authService.getUser();
+    logger.finest(
+        "Handle connect with $connect, $address, $user, $connectionError");
+
     final isConnected = _connection?.state == HubConnectionState.connected;
+    final tokenFactory = user != null ? () => user.getIdToken() : null;
 
     if ((!connect || address == null) && isConnected) {
       logger.info('Stopping connection');
@@ -163,7 +186,7 @@ class Connection extends ChangeNotifier implements IConnection {
     final hubUrl = address + '/hub';
 
     if (connect && !isConnected) {
-      _createConnection(hubUrl);
+      _createConnection(hubUrl, tokenFactory);
       logger.info('Starting connection at $hubUrl ...');
       await _connection?.start();
       logger.info('Connection established at $hubUrl!');
@@ -171,22 +194,22 @@ class Connection extends ChangeNotifier implements IConnection {
     }
 
     if (connect && _connection!.baseUrl != hubUrl) {
-      _createConnection(address);
+      _createConnection(address, tokenFactory);
       logger.info('Reconnecting to a different url at $hubUrl ...');
       stop();
       start();
     }
   }
 
-  void _createConnection(String hubUrl) {
+  void _createConnection(String hubUrl, AccessTokenFactory? tokenFactory) {
     final options = new HttpConnectionOptions(
-      // Workaround to fix a bug that currently happens when connecting
-      // to the server
-      transport: hubUrl.contains("iot.perz.cloud")
-          ? HttpTransportType.serverSentEvents
-          : HttpTransportType.webSockets,
-      //logging: (level, message) => print(message)
-    );
+        // Workaround to fix a bug that currently happens when connecting
+        // to the server
+        transport: hubUrl.contains("iot.perz.cloud")
+            ? HttpTransportType.serverSentEvents
+            : HttpTransportType.webSockets,
+        //logging: (level, message) => print(message)
+        accessTokenFactory: tokenFactory);
 
     _connection = HubConnectionBuilder()
         .withUrl(hubUrl, options)

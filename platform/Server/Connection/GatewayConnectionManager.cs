@@ -33,7 +33,7 @@ namespace Server.Connection
                 _lock.ExitWriteLock();
             }
         }
-
+        
         public bool RemoveConnection(string connectionId)
         {
             _lock.EnterWriteLock();
