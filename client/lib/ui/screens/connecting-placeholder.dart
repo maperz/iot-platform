@@ -1,4 +1,4 @@
-import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/connection/model/connection-info.dart';
 import 'package:curtains_client/ui/helper/skeleton-tile.dart';
 import 'package:flutter/material.dart';
 

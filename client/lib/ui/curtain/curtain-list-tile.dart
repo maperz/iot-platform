@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/api/api-service.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:curtains_client/ui/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +45,8 @@ class CurtainState {
 class _CurtainListTileState extends State<CurtainListTile> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<Connection>(
-        builder: (context, connection, child) => Card(
+    return Consumer<IApiService>(
+        builder: (context, apiService, child) => Card(
               child: ListTile(
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -62,7 +62,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => DetailDevicePage(
-                                        widget.deviceState, connection)));
+                                        widget.deviceState, apiService)));
                           }
                         : null,
                     child: Padding(
@@ -87,7 +87,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                               " Percent",
                           onChanged: widget.deviceState.connected
                               ? (double value) {
-                                  setState(() => setSpeed(connection, value));
+                                  setState(() => setSpeed(apiService, value));
                                 }
                               : null,
                         ),
@@ -98,8 +98,8 @@ class _CurtainListTileState extends State<CurtainListTile> {
             ));
   }
 
-  void setSpeed(Connection connection, double value) {
-    connection.sendRequest(
+  void setSpeed(IApiService apiService, double value) {
+    apiService.sendRequest(
         widget.deviceState.deviceId, "speed", value.toStringAsPrecision(2));
   }
 }

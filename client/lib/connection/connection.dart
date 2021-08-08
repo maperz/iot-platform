@@ -1,273 +1,191 @@
 import 'dart:async';
 
-import 'package:curtains_client/api/api-methods.dart';
 import 'package:curtains_client/auth/auth-service.dart';
 import 'package:curtains_client/connection/address-resolver.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:curtains_client/connection/model/connection-info.dart';
+import 'package:curtains_client/connection/signalr/signalr-helper.dart';
+import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:signalr_core/signalr_core.dart';
 
-abstract class IConnection implements ApiMethods {
-  void start();
-  void stop();
-  void restart();
+typedef Json = Map<String, dynamic>;
 
-  Stream<bool> getConnectedState();
+class ConnectionStateData {
+  final bool isConnected;
+  final ConnectionInfo? info;
+  const ConnectionStateData(this.isConnected, this.info);
 
-  Stream<String?> getConnectionAddress();
+  static const ConnectionStateData disconnected =
+      ConnectionStateData(false, null);
 
-  void listenOn(String endpoint, Function(List<dynamic>?) callback);
-}
-
-class ConnectionInfo {
-  String targetAddress;
-  bool isConnected;
-  bool isProxy;
-  String? proxiedAddress;
-  String version;
-
-  ConnectionInfo(this.targetAddress, this.isConnected, this.isProxy,
-      this.proxiedAddress, this.version);
-
-  factory ConnectionInfo.fromJson(
-      String targetAddress, Map<String, dynamic> json) {
-    var isConnected = json['isConnected'];
-    var isProxy = json['isProxy'];
-    var proxiedAddress = json['proxiedAddress'];
-    var version = json['version'];
-
-    return ConnectionInfo(
-        targetAddress, isConnected, isProxy, proxiedAddress, version);
+  String toString() {
+    var connected = isConnected ? "Connected" : "Disconnected";
+    return "[$connected] $info";
   }
 }
 
-class ConnectionState {
-  final bool shouldConnect;
-  final String? address;
-  final Exception? connectionError;
+abstract class IConnectionService {
+  Stream<ConnectionStateData> getConnectedState();
 
-  ConnectionState(this.shouldConnect, this.address, this.connectionError);
+  Stream<bool> isConnected();
+
+  Future<S> invoke<S>(String endpoint, {List<dynamic>? args});
+
+  Stream<S> listenOn<S>(String endpoint);
+
+  Future init();
 }
 
-class Connection extends ChangeNotifier implements IConnection {
-  final logger = Logger('Connection');
+class ConnectionEndpoints {
+  static const String ConnectionInfo = "ConnectionInfo";
+}
 
-  HubConnection? _connection;
+class AddressTokenTuple {
+  final HubAddress address;
+  final String? token;
+  AddressTokenTuple(this.address, this.token);
+}
 
-  late Stream<bool> _isConnected;
-  BehaviorSubject<bool> _startState = BehaviorSubject.seeded(false);
-  BehaviorSubject<Exception?> _connectionError = BehaviorSubject.seeded(null);
-  BehaviorSubject<ConnectionInfo?> _connectionInfo =
+class ConnectionService implements IConnectionService {
+  final logger = Logger('ConnectionService');
+  final IAddressResolver addressResolver;
+  final IAuthService authService;
+  late final SignalRHelper signalR;
+
+  late final BehaviorSubject<ConnectionStateData> _connectionState =
+      BehaviorSubject.seeded(ConnectionStateData.disconnected);
+
+  final BehaviorSubject<bool> _isConnected = BehaviorSubject.seeded(false);
+
+  final BehaviorSubject<ConnectionInfo?> _connectionInfo =
       BehaviorSubject.seeded(null);
 
-  BehaviorSubject<String?> _addressStream = new BehaviorSubject();
+  ConnectionService({required this.addressResolver, required this.authService});
 
-  Connection(IAddressResolver addressResolver, IAuthService authService) {
-    addressResolver.getHubUrl().listen((address) {
-      _addressStream.add(address);
+  Future init() async {
+    void onReconnecting(Exception? err) {}
+
+    void onReconnected(String? id) {}
+
+    this.signalR = new SignalRHelper(
+        onReconnect: onReconnecting, onReconnected: onReconnected);
+
+    Rx.combineLatest2(
+            _isConnected,
+            _connectionInfo,
+            (bool connected, ConnectionInfo? info) =>
+                ConnectionStateData(connected, info))
+        .asBroadcastStream()
+        .listen((stateDate) {
+      _connectionState.add(stateDate);
     });
 
-    authService.currentUser().listen((user) {
-      final isConnected = _connection?.state != HubConnectionState.disconnected;
-      if (isConnected) {
-        this.restart();
-      }
-    });
-
-    var connectionStream = CombineLatestStream.combine3(
-        _startState.distinct(),
-        _addressStream.distinct(),
-        _connectionError,
-        (bool connect, String? address, Exception? error) =>
-            new ConnectionState(connect, address, error));
-
-    connectionStream.listen((state) async => _handleConnection(
-        state.shouldConnect,
-        state.address,
-        state.connectionError,
-        authService));
-
-    _isConnected = _connectionInfo
-        .map((info) => info != null && info.isConnected)
+    var addressChanged = addressResolver.getAddress();
+    var tokenChanged = authService
+        .currentUser()
+        .asyncMap((user) => user?.getIdToken() ?? Future.value(null))
         .distinct();
 
-    _isConnected.listen((event) {
-      notifyListeners();
-    });
-  }
-  @override
-  void start() {
-    _startState.sink.add(true);
-  }
+    var changeStream = Rx.combineLatest2(
+        addressChanged,
+        tokenChanged,
+        (HubAddress address, String? token) =>
+            AddressTokenTuple(address, token)).distinct();
 
-  @override
-  void stop() {
-    _startState.sink.add(false);
-  }
+    await for (var change in changeStream) {
+      var address = change.address;
+      var token = change.token;
 
-  @override
-  void restart() {
-    this.stop();
-    this.start();
-  }
+      final hubUrl = address.toString() + '/hub';
 
-  @override
-  Stream<bool> getConnectedState() {
-    return _isConnected;
-  }
+      logger.finest(
+          "Handle connection to $hubUrl. Requires Auth: ${address.requiresAuthentication} and Token: ${token?.substring(0, 5)}...");
 
-  Stream<ConnectionInfo?> getConnectionInfo() {
-    return _connectionInfo.stream.distinct();
-  }
+      await this.signalR.stop();
+      _onConnectionStopped();
 
-  @override
-  Stream<String?> getConnectionAddress() {
-    return _addressStream;
-  }
-
-  @override
-  void listenOn(String endpoint, Function(List<dynamic>?) callback) {
-    logger.info('Listening on Endpoint: "$endpoint"');
-    _connection?.off(endpoint);
-    _connection?.on(endpoint, (message) {
-      try {
-        logger
-            .fine('Endpoint: $endpoint - Received: ${message![0].toString()}');
-        callback(message[0]);
-      } catch (e) {
-        logger.severe('Caught error listening on "$endpoint"', e);
+      if (address.requiresAuthentication && token == null) {
+        // Requires authentication
+        logger.warning(
+            "Not connecting since token is not set and auth is required");
+        continue;
       }
-    });
-  }
 
-  // API
+      await this.signalR.init(hubUrl, token);
 
-  @override
-  Future sendRequest(String deviceId, String name, String payload) async {
-    await _connection?.invoke("SendRequest", args: [deviceId, name, payload]);
-  }
-
-  @override
-  Future setDeviceName(String deviceId, String name) async {
-    await _connection?.invoke("ChangeDeviceName", args: [deviceId, name]);
-  }
-
-  @override
-  Future<Iterable<dynamic>> getDeviceList() async {
-    var deviceList =
-        (await _connection?.invoke("GetDeviceList")) as Iterable<dynamic>;
-    return deviceList;
-  }
-
-  Future _handleConnection(bool connect, String? address,
-      Exception? connectionError, IAuthService authService) async {
-    final user = await authService.getUser();
-    logger.finest(
-        "Handle connect with $connect, $address, $user, $connectionError");
-
-    final isConnected = _connection?.state == HubConnectionState.connected;
-    final tokenFactory = user != null ? () => user.getIdToken() : null;
-
-    if ((!connect || address == null) && isConnected) {
-      logger.info('Stopping connection');
-      await _connection!.stop();
-      _connection = null;
-      _connectionInfo.add(null);
-      return;
-    }
-
-    if (!connect || address == null) {
-      return;
-    }
-
-    final hubUrl = address + '/hub';
-
-    if (connect && !isConnected) {
-      _createConnection(hubUrl, tokenFactory);
-      logger.info('Starting connection at $hubUrl ...');
-      await _connection?.start();
-      logger.info('Connection established at $hubUrl!');
-      return;
-    }
-
-    if (connect && _connection!.baseUrl != hubUrl) {
-      _createConnection(address, tokenFactory);
-      logger.info('Reconnecting to a different url at $hubUrl ...');
-      stop();
-      start();
-    }
-  }
-
-  void _createConnection(String hubUrl, AccessTokenFactory? tokenFactory) {
-    final options = new HttpConnectionOptions(
-        // Workaround to fix a bug that currently happens when connecting
-        // to the server
-        transport: hubUrl.contains("iot.perz.cloud")
-            ? HttpTransportType.serverSentEvents
-            : HttpTransportType.webSockets,
-        //logging: (level, message) => print(message)
-        accessTokenFactory: tokenFactory);
-
-    _connection = HubConnectionBuilder()
-        .withUrl(hubUrl, options)
-        .withHubProtocol(JsonHubProtocol())
-        .withAutomaticReconnect(new CustomRetryPolicy())
-        .build();
-
-    _connection!.onreconnecting((error) {
-      logger.severe(
-          error != null ? 'Reconnecting with error' : 'Reconnecting ...',
-          error);
-
-      _connectionInfo.add(null);
-    });
-
-    _connection!.onreconnected((connectionId) {
-      logger.info("Reconnected successfully");
-      _connectionInfo.add(null);
-    });
-
-    _connection!.onclose((error) {
-      logger.log(
-          error != null ? Level.SEVERE : Level.INFO,
-          error != null
-              ? 'Connection closed with error: ${error.toString()}'
-              : 'Connection closed');
-
-      _connectionError.add(error);
-      _connectionInfo.add(null);
-    });
-
-    _connection!.on("ConnectionInfo", (message) {
-      if (message != null && message.length > 0) {
-        var info = ConnectionInfo.fromJson(hubUrl, message[0]);
+      listenOn<Json>(ConnectionEndpoints.ConnectionInfo)
+          .map((json) => ConnectionInfo.fromJson(hubUrl, json))
+          .listen((info) {
         _connectionInfo.add(info);
-      }
-    });
-  }
-}
+      });
 
-class CustomRetryPolicy extends RetryPolicy {
-  final List<Duration> intervals = [
-    Duration(seconds: 1),
-    Duration(seconds: 5),
-    Duration(seconds: 10),
-    Duration(seconds: 15),
-    Duration(seconds: 15),
-    Duration(seconds: 30),
-  ];
+      await this.signalR.start();
+      _onConnectionStarted(hubUrl);
+    }
+  }
+
+  void _onConnectionStopped() {
+    _connectionInfo.add(null);
+    _isConnected.add(false);
+  }
+
+  void _onConnectionStarted(String hubUrl) {
+    _isConnected.add(true);
+  }
 
   @override
-  int? nextRetryDelayInMilliseconds(RetryContext retryContext) {
-    int previousRetries = retryContext.previousRetryCount ?? 0;
+  Stream<bool> isConnected() {
+    return getConnectedState().map((state) => state.isConnected);
+  }
 
-    if (previousRetries < intervals.length) {
-      return intervals[previousRetries].inMilliseconds;
+  @override
+  Stream<ConnectionStateData> getConnectedState() {
+    return _connectionState.distinct();
+  }
+
+  @override
+  Future<S> invoke<S>(String endpoint, {List? args}) async {
+    var response = await signalR.getConnection()?.invoke(endpoint, args: args);
+    assert(response is S, "Invoke expected wrong type");
+    return response as S;
+  }
+
+  @override
+  Stream<S> listenOn<S>(String endpoint) {
+    // ignore: close_sinks
+    late StreamController<S> controller;
+
+    void callback(List<dynamic>? values) {
+      try {
+        if (values != null && values.length > 0) {
+          controller.add(values[0] as S);
+        }
+      } catch (error) {
+        logger.severe("Callback on listenOn failed: ", error);
+        controller.addError(error);
+      }
     }
 
-    return intervals.last.inMilliseconds;
+    void startListening() {
+      signalR.getConnection()?.on(endpoint, callback);
+    }
+
+    void stopListening() {
+      signalR.getConnection()?.off(endpoint, method: callback);
+    }
+
+    controller = StreamController<S>(
+        onListen: startListening,
+        onPause: stopListening,
+        onResume: startListening,
+        onCancel: stopListening);
+
+    return controller.stream;
+  }
+
+  void dispose() {
+    _isConnected.close();
+    _connectionInfo.close();
   }
 }

@@ -20,9 +20,9 @@ class _State extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Consumer<IAuthService>(
       builder: (context, authService, child) => Scaffold(
-          appBar: AppBar(
+          /*appBar: AppBar(
             title: Text(_getAppTitle(context)),
-          ),
+          ),*/
           body: Padding(
               padding: EdgeInsets.all(10),
               child: ListView(
@@ -36,6 +36,7 @@ class _State extends State<LoginPage> {
                     padding: EdgeInsets.all(10),
                     child: TextField(
                       autofocus: true,
+                      keyboardType: TextInputType.emailAddress,
                       controller: emailController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -72,12 +73,6 @@ class _State extends State<LoginPage> {
                           _onLogin(context, authService);
                         },
                       )),
-                  TextButton(
-                    onPressed: () {
-                      //forgot password screen
-                    },
-                    child: Text('Forgot Password'),
-                  ),
                 ],
               ))),
     );

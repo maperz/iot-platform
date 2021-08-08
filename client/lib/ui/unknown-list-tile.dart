@@ -1,3 +1,4 @@
+import 'package:curtains_client/api/api-service.dart';
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,8 @@ class UnknownListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Connection>(
-        builder: (context, connection, child) => Card(
+    return Consumer<IApiService>(
+        builder: (context, apiService, child) => Card(
             child: ListTile(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -32,7 +33,7 @@ class UnknownListTile extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => DetailDevicePage(
-                                      _deviceState, connection)));
+                                      _deviceState, apiService)));
                         }
                       : null,
                   child: Padding(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:curtains_client/discovery/hub-address.dart';
 import 'package:curtains_client/discovery/local-hub-discovery.dart';
 import 'package:curtains_client/discovery/remote-hub-discovery.dart';
 import 'package:connectivity/connectivity.dart';
@@ -8,7 +9,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 abstract class IAddressResolver {
-  Stream<String?> getHubUrl();
+  Stream<HubAddress> getAddress();
   Future init();
 }
 
@@ -16,10 +17,8 @@ class WebAddressResolver implements IAddressResolver {
   final remoteDiscovery = new RemoteHubDiscovery();
 
   @override
-  Stream<String?> getHubUrl() {
-    return remoteDiscovery
-        .getHubAddresses()
-        .map((address) => address.toString());
+  Stream<HubAddress> getAddress() {
+    return remoteDiscovery.getHubAddresses();
   }
 
   Future init() async {}
@@ -31,7 +30,7 @@ class AddressResolver implements IAddressResolver {
   final logger = new Logger("AddressResolver");
 
   BehaviorSubject<ConnectivityResult>? _connectivity;
-  Stream<String?>? _hubUrlStream;
+  late Stream<HubAddress> _hubUrlStream;
 
   Future init() async {
     if (_connectivity == null) {
@@ -45,27 +44,19 @@ class AddressResolver implements IAddressResolver {
         logger.info('Connectivity changed to: $result');
         switch (result) {
           case ConnectivityResult.wifi:
-            return localDiscovery
-                .getHubAddresses()
-                .map((address) => address.toString());
+            return localDiscovery.getHubAddresses();
           case ConnectivityResult.mobile:
-            return remoteDiscovery
-                .getHubAddresses()
-                .map((address) => address.toString());
+            return remoteDiscovery.getHubAddresses();
           default:
-            return Stream.value(null);
+            return Stream<HubAddress>.empty();
         }
-      });
+      }).asBroadcastStream();
     }
   }
 
   @override
-  Stream<String?> getHubUrl() {
-    if (_hubUrlStream == null) {
-      throw new Error();
-    }
-
-    return _hubUrlStream!;
+  Stream<HubAddress> getAddress() {
+    return _hubUrlStream;
   }
 
   dispose() {

@@ -1,14 +1,14 @@
-import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/api/api-service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../domain/device/device-state.dart';
 
 class DetailDevicePage extends StatelessWidget {
   final DeviceState state;
-  final Connection connection;
+  final IApiService apiService;
   final nameController = TextEditingController();
 
-  DetailDevicePage(this.state, this.connection) {
+  DetailDevicePage(this.state, this.apiService) {
     nameController.text = state.getDisplayName();
   }
 
@@ -73,6 +73,6 @@ class DetailDevicePage extends StatelessWidget {
   }
 
   Future _changeDeviceName(String newName) {
-    return this.connection.setDeviceName(this.state.deviceId, newName);
+    return this.apiService.setDeviceName(this.state.deviceId, newName);
   }
 }

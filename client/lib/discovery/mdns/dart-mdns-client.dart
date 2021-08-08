@@ -1,13 +1,16 @@
+import 'package:logging/logging.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 
 import 'mdns-client.dart';
 
 class DartMDNSClient implements IMDNSClient {
+  var logger = new Logger("MDNSClient");
+
   @override
   Future<MDNSResult?> discoverService(String serviceName) async {
     final MDnsClient client = MDnsClient();
 
-    print("Running mDNS discovery");
+    logger.info("Running mDNS discovery for '$serviceName'");
     await client.start();
     try {
       while (true) {
@@ -33,7 +36,6 @@ class DartMDNSClient implements IMDNSClient {
         await Future.delayed(Duration(seconds: 1));
       }
     } finally {
-      print("Quitting discovery");
       client.stop();
     }
   }

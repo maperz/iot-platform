@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'package:rxdart/rxdart.dart';
 
 abstract class IAuthService {
   Future<User?> login(String email, String password);
   Future logout();
+  Future init();
 
   Stream<bool> isLoggedIn();
   Stream<User?> currentUser();
@@ -11,14 +15,11 @@ abstract class IAuthService {
 
 class FirebaseAuthService extends IAuthService {
   late FirebaseAuth _auth;
-
-  FirebaseAuthService() {
-    _auth = FirebaseAuth.instance;
-  }
+  late BehaviorSubject<User?> _userStream;
 
   @override
   Stream<User?> currentUser() {
-    return _auth.userChanges();
+    return _userStream.distinct();
   }
 
   @override
@@ -30,7 +31,9 @@ class FirebaseAuthService extends IAuthService {
   Future<User?> login(String email, String password) async {
     var response = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
-    return response.user;
+    var user = response.user;
+    _userStream.add(user);
+    return user;
   }
 
   @override
@@ -41,5 +44,16 @@ class FirebaseAuthService extends IAuthService {
   @override
   Future<User?> getUser() async {
     return _auth.currentUser;
+  }
+
+  @override
+  Future init() async {
+    await Firebase.initializeApp();
+    _auth = FirebaseAuth.instance;
+    _userStream = new BehaviorSubject.seeded(_auth.currentUser);
+
+    _auth.idTokenChanges().listen((user) {
+      _userStream.add(user);
+    });
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:curtains_client/api/api-service.dart';
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:curtains_client/ui/helper/last-update-text.dart';
@@ -50,10 +51,10 @@ class ThermoState {
 class _ThermoListTileState extends State<ThermoListTile> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<Connection>(
-        builder: (context, connection, child) => Card(
+    return Consumer<IApiService>(
+        builder: (context, apiService, child) => Card(
               child: InkWell(
-                onTap: () => requestMeasurement(connection),
+                onTap: () => requestMeasurement(apiService),
                 child: ListTile(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -69,7 +70,7 @@ class _ThermoListTileState extends State<ThermoListTile> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DetailDevicePage(
-                                          widget.deviceState, connection)));
+                                          widget.deviceState, apiService)));
                             }
                           : null,
                       child: Padding(
@@ -106,7 +107,7 @@ class _ThermoListTileState extends State<ThermoListTile> {
             ));
   }
 
-  void requestMeasurement(Connection connection) {
-    connection.sendRequest(widget.deviceState.deviceId, "temperature", "");
+  void requestMeasurement(IApiService apiService) {
+    apiService.sendRequest(widget.deviceState.deviceId, "temperature", "");
   }
 }

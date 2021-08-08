@@ -41,6 +41,6 @@ class LocalHubDiscovery implements HubDiscovery {
       return null;
     }
 
-    return HubAddress("http", result.address, result.port);
+    return HubAddress("http", result.address, result.port, false);
   }
 }

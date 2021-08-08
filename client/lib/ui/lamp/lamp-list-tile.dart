@@ -1,3 +1,4 @@
+import 'package:curtains_client/api/api-service.dart';
 import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:curtains_client/ui/helper/last-update-text.dart';
@@ -47,8 +48,8 @@ class LampState {
 class _LampListTileState extends State<LampListTile> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<Connection>(
-        builder: (context, connection, child) => Card(
+    return Consumer<IApiService>(
+        builder: (context, apiService, child) => Card(
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 400),
                 curve: Curves.fastOutSlowIn,
@@ -60,7 +61,7 @@ class _LampListTileState extends State<LampListTile> {
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 child: InkWell(
                   onTap: () => setState(
-                      () => setSwitchState(connection, !widget.lampState.isOn)),
+                      () => setSwitchState(apiService, !widget.lampState.isOn)),
                   child: ListTile(
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -76,7 +77,7 @@ class _LampListTileState extends State<LampListTile> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DetailDevicePage(
-                                            widget.deviceState, connection)));
+                                            widget.deviceState, apiService)));
                               }
                             : null,
                         child: Padding(
@@ -93,8 +94,8 @@ class _LampListTileState extends State<LampListTile> {
             ));
   }
 
-  void setSwitchState(Connection connection, bool value) {
-    connection.sendRequest(
+  void setSwitchState(IApiService apiService, bool value) {
+    apiService.sendRequest(
         widget.deviceState.deviceId, "switch", value ? "1.0" : "0.0");
   }
 }

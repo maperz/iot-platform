@@ -1,4 +1,5 @@
 import 'package:curtains_client/connection/connection.dart';
+import 'package:curtains_client/connection/model/connection-info.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,12 +11,12 @@ class ConnectionInfoScreen extends StatelessWidget {
           title: const Text('Connectivity Info'),
         ),
         body: Center(
-          child: Consumer<Connection>(builder: (context, connection, child) {
-            return StreamBuilder<ConnectionInfo?>(
-              stream: connection.getConnectionInfo(),
+          child: Consumer<IConnectionService>(
+              builder: (context, connection, child) {
+            return StreamBuilder<ConnectionStateData>(
+              stream: connection.getConnectedState(),
               builder: (context, infoSnapShot) {
-                ConnectionInfo? info = infoSnapShot.data;
-
+                ConnectionInfo? info = infoSnapShot.data?.info;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

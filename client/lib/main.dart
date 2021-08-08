@@ -1,3 +1,4 @@
+import 'package:curtains_client/api/api-service.dart';
 import 'package:curtains_client/auth/auth-service.dart';
 import 'package:curtains_client/connection/address-resolver.dart';
 import 'package:curtains_client/connection/connection.dart';
@@ -9,7 +10,6 @@ import 'package:curtains_client/ui/screens/connection-info-screen.dart';
 import 'package:curtains_client/ui/screens/main-screen.dart';
 import 'package:curtains_client/utils/build-info.dart';
 import 'package:curtains_client/utils/platform.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -24,25 +24,32 @@ void main() async {
         '[${record.level.name}]: ${record.time}: (${record.loggerName}) ${record.message}');
   });
 
-  await Firebase.initializeApp();
-
   IAuthService authService = new FirebaseAuthService();
+  await authService.init();
 
-  IAddressResolver resolver =
+  IAddressResolver addressResolver =
       PlatformInfo.isWeb() ? new WebAddressResolver() : new AddressResolver();
 
-  await resolver.init();
+  await addressResolver.init();
 
-  IConnection connection = new Connection(resolver, authService);
-  connection.start();
+  ConnectionService connectionService = new ConnectionService(
+      addressResolver: addressResolver, authService: authService);
 
-  IDeviceListService deviceService = new DeviceListService(connection);
+  connectionService.init();
+
+  IApiService apiService = new ApiService(signalR: connectionService.signalR);
+
+  IDeviceListService deviceService = new DeviceListService(
+      connectionService: connectionService, apiService: apiService);
+
   var deviceListModel = new DeviceListModel(deviceService);
 
   runApp(MultiProvider(providers: [
-    Provider(create: (context) => authService),
-    ChangeNotifierProvider<Connection>(
-      create: (context) => connection as Connection,
+    Provider<IAuthService>(create: (context) => authService),
+    Provider<IAddressResolver>(create: (context) => addressResolver),
+    Provider<IApiService>(create: (context) => apiService),
+    Provider<IConnectionService>(
+      create: (context) => connectionService,
     ),
     ChangeNotifierProvider<DeviceListModel>(
       create: (context) => deviceListModel,

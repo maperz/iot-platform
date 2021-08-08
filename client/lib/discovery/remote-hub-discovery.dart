@@ -16,6 +16,6 @@ class RemoteHubDiscovery implements HubDiscovery {
   Stream<HubAddress> getHubAddresses() async* {
     logger.info('Accessing global hub address');
     yield new HubAddress(
-        PUBLIC_SERVER_PROTOCOL, PUBLIC_SERVER_HOST, PUBLIC_SERVER_PORT);
+        PUBLIC_SERVER_PROTOCOL, PUBLIC_SERVER_HOST, PUBLIC_SERVER_PORT, true);
   }
 }

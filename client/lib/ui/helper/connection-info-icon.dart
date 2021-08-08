@@ -7,11 +7,11 @@ class ConnectionInfoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Connection>(builder: (context, connection, child) {
-      return StreamBuilder<ConnectionInfo?>(
-        stream: connection.getConnectionInfo(),
+    return Consumer<IConnectionService>(builder: (context, connection, child) {
+      return StreamBuilder<ConnectionStateData>(
+        stream: connection.getConnectedState(),
         builder: (context, snapshot) {
-          final info = snapshot.data;
+          final info = snapshot.data?.info;
           if (snapshot.hasData && info != null && info.isConnected) {
             return Icon(
               Icons.check,
