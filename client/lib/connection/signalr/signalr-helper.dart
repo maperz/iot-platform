@@ -68,6 +68,9 @@ class SignalRHelper {
               ? 'Connection closed with error: ${error.toString()}'
               : 'Connection closed');
     });
+
+    logger
+        .fine("Created connection instance pointing to ${connection.baseUrl}");
   }
 
   Future start() async {

@@ -42,6 +42,7 @@ class MainScreenBloc extends StatelessWidget {
                     var builder = (snapshot.data!
                         ? this._loginPageBuilder
                         : this._onAuthorizedPageBuilder);
+
                     return builder(context);
                   });
             }));

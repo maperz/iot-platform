@@ -99,7 +99,7 @@ class ConnectionService implements IConnectionService {
 
       final hubUrl = address.toString() + '/hub';
 
-      logger.finest(
+      logger.fine(
           "Handle connection to $hubUrl. Requires Auth: ${address.requiresAuthentication} and Token: ${token?.substring(0, 5)}...");
 
       await this.signalR.stop();
@@ -141,7 +141,7 @@ class ConnectionService implements IConnectionService {
 
   @override
   Stream<ConnectionStateData> getConnectedState() {
-    return _connectionState.distinct();
+    return _connectionState;
   }
 
   @override
