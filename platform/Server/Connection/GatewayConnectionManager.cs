@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.Threading;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Server.Connection
 {
     public class GatewayConnectionManager : IGatewayConnectionManager
     {
-        private readonly ReaderWriterLockSlim _lock = new ();
-        private readonly Dictionary<string, IGatewayConnection> _connections = new ();
+        private readonly Dictionary<string, GatewayConnection> _connections = new ();
 
         private readonly IHubContext<ServerHub> _context;
 
@@ -16,48 +14,33 @@ namespace Server.Connection
             _context = context;
         }
         
-        public void AddConnection(string connectionId)
+        public void AddConnection(string connectionId, string address, string hubId)
         {
-            _lock.EnterWriteLock();
-            try
+            lock(this)
             {
                 if (_connections.ContainsKey(connectionId))
                 {
                     return;
                 }
-
-                _connections.Add(connectionId, new GatewayConnection(connectionId, _context));
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
+                
+                _connections.Add(connectionId, new GatewayConnection(connectionId, address, hubId, _context));
             }
         }
         
         public bool RemoveConnection(string connectionId)
         {
-            _lock.EnterWriteLock();
-            try
+            lock(this)
             {
                 return _connections.Remove(connectionId);
             }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
         }
 
-        public IGatewayConnection? GetConnection(string connectionId)
+        public GatewayConnection? GetConnection(string connectionId)
         {
             
-            _lock.EnterReadLock();
-            try
+            lock(this)
             {
                 return _connections.GetValueOrDefault(connectionId);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
             }
         }
     }

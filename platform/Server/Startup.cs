@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -8,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using Server.Connection;
 using Server.Data;
@@ -27,11 +30,48 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-
+            
             services.Configure<AppSettings>(Configuration);
             var appSettings = new AppSettings();
             Configuration.Bind(appSettings);
             services.AddSingleton(appSettings);
+            
+            string firebaseAppId = appSettings.FirebaseAppId;
+            services
+                .AddAuthentication( options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = $"https://securetoken.google.com/{firebaseAppId}";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = $"https://securetoken.google.com/{firebaseAppId}",
+                        ValidateAudience = true,
+                        ValidAudience = firebaseAppId,
+                        ValidateLifetime = true
+                    };
+                    
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // Check if the request is for the hub
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hub")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
             
             services.AddSignalR(
                 options =>
@@ -43,6 +83,7 @@ namespace Server
                 });
             
             services.AddSingleton<IGatewayConnectionManager, GatewayConnectionManager>();
+            services.AddSingleton<IUserHubManager, UserHubManager>();
             
             services.AddMediatR(typeof(Startup));
             

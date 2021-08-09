@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using EmpoweredSignalR;
 using Microsoft.AspNetCore.SignalR;
@@ -6,15 +7,20 @@ using Shared;
 
 namespace Server.Connection
 {
-    public class GatewayConnection : IGatewayConnection
+    public class GatewayConnection : IApiMethods
     {
         private readonly string _connectionId;
+        private readonly string _address;
+        private readonly string _hubId;
+
         private readonly IHubContext<ServerHub> _context;
         
-        public GatewayConnection(string connectionId, IHubContext<ServerHub> context)
+        public GatewayConnection(string connectionId, string address, string hubId, IHubContext<ServerHub> context)
         {
             _connectionId = connectionId;
+            _address = address;
             _context = context;
+            _hubId = hubId;
         }
         
         public Task<IEnumerable<DeviceState>> GetDeviceList()
@@ -32,9 +38,26 @@ namespace Server.Connection
             return _context.Clients.Client(_connectionId).SendAsync(nameof(IApiMethods.ChangeDeviceName), deviceId, name);
         }
 
+        public string GetHubId()
+        {
+            return _hubId;
+        }
+
         public Task<ConnectionInfo> GetConnectionInfo()
         {
-            throw new System.NotImplementedException();
+            var version = GetType()
+                .Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "";
+
+            var info = new ConnectionInfo()
+            {
+                IsConnected = true,
+                IsProxy = true,
+                ProxiedAddress = _address,
+                Version = version
+            };
+
+            return Task.FromResult(info);
         }
     }
 }

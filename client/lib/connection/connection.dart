@@ -75,7 +75,7 @@ class ConnectionService implements IConnectionService {
             _isConnected,
             _connectionInfo,
             (bool connected, ConnectionInfo? info) =>
-                ConnectionStateData(connected, info))
+                ConnectionStateData(info?.isConnected ?? false, info))
         .asBroadcastStream()
         .listen((stateDate) {
       _connectionState.add(stateDate);

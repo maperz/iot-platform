@@ -10,6 +10,8 @@ namespace Server
         public int KeepAliveTimeout { get; init; }
         public int HandshakeTimeout { get; init; }
 
+        public string FirebaseAppId { get; set; } = "";
+        
         public Connections ConnectionStrings { get; set; } = new ();
     }
 }
