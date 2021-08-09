@@ -74,6 +74,8 @@ class ConnectionInfoScreen extends StatelessWidget {
           "${info.isProxy ? "Proxied" : "Directly"} via ${info.isProxy ? info.proxiedAddress : info.targetAddress} ",
           style: commonStyle),
       spacer,
+      Text("Hub ID: ${info.hubId}", style: commonStyle),
+      spacer,
       Text("Version: ${info.version}", style: commonStyle)
     ];
   }

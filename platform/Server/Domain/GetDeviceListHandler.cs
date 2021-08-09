@@ -23,7 +23,7 @@ namespace Server.Domain
         {
             _logger.LogInformation("Device List request Handler called");
 
-            var connection = _connectionManager.GetConnection(request.HubId);
+            var connection = _connectionManager.GetConnectionByHubId(request.HubId);
             
             if (connection == null)
             {

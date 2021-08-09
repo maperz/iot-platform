@@ -6,6 +6,7 @@ namespace Server.Connection
 
         public bool RemoveConnection(string connectionId);
 
-        public GatewayConnection? GetConnection(string connectionId);
+        public GatewayConnection? GetConnectionByConnectionId(string connectionId);
+        public GatewayConnection? GetConnectionByHubId(string hubId);
     }
 }

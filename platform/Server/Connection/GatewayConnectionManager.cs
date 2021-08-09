@@ -5,25 +5,30 @@ namespace Server.Connection
 {
     public class GatewayConnectionManager : IGatewayConnectionManager
     {
-        private readonly Dictionary<string, GatewayConnection> _connections = new ();
 
         private readonly IHubContext<ServerHub> _context;
+
+        private readonly Dictionary<string, GatewayConnection> _connectionIdMap = new ();
+        private readonly Dictionary<string, GatewayConnection> _hubIdMap = new ();
 
         public GatewayConnectionManager(IHubContext<ServerHub> context)
         {
             _context = context;
         }
         
+        
         public void AddConnection(string connectionId, string address, string hubId)
         {
             lock(this)
             {
-                if (_connections.ContainsKey(connectionId))
+                if (_connectionIdMap.ContainsKey(connectionId))
                 {
                     return;
                 }
-                
-                _connections.Add(connectionId, new GatewayConnection(connectionId, address, hubId, _context));
+
+                var connection = new GatewayConnection(connectionId, address, hubId, _context);
+                _connectionIdMap.Add(connectionId, connection);
+                _hubIdMap.Add(hubId, connection);
             }
         }
         
@@ -31,16 +36,28 @@ namespace Server.Connection
         {
             lock(this)
             {
-                return _connections.Remove(connectionId);
+                if (!_connectionIdMap.TryGetValue(connectionId, out var connection)) return false;
+                
+                _connectionIdMap.Remove(connectionId);
+                _hubIdMap.Remove(connection.GetHubId());
+                return true;
+
             }
         }
 
-        public GatewayConnection? GetConnection(string connectionId)
+        public GatewayConnection? GetConnectionByConnectionId(string connectionId)
         {
-            
             lock(this)
             {
-                return _connections.GetValueOrDefault(connectionId);
+                return _connectionIdMap.GetValueOrDefault(connectionId);
+            }
+        }
+
+        public GatewayConnection? GetConnectionByHubId(string hubId)
+        {
+            lock(this)
+            {
+                return _hubIdMap.GetValueOrDefault(hubId);
             }
         }
     }

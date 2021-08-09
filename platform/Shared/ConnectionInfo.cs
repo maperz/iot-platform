@@ -6,5 +6,7 @@ namespace Shared
         public bool IsProxy { get; set; }
         public string? ProxiedAddress { get; set; }
         public string Version { get; set; } = "";
+        
+        public string? HubId { get; set; }
     }
 }

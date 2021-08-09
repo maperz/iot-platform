@@ -22,7 +22,7 @@ namespace Server.Domain
             _logger.LogInformation("Changing name requested for client via {Hub}: {DeviceId} to name: '{Name}' ",
                 request.HubId, request.DeviceId, request.Name);
             
-            var connection = _connectionManager.GetConnection(request.HubId);
+            var connection = _connectionManager.GetConnectionByHubId(request.HubId);
             
             if (connection == null)
             {

@@ -15,14 +15,18 @@ class SignalRHelper {
     assert(_connection == null ||
         _connection!.state == HubConnectionState.disconnected);
 
-    var accessTokenFactory = (token != null) ? () => Future.value(token) : null;
+    var accessTokenFactory = (token != null)
+        ? () {
+            return Future.value(token);
+          }
+        : null;
 
     final options = new HttpConnectionOptions(
         // Workaround to fix a bug that
         //ly happens when connecting
         // to the server
         transport: hubUrl.contains("iot.perz.cloud")
-            ? HttpTransportType.serverSentEvents
+            ? HttpTransportType.longPolling
             : HttpTransportType.webSockets,
         //logging: (level, message) => print(message)
         accessTokenFactory: accessTokenFactory);
@@ -67,13 +71,27 @@ class SignalRHelper {
   }
 
   Future start() async {
-    await _connection?.start();
-    logger.fine("Connection established to ${_connection?.baseUrl}");
+    var connection = _connection;
+    if (connection == null) {
+      throw Exception("Can not start SignalR Helper without calling init");
+    }
+
+    logger.fine("Starting connection to ${connection.baseUrl}");
+    await connection.start();
+    logger.fine("Connection established to ${connection.baseUrl}");
   }
 
   Future stop() async {
-    await _connection?.stop();
-    logger.fine("Connection stopped");
+    var connection = _connection;
+    if (connection == null) {
+      return;
+    }
+
+    if (connection.state != HubConnectionState.disconnected &&
+        connection.state != HubConnectionState.disconnecting) {
+      await connection.stop();
+      logger.fine("Connection stopped");
+    }
   }
 
   HubConnection? getConnection() => this._connection;

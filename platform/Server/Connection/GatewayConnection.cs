@@ -43,6 +43,11 @@ namespace Server.Connection
             return _hubId;
         }
 
+        public string GetHubGroupName()
+        {
+            return $"HUB:{_hubId}";
+        }
+        
         public Task<ConnectionInfo> GetConnectionInfo()
         {
             var version = GetType()
@@ -54,7 +59,8 @@ namespace Server.Connection
                 IsConnected = true,
                 IsProxy = true,
                 ProxiedAddress = _address,
-                Version = version
+                Version = version,
+                HubId = _hubId
             };
 
             return Task.FromResult(info);

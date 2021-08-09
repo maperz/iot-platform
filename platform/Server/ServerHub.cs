@@ -15,7 +15,6 @@ using Shared;
 
 namespace Server
 {
-    [Authorize]
     public class ServerHub : EmpoweredHub, IApiMethods, IApiListener, IServerMethods
     {
         private readonly ILogger<ServerHub> _logger;
@@ -65,49 +64,16 @@ namespace Server
 
             _logger.LogInformation("SignalR Client disconnected {ClientId}", connectionId);
 
-            var hubConnection = _connectionManager.GetConnection(connectionId);
+            var hubConnection = _connectionManager.GetConnectionByConnectionId(connectionId);
             if (hubConnection != null && _connectionManager.RemoveConnection(connectionId))
             {
-                var hubGroup = $"HUB:{hubConnection.GetHubId()}";
+                var hubGroup = hubConnection.GetHubGroupName();
                 await Clients.Group(hubGroup).SendAsync(nameof(ConnectionInfo), GetDisconnectedInfo());
             }
             
             await base.OnDisconnectedAsync(exception);
         }
         
-        public async Task<IEnumerable<DeviceState>> GetDeviceList()
-        {
-            var hubId = await GetHubIdForCurrentUser();
-            return await _mediator.Send(new GetDeviceListRequest() {HubId = hubId});
-        }
-
-        public async Task SendRequest(string deviceId, string name, string payload)
-        {
-            var hubId = await GetHubIdForCurrentUser();
-            await _mediator.Send(new SendHubDeviceRequest()
-                {HubId = hubId, DeviceId = deviceId, Name = name, Payload = payload});
-        }
-
-        public async Task ChangeDeviceName(string deviceId, string name)
-        {
-            var hubId = await GetHubIdForCurrentUser();
-            await _mediator.Send(new SetNameRequest()
-                {HubId = hubId, DeviceId = deviceId, Name = name});
-        }
-        
-        private ConnectionInfo GetDisconnectedInfo()
-        {
-            return new ()
-            {
-                IsConnected = false,
-                IsProxy = true,
-                ProxiedAddress = null,
-                Version = GetType()
-                    .Assembly
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? ""
-            };
-        }
-
         public async Task RegisterAsGateway(string hubId)
         {
             _logger.LogInformation("Gateway registering with HubId: {HubId}, and CId: {ConnectionId} ...", hubId, Context.ConnectionId);
@@ -118,7 +84,7 @@ namespace Server
                 var address = ip?.ToString() ?? "No address info";
                 
                 _connectionManager.AddConnection(connectionId, address, hubId);
-                var connection = _connectionManager.GetConnection(connectionId);
+                var hubConnection = _connectionManager.GetConnectionByConnectionId(connectionId);
 
                 await Groups.RemoveFromGroupAsync(connectionId, "clients");
                 await Groups.AddToGroupAsync(connectionId, "gateways");
@@ -126,11 +92,11 @@ namespace Server
                 _logger.LogInformation("Gateway successfully registered with HubId: {HubId}, and CId: {ConnectionId}!", hubId,
                     Context.ConnectionId);
                 
-                if (connection != null)
+                if (hubConnection != null)
                 {
                     // Update all users waiting for this hub
-                    var hubGroup = $"HUB:{hubId}";
-                    await Clients.Group(hubGroup).SendAsync(nameof(ConnectionInfo), await connection.GetConnectionInfo());
+                    var hubGroup = hubConnection.GetHubGroupName();
+                    await Clients.Group(hubGroup).SendAsync(nameof(ConnectionInfo), await hubConnection.GetConnectionInfo());
                 }
 
             }
@@ -140,11 +106,47 @@ namespace Server
                     Context.ConnectionId, e.Message);
             }
         }
+        
+        
+        [Authorize]
+        public async Task<IEnumerable<DeviceState>> GetDeviceList()
+        {
+            var hubId = await GetHubIdForCurrentUser();
+            return await _mediator.Send(new GetDeviceListRequest() {HubId = hubId});
+        }
 
+        [Authorize]
+        public async Task SendRequest(string deviceId, string name, string payload)
+        {
+            var hubId = await GetHubIdForCurrentUser();
+            await _mediator.Send(new SendHubDeviceRequest()
+                {HubId = hubId, DeviceId = deviceId, Name = name, Payload = payload});
+        }
+
+        [Authorize]
+        public async Task ChangeDeviceName(string deviceId, string name)
+        {
+            var hubId = await GetHubIdForCurrentUser();
+            await _mediator.Send(new SetNameRequest()
+                {HubId = hubId, DeviceId = deviceId, Name = name});
+        }
+        
+        
         public Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
         {
             // _logger.LogInformation("Sending Device State change to clients");
-            return Clients.Group("clients").SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
+
+            var connectionId = Context.ConnectionId;
+            var connection = _connectionManager.GetConnectionByConnectionId(connectionId);
+
+            if (connection == null)
+            {
+                _logger.LogWarning("Trying to send device state change as not registered hub");
+                return Task.CompletedTask;
+            }
+
+            var hubGroup = connection.GetHubGroupName();
+            return Clients.Group(hubGroup).SendAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
         }
 
         private async Task<string> GetHubIdForCurrentUser()
@@ -180,7 +182,7 @@ namespace Server
             var hubId = await _userHubManager.GetHubForUser(user.Id);
             if (hubId == null) return GetDisconnectedInfo();
             
-            var connection = _connectionManager.GetConnection(hubId);
+            var connection = _connectionManager.GetConnectionByHubId(hubId);
             if (connection != null)
             {
                 return await connection.GetConnectionInfo();
@@ -200,6 +202,20 @@ namespace Server
             }
             
             return new User() { Name = username, Id = id };
+        }
+        
+        private ConnectionInfo GetDisconnectedInfo()
+        {
+            return new ()
+            {
+                IsConnected = false,
+                IsProxy = true,
+                ProxiedAddress = null,
+                HubId = null,
+                Version = GetType()
+                    .Assembly
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "",
+            };
         }
     }
 }

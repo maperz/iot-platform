@@ -21,7 +21,7 @@ namespace Server.Domain
         {
             _logger.LogInformation("Sending request via {Hub} to: {DeviceId}, Name = {Request}", request.HubId, request.DeviceId, request.Name);
 
-            var connection = _connectionManager.GetConnection(request.HubId);
+            var connection = _connectionManager.GetConnectionByHubId(request.HubId);
 
             if (connection == null)
             {

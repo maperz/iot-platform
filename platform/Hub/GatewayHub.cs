@@ -14,11 +14,13 @@ namespace Hub
     {
         private readonly IMediator _mediator;
         private readonly ILogger<GatewayHub> _logger;
-
-        public GatewayHub(IMediator mediator, ILogger<GatewayHub> logger)
+        private readonly string _hubId;
+        
+        public GatewayHub(IMediator mediator, ILogger<GatewayHub> logger, AppSettings appSettings)
         {
             _mediator = mediator;
             _logger = logger;
+            _hubId = appSettings.HubId;
         }
 
         public override async Task OnConnectedAsync()
@@ -66,7 +68,8 @@ namespace Hub
                 IsConnected = true,
                 IsProxy = false,
                 ProxiedAddress = null,
-                Version = versionInfo
+                Version = versionInfo,
+                HubId = _hubId
             };
             
             return Task.FromResult(info);
