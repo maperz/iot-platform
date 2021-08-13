@@ -3,6 +3,7 @@
 
 #include <controller.h>
 
+
 class LampController : public Controller {
 public:
   virtual void setup();
@@ -18,5 +19,6 @@ public:
 private:
   bool isOn = false;
 };
+
 
 #endif // LAMP_CONTROLLER_H_GUARD

@@ -14,6 +14,6 @@ String Device::getName()
 
 void Device::setName(const String &name)
 {
-    log(LogLevel::Info, "Setting name: %s\n", name.c_str());
+    printLog(LogLevel::Info, "Setting name: %s\n", name.c_str());
     Storage::write(STORAGE_NAME_ADDRESS, name.c_str(), name.length() + 1);
 }

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define SHARED_BUFFER_SIZE 512
-extern byte sharedBuffer[SHARED_BUFFER_SIZE];
+extern unsigned char sharedBuffer[SHARED_BUFFER_SIZE];
 
 String getClientId();
 String getDeviceChannel(String channelName);

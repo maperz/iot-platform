@@ -20,15 +20,15 @@ namespace Connectivity
     {
         WiFi.mode(WIFI_AP);
         WiFi.softAP("NodeMCU HotSpot");
-        log(LogLevel::Info, "Created SoftAccessPoint!");
+        printLog(LogLevel::Info, "Created SoftAccessPoint!");
         serverIP = WiFi.softAPIP();
     }
     
     void setupServer()
     {
         server.begin();
-        log(LogLevel::Info, "Server is listening at: ");
-        log(LogLevel::Info, "%s\n", serverIP.toString().c_str());
+        printLog(LogLevel::Info, "Server is listening at: ");
+        printLog(LogLevel::Info, "%s\n", serverIP.toString().c_str());
     }
 
     void setupUdp()
@@ -52,13 +52,13 @@ namespace Connectivity
 
             if (mqtt.connect(clientId.c_str()))
             {
-                log(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s:%d\n", address.c_str(), port);
+                printLog(LogLevel::Info, "[Connected]\nConnected MQTT to Host at %s:%d\n", address.c_str(), port);
                 mqtt.subscribe(getRequestChannel("#").c_str());
             }
             else
             {
                 delay(2000);
-                log(LogLevel::Info, ".");
+                printLog(LogLevel::Info, ".");
             }
         }
 
@@ -68,7 +68,7 @@ namespace Connectivity
 
     void topicCallback(char *topicBytes, byte *rawPayload, unsigned int length)
     {
-        log(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
+        printLog(LogLevel::Info, "Received message in topic: %s\n", topicBytes);
 
         char payload[length + 1];
         memcpy(payload, rawPayload, length);

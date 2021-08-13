@@ -1,4 +1,5 @@
-#include "domain/distance-measure/dm-controller.h"
+#include "dm-controller.h"
+
 #include <ArduinoJson.h>
 #include "logger.h"
 

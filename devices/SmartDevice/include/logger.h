@@ -9,6 +9,6 @@ enum class LogLevel
     Error
 };
 
-#define log(level, ...) Serial.printf(__VA_ARGS__)
+#define printLog(level, ...) Serial.printf(__VA_ARGS__)
 
 #endif //LOGGOR_H_GUARD

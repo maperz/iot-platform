@@ -1,62 +1,56 @@
-#include <Arduino.h>
 #include "connectivity.h"
-#include "logger.h"
 #include "discovery.h"
+#include "logger.h"
 #include "storage.h"
 #include "utils.h"
+#include <Arduino.h>
 
-#include "domain/motor/motor-controller.h"
-#include "domain/lamp/lamp-controller.h"
-#include "domain/thermometer/thermo-controller.h"
 #include "domain/distance-measure/dm-controller.h"
+#include "domain/lamp/lamp-controller.h"
+#include "domain/motor/motor-controller.h"
+#include "domain/thermometer/thermo-controller.h"
 
+#include <ESP8266WiFi.h>
 #include <WiFiManager.h>
 
-void setupController()
-{
-  //Connectivity::controller = new MotorController(&Connectivity::mqtt);
-  //Connectivity::controller = new LampController(&Connectivity::mqtt);
-  Connectivity::controller = new ThermoController(&Connectivity::mqtt);
-  //Connectivity::controller = new DistanceMeasureController(&Connectivity::mqtt);
+void setupController() {
+  // Connectivity::controller = new MotorController(&Connectivity::mqtt);
+  // Connectivity::controller = new LampController(&Connectivity::mqtt);
+  // Connectivity::controller = new ThermoController(&Connectivity::mqtt);
+  Connectivity::controller = new DistanceMeasureController(&Connectivity::mqtt);
 }
 
-WiFiManager wifiManager;
-
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Storage::init();
 
-  log(LogLevel::Info, "Starting WiFi connection routine");
+  printLog(LogLevel::Info, "Starting WiFi connection routine");
+
+  WiFiManager wifiManager;
   wifiManager.autoConnect(getClientId().c_str());
-  log(LogLevel::Info, "Connected to WiFi successfully");
+  
+  printLog(LogLevel::Info, "Connected to WiFi successfully");
 
   printf("\n\n");
   setupController();
-
 }
 
-bool forward = true;
 ServiceDiscovery serviceDiscovery(sharedBuffer, SHARED_BUFFER_SIZE);
 
-void loop()
-{
+void loop() {
 
   bool discoveryCompleted = serviceDiscovery.discoveryCompleted();
-  if (!discoveryCompleted)
-  {
+  if (!discoveryCompleted) {
     serviceDiscovery.loop();
     return;
   }
 
-  if (!Connectivity::mqtt.connected() && discoveryCompleted)
-  {
+  if (!Connectivity::mqtt.connected() && discoveryCompleted) {
     MSDNHost host = serviceDiscovery.getHost();
     Connectivity::setupMqtt(host.address, host.port);
   }
 
-  if (Connectivity::mqtt.connected())
-  {
+  if (Connectivity::mqtt.connected()) {
     Connectivity::mqtt.loop();
     Connectivity::controller->loop();
   }

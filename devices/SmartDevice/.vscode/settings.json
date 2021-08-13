@@ -20,6 +20,7 @@
         "random": "cpp",
         "typeinfo": "cpp",
         "*.tcc": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "cmath": "cpp"
     }
 }
