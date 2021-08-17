@@ -25,7 +25,7 @@ namespace DataPoller
 				var addressRecord = response.AdditionalRecords.OfType<ARecord>().First();
 				var srvRecord = response.AdditionalRecords.OfType<SRVRecord>().First();
 
-				var address = addressRecord.Address.ToString() + ":" + srvRecord.Port;
+				var address = addressRecord.Address + ":" + srvRecord.Port;
 				return address;
 			}
             catch (Exception)

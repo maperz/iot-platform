@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:curtains_client/api/api-service.dart';
-import 'package:curtains_client/connection/connection.dart';
 import 'package:curtains_client/domain/device/device-state.dart';
 import 'package:curtains_client/ui/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
@@ -11,44 +10,34 @@ import 'package:provider/provider.dart';
 import '../device-detail.dart';
 import '../device-icon.dart';
 
-class ThermoListTile extends StatefulWidget {
+class DistanceSensorTile extends StatefulWidget {
   final DeviceState deviceState;
-  late final ThermoState thermoState;
+  late final DistanseSensorState thermoState;
 
-  ThermoListTile(
+  DistanceSensorTile(
     this.deviceState, {
     Key? key,
   }) : super(key: key) {
-    this.thermoState = ThermoState(this.deviceState.state);
+    this.thermoState = DistanseSensorState(this.deviceState.state);
   }
 
   @override
-  _ThermoListTileState createState() => _ThermoListTileState();
+  _DistanceSensorTileState createState() => _DistanceSensorTileState();
 }
 
-class ThermoState {
-  /* Example curtain state
-   * {
-   *  temp: "1.0",
-   *  hum: "32.0",
-   * }
-   */
+class DistanseSensorState {
+  late double distance;
+  // late double change;
 
-  late double temp;
-  late double hum;
-
-  ThermoState(String jsonEncode) {
+  DistanseSensorState(String jsonEncode) {
     final state = json.decode(jsonEncode);
 
-    var tempJson = state['temp'] ?? "0.0";
-    var humJson = state['hum'] ?? "0.0";
-
-    temp = tempJson is int ? (tempJson).toDouble() : tempJson;
-    hum = humJson is int ? (humJson).toDouble() : humJson;
+    var tempJson = state['distance'] ?? "0.0";
+    distance = tempJson is int ? (tempJson).toDouble() : tempJson;
   }
 }
 
-class _ThermoListTileState extends State<ThermoListTile> {
+class _DistanceSensorTileState extends State<DistanceSensorTile> {
   @override
   Widget build(BuildContext context) {
     return Consumer<IApiService>(
@@ -86,11 +75,7 @@ class _ThermoListTileState extends State<ThermoListTile> {
                         Container(
                           width: 10,
                         ),
-                        Text(widget.thermoState.temp.toString() + "°C"),
-                        Container(
-                          width: 10,
-                        ),
-                        Text(widget.thermoState.hum.toString() + "%"),
+                        Text(widget.thermoState.distance.toString() + "cm"),
                       ],
                     ),
                     subtitle: LastUpdateText(widget.deviceState.lastUpdate)),

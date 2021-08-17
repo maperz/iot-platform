@@ -1,5 +1,6 @@
 import 'package:curtains_client/domain/device/devices-model.dart';
 import 'package:curtains_client/ui/curtain/curtain-list-tile.dart';
+import 'package:curtains_client/ui/distance-sensor/distance-sensor-tile.dart';
 import 'package:curtains_client/ui/lamp/lamp-list-tile.dart';
 import 'package:curtains_client/ui/thermo/thermo-list-tile.dart';
 import 'package:curtains_client/ui/unknown-list-tile.dart';
@@ -29,6 +30,8 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                     return LampListTile(deviceState);
                   case DeviceType.Thermo:
                     return ThermoListTile(deviceState);
+                  case DeviceType.DistanceSensor:
+                    return DistanceSensorTile(deviceState);
                   default:
                     return UnknownListTile(deviceState);
                 }

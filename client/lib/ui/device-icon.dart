@@ -25,8 +25,10 @@ class DeviceIcon extends StatelessWidget {
         return "switch.png";
       case DeviceType.Thermo:
         return "thermo.png";
+      case DeviceType.DistanceSensor:
+        return "distance-sensor.png";
       default:
-        return "unknown.png";
+        return "unknown-device.png";
     }
   }
 }

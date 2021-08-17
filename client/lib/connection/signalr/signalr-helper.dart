@@ -21,15 +21,8 @@ class SignalRHelper {
           }
         : null;
 
-    final options = new HttpConnectionOptions(
-        // Workaround to fix a bug that
-        //ly happens when connecting
-        // to the server
-        transport: hubUrl.contains("iot.perz.cloud")
-            ? HttpTransportType.longPolling
-            : HttpTransportType.webSockets,
-        //logging: (level, message) => print(message)
-        accessTokenFactory: accessTokenFactory);
+    final options =
+        new HttpConnectionOptions(accessTokenFactory: accessTokenFactory);
 
     var retryPolicy = new IntervalRetryPolicy([
       Duration(seconds: 1),
