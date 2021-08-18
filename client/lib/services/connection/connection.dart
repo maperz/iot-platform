@@ -34,7 +34,9 @@ abstract class IConnectionService {
 
   Stream<S> listenOn<S>(String endpoint);
 
-  Future init();
+  Future start();
+
+  Future stop();
 }
 
 class ConnectionEndpoints {
@@ -63,7 +65,7 @@ class ConnectionService implements IConnectionService {
 
   ConnectionService({required this.addressResolver, required this.authService});
 
-  Future init() async {
+  Future start() async {
     void onReconnecting(Exception? err) {}
 
     void onReconnected(String? id) {}
@@ -184,7 +186,8 @@ class ConnectionService implements IConnectionService {
     return controller.stream;
   }
 
-  void dispose() {
+  Future stop() async {
+    await signalR.stop();
     _isConnected.close();
     _connectionInfo.close();
   }

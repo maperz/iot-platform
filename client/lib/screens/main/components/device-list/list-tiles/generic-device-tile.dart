@@ -1,7 +1,8 @@
 import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/screens/home/components/device-list/device-icon.dart';
-import 'package:curtains_client/screens/home/components/helper/last-update-text.dart';
+import 'package:curtains_client/screens/main/components/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
+
+import '../device-icon.dart';
 
 typedef OnDeviceClickedCallback = Function();
 typedef ShowDeviceDetailCallback = Function();

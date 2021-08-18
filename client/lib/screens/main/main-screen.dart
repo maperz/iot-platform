@@ -19,33 +19,32 @@ class MainScreenBloc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<IAddressResolver>(
-        builder: (context, addressResolver, child) =>
-            Consumer<IAuthService>(builder: (context, authService, child) {
-              var requiresAuthStream = addressResolver
-                  .getAddress()
-                  .map((address) => address.requiresAuthentication);
+    return Consumer2<IAddressResolver, IAuthService>(
+        builder: (context, addressResolver, authService, child) {
+      var requiresAuthStream = addressResolver
+          .getAddress()
+          .map((address) => address.requiresAuthentication);
 
-              var isAuthenticated = authService.isLoggedIn();
+      var isAuthenticated = authService.isLoggedIn();
 
-              var showLoginPage = CombineLatestStream.combine2(
-                  requiresAuthStream,
-                  isAuthenticated,
-                  (bool requires, bool isAuth) => (!requires || isAuth));
+      var showLoginPage = CombineLatestStream.combine2(
+          requiresAuthStream,
+          isAuthenticated,
+          (bool requires, bool isAuth) => (!requires || isAuth));
 
-              return StreamBuilder<bool>(
-                  stream: showLoginPage,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Container();
-                    }
-                    var builder = (snapshot.data!
-                        ? this._loginPageBuilder
-                        : this._onAuthorizedPageBuilder);
+      return StreamBuilder<bool>(
+          stream: showLoginPage,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Container();
+            }
+            var builder = (snapshot.data!
+                ? this._loginPageBuilder
+                : this._onAuthorizedPageBuilder);
 
-                    return builder(context);
-                  });
-            }));
+            return builder(context);
+          });
+    });
   }
 }
 

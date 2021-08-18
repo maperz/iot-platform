@@ -2,12 +2,13 @@ import 'dart:convert';
 
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-detail/device-detail.dart';
-import 'package:curtains_client/screens/home/components/device-list/device-icon.dart';
-import 'package:curtains_client/screens/home/components/helper/last-update-text.dart';
+import 'package:curtains_client/screens/main/components/helper/last-update-text.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+
+import '../device-icon.dart';
 
 class CurtainListTile extends StatefulWidget {
   final DeviceState deviceState;

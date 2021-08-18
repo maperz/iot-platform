@@ -1,5 +1,5 @@
 import 'package:curtains_client/models/connection/index.dart';
-import 'package:curtains_client/screens/home/components/helper/skeleton-tile.dart';
+import 'package:curtains_client/screens/main/components/helper/skeleton-tile.dart';
 import 'package:flutter/material.dart';
 
 class ConnectingPlaceholder extends StatelessWidget {
