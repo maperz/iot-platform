@@ -1,16 +1,14 @@
-import 'package:curtains_client/api/api-service.dart';
-import 'package:curtains_client/auth/auth-service.dart';
-import 'package:curtains_client/connection/address-resolver.dart';
-import 'package:curtains_client/connection/connection.dart';
-import 'package:curtains_client/domain/device/device-service.dart';
-import 'package:curtains_client/domain/device/devices-model.dart';
-import 'package:curtains_client/ui/account/profile.dart';
-import 'package:curtains_client/ui/helper/connection-info-icon.dart';
-import 'package:curtains_client/ui/screens/connection-info-screen.dart';
-import 'package:curtains_client/ui/screens/main-screen.dart';
-import 'package:curtains_client/utils/build-info.dart';
-import 'package:curtains_client/utils/platform.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:curtains_client/screens/home/components/account/profile.dart';
+import 'package:curtains_client/screens/home/components/helper/connection-info-icon.dart';
+import 'package:curtains_client/services/api/api-service.dart';
+import 'package:curtains_client/services/auth/auth-service.dart';
+import 'package:curtains_client/services/connection/address-resolver.dart';
+import 'package:curtains_client/services/connection/connection.dart';
+import 'package:curtains_client/services/device/device-service.dart';
+import 'package:curtains_client/services/device/devices-model.dart';
+import 'package:curtains_client/screens/connection-info/connection-info-page.dart';
+import 'package:curtains_client/screens/home/main-screen.dart';
+import 'package:curtains_client/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -37,12 +35,7 @@ void main() async {
 
   connectionService.init();
 
-  IApiService apiService = new ApiService(signalR: connectionService.signalR);
-
-  IDeviceListService deviceService = new DeviceListService(
-      connectionService: connectionService, apiService: apiService);
-
-  var deviceListModel = new DeviceListModel(deviceService);
+  IApiService apiService = new ApiService(connectionService: connectionService);
 
   runApp(MultiProvider(providers: [
     Provider<IAuthService>(create: (context) => authService),
@@ -51,9 +44,6 @@ void main() async {
     Provider<IConnectionService>(
       create: (context) => connectionService,
     ),
-    ChangeNotifierProvider<DeviceListModel>(
-      create: (context) => deviceListModel,
-    )
   ], child: MyApp()));
 }
 
@@ -88,7 +78,7 @@ class MyHomePage extends StatelessWidget {
             onPressed: () {
               Navigator.push(context, MaterialPageRoute<void>(
                 builder: (BuildContext context) {
-                  return ConnectionInfoScreen();
+                  return ConnectionInfoPage();
                 },
               ));
             },
