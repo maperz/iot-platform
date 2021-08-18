@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-detail/device-detail.dart';
-import 'package:curtains_client/screens/home/components/device-icon.dart';
+import 'package:curtains_client/screens/home/components/device-list/device-icon.dart';
 import 'package:curtains_client/screens/home/components/helper/last-update-text.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:flutter/material.dart';

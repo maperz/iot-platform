@@ -1,46 +1,32 @@
-import 'dart:convert';
-
 import 'package:curtains_client/models/device/index.dart';
+import 'package:curtains_client/screens/home/components/device-list/device-icon.dart';
 import 'package:curtains_client/screens/home/components/helper/last-update-text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import '../device-icon.dart';
 
-typedef RequestMeasurementCallback = Function();
+typedef OnDeviceClickedCallback = Function();
 typedef ShowDeviceDetailCallback = Function();
 
-class DistanseSensorState {
-  late double distance;
-  // late double change;
-
-  DistanseSensorState(String jsonEncode) {
-    final state = json.decode(jsonEncode);
-
-    var tempJson = state['distance'] ?? "0.0";
-    distance = tempJson is int ? (tempJson).toDouble() : tempJson;
-  }
-}
-
-class DistanceSensorTile extends StatelessWidget {
+class GenericDeviceTile extends StatelessWidget {
   final DeviceState deviceState;
-  late final DistanseSensorState distanceSensorState;
 
-  final RequestMeasurementCallback requestCallback;
-  final ShowDeviceDetailCallback showDeviceDetail;
-  DistanceSensorTile(
+  final OnDeviceClickedCallback? onClick;
+  final ShowDeviceDetailCallback? showDeviceDetail;
+
+  final WidgetBuilder builder;
+
+  const GenericDeviceTile(
       {required this.deviceState,
-      required this.requestCallback,
-      required this.showDeviceDetail,
+      this.onClick,
+      this.showDeviceDetail,
+      required this.builder,
       Key? key})
-      : super(key: key) {
-    this.distanceSensorState = DistanseSensorState(this.deviceState.state);
-  }
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => requestCallback(),
+        onTap: onClick,
         child: ListTile(
             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             enabled: deviceState.connected,
@@ -63,7 +49,7 @@ class DistanceSensorTile extends StatelessWidget {
                 Container(
                   width: 10,
                 ),
-                Text(distanceSensorState.distance.toString() + "cm"),
+                builder(context),
               ],
             ),
             subtitle: LastUpdateText(deviceState.lastUpdate)),

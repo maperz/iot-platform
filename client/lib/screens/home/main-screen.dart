@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'components/device-list.dart';
+import 'components/device-list/device-list.dart';
 import 'components/connecting-placeholder.dart';
 
 class MainScreenBloc extends StatelessWidget {

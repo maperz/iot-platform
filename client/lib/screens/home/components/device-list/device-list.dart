@@ -1,16 +1,12 @@
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-detail/device-detail.dart';
-import 'package:curtains_client/screens/home/components/list-tiles/curtain-list-tile.dart';
-import 'package:curtains_client/screens/home/components/list-tiles/distance-sensor-tile.dart';
-import 'package:curtains_client/screens/home/components/list-tiles/lamp-list-tile.dart';
-import 'package:curtains_client/screens/home/components/list-tiles/thermo-list-tile.dart';
-import 'package:curtains_client/screens/home/components/list-tiles/unknown-list-tile.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:curtains_client/services/connection/connection.dart';
 import 'package:curtains_client/services/device/device-service.dart';
 import 'package:curtains_client/services/device/devices-model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import './list-tiles/index.dart';
 
 class DeviceListWidget extends StatefulWidget {
   @override
@@ -41,11 +37,16 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                           case DeviceType.Lamp:
                             return LampListTile(deviceState);
                           case DeviceType.Thermo:
-                            return ThermoListTile(deviceState);
-                          case DeviceType.DistanceSensor:
-                            return DistanceSensorTile(
+                            return ThermoListTile(
                                 deviceState: deviceState,
-                                requestCallback: () => apiService.sendRequest(
+                                onClick: () => apiService.sendRequest(
+                                    deviceState.deviceId, "temperature", ""),
+                                showDeviceDetail: () =>
+                                    _showDeviceDetail(deviceState, apiService));
+                          case DeviceType.DistanceSensor:
+                            return DistanceSensorListTile(
+                                deviceState: deviceState,
+                                onClick: () => apiService.sendRequest(
                                     deviceState.deviceId, "measure", ""),
                                 showDeviceDetail: () =>
                                     _showDeviceDetail(deviceState, apiService));
