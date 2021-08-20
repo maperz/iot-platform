@@ -10,7 +10,6 @@ abstract class IAuthService {
 
   Stream<bool> isLoggedIn();
   Stream<User?> currentUser();
-  Future<User?> getUser();
 }
 
 class FirebaseAuthService extends IAuthService {
@@ -19,7 +18,7 @@ class FirebaseAuthService extends IAuthService {
 
   @override
   Stream<User?> currentUser() {
-    return _userStream.distinct();
+    return _auth.idTokenChanges();
   }
 
   @override
@@ -32,7 +31,6 @@ class FirebaseAuthService extends IAuthService {
     var response = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
     var user = response.user;
-    _userStream.add(user);
     return user;
   }
 
@@ -42,18 +40,8 @@ class FirebaseAuthService extends IAuthService {
   }
 
   @override
-  Future<User?> getUser() async {
-    return _auth.currentUser;
-  }
-
-  @override
   Future init() async {
     await Firebase.initializeApp();
     _auth = FirebaseAuth.instance;
-    _userStream = new BehaviorSubject.seeded(_auth.currentUser);
-
-    _auth.idTokenChanges().listen((user) {
-      _userStream.add(user);
-    });
   }
 }

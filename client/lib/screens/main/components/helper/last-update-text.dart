@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class LastUpdateText extends StatefulWidget {
+class FriendlyChangeText extends StatefulWidget {
   final DateTime updateTime;
-  const LastUpdateText(this.updateTime, {Key? key}) : super(key: key);
+  const FriendlyChangeText(this.updateTime, {Key? key}) : super(key: key);
 
   @override
-  _LastUpdateTextState createState() => _LastUpdateTextState();
+  _FriendlyChangeTextState createState() => _FriendlyChangeTextState();
 }
 
-class _LastUpdateTextState extends State<LastUpdateText> {
+class _FriendlyChangeTextState extends State<FriendlyChangeText> {
   late String _timeInfo;
   late String _timeDetail;
   late Timer _timer;
@@ -47,7 +47,7 @@ class _LastUpdateTextState extends State<LastUpdateText> {
   void _refreshTime() {
     setState(() {
       final updatedTime = widget.updateTime.toLocal();
-      _timeDetail = DateFormat("HH:mm:ss dd.MM.y").format(updatedTime);
+      _timeDetail = DateFormat("HH:mm:ss, dd.MM.y").format(updatedTime);
       _timeInfo = _getFriendlyTimeInfo();
     });
   }
@@ -70,9 +70,13 @@ class _LastUpdateTextState extends State<LastUpdateText> {
     }
 
     if (diff < Duration(days: 1)) {
-      return DateFormat("HH:mm").format(updatedTime);
+      return "Today, " + DateFormat("HH:mm").format(updatedTime);
     }
 
-    return DateFormat("HH:mm dd.MM.y").format(widget.updateTime);
+    if (diff < Duration(days: 2)) {
+      return "Yesterday, " + DateFormat("HH:mm").format(updatedTime);
+    }
+
+    return DateFormat("HH:mm, dd.MM.y").format(widget.updateTime);
   }
 }

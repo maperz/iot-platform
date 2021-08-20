@@ -94,7 +94,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                       ),
                     ],
                   ),
-                  subtitle: LastUpdateText(widget.deviceState.lastUpdate,
+                  subtitle: FriendlyChangeText(widget.deviceState.lastUpdate,
                       key: UniqueKey())),
             ));
   }

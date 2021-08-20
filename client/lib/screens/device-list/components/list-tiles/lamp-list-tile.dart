@@ -87,7 +87,8 @@ class _LampListTileState extends State<LampListTile> {
                         ),
                       ),
                       title: Text(widget.deviceState.getDisplayName()),
-                      subtitle: LastUpdateText(widget.deviceState.lastUpdate,
+                      subtitle: FriendlyChangeText(
+                          widget.deviceState.lastUpdate,
                           key: UniqueKey())),
                 ),
               ),

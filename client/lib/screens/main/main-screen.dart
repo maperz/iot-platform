@@ -1,72 +1,38 @@
+import 'package:curtains_client/screens/device-list/components/connection-placeholder/connection-placeholder-page.dart';
+import 'package:curtains_client/screens/device-list/device-list-page.dart';
 import 'package:curtains_client/screens/login/login-page.dart';
+import 'package:curtains_client/screens/main/bloc/authentication_bloc.dart';
 import 'package:curtains_client/services/auth/auth-service.dart';
 import 'package:curtains_client/services/connection/address-resolver.dart';
-import 'package:curtains_client/services/connection/connection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'components/device-list/device-list.dart';
-import 'components/connecting-placeholder.dart';
-
-class MainScreenBloc extends StatelessWidget {
-  final WidgetBuilder _onAuthorizedPageBuilder;
-  final WidgetBuilder _loginPageBuilder;
-
-  const MainScreenBloc(this._onAuthorizedPageBuilder, this._loginPageBuilder,
-      {Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer2<IAddressResolver, IAuthService>(
-        builder: (context, addressResolver, authService, child) {
-      var requiresAuthStream = addressResolver
-          .getAddress()
-          .map((address) => address.requiresAuthentication);
-
-      var isAuthenticated = authService.isLoggedIn();
-
-      var showLoginPage = CombineLatestStream.combine2(
-          requiresAuthStream,
-          isAuthenticated,
-          (bool requires, bool isAuth) => (!requires || isAuth));
-
-      return StreamBuilder<bool>(
-          stream: showLoginPage,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Container();
-            }
-            var builder = (snapshot.data!
-                ? this._loginPageBuilder
-                : this._onAuthorizedPageBuilder);
-
-            return builder(context);
-          });
-    });
-  }
-}
 
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var loginPageBuilder = (context) => LoginPage(loggedInCallback: (user) {});
-    var authorizedPageBuilder = (context) => Consumer<IConnectionService>(
-        builder: (context, connectionService, child) =>
-            StreamBuilder<ConnectionStateData>(
-                stream: connectionService.getConnectedState(),
-                builder: (context, snapshot) {
-                  final info = snapshot.data?.info;
-                  if (snapshot.hasData && info != null && info.isConnected) {
-                    return DeviceListWidget();
-                  }
-                  return Stack(children: [
-                    ConnectingListPlaceholder(info),
-                    ConnectingPlaceholder(info)
-                  ]);
-                }));
+    return Consumer2<IAddressResolver, IAuthService>(
+        builder: (context, addressResolver, authService, child) {
+      var authBloc = AuthenticationBloc(
+          addressResolver: addressResolver, authService: authService);
+      return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        bloc: authBloc,
+        builder: (context, state) {
+          if (state is ShowLoginScreen) {
+            return LoginPage(loggedInCallback: (user) {});
+          }
+          if (state is ShowDeviceListScreen) {
+            return DeviceListPage();
+          }
 
-    return MainScreenBloc(loginPageBuilder, authorizedPageBuilder);
+          if (state is InitialAuthenticationState) {
+            return ConnectionPlaceholderPage(
+              alternativeStatus: "Determining Authentication",
+            );
+          }
+          return Container();
+        },
+      );
+    });
   }
 }
