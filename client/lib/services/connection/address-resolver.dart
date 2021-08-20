@@ -31,7 +31,6 @@ class AddressResolver implements IAddressResolver {
 
   Future init() async {
     var currentConnectivity = await Connectivity().checkConnectivity();
-
     _hubUrlStream = Connectivity()
         .onConnectivityChanged
         .startWith(currentConnectivity)

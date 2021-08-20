@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Logger.root.level = BuildInfo.isRelease() ? Level.INFO : Level.ALL;
+  Logger.root.level =
+      Level.ALL; //BuildInfo.isRelease() ? Level.INFO : Level.ALL;
   Logger.root.onRecord.listen((record) {
     print(
         '[${record.level.name}]: ${record.time}: (${record.loggerName}) ${record.message}');

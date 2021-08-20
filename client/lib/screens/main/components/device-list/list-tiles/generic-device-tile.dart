@@ -53,7 +53,10 @@ class GenericDeviceTile extends StatelessWidget {
                 builder(context),
               ],
             ),
-            subtitle: LastUpdateText(deviceState.lastUpdate)),
+            subtitle: LastUpdateText(
+              deviceState.lastUpdate,
+              key: UniqueKey(),
+            )),
       ),
     );
   }
