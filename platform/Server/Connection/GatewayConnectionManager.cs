@@ -27,8 +27,8 @@ namespace Server.Connection
                 }
 
                 var connection = new GatewayConnection(connectionId, address, hubId, _context);
-                _connectionIdMap.Add(connectionId, connection);
-                _hubIdMap.Add(hubId, connection);
+                _connectionIdMap[connectionId] = connection;
+                _hubIdMap[hubId] = connection;
             }
         }
         

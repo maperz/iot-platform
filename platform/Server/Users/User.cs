@@ -1,4 +1,4 @@
-namespace Server
+namespace Server.Users
 {
     public class User
     {

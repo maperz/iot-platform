@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Server.Connection;
 using Server.Domain;
+using Server.Users;
 using Shared;
 
 namespace Server

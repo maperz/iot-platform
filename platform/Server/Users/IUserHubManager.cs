@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Server.Connection
+namespace Server.Users
 {
     public interface IUserHubManager
     {
