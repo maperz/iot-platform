@@ -61,19 +61,26 @@ class _FriendlyChangeTextState extends State<FriendlyChangeText> {
       return "Few seconds ago";
     }
 
+    final pluralization = (int n) => n > 1 ? "s" : "";
+
     if (diff < Duration(hours: 1)) {
-      return "${diff.inMinutes}min ago";
+      return "${diff.inMinutes} minute${pluralization(diff.inMinutes)} ago";
     }
 
     if (diff < Duration(hours: 3)) {
-      return "${diff.inHours}h ago";
+      return "${diff.inHours} hour${pluralization(diff.inHours)} ago";
     }
 
-    if (diff < Duration(days: 1)) {
+    if (updatedTime.day == now.day &&
+        updatedTime.month == now.month &&
+        updatedTime.year == now.year) {
       return "Today, " + DateFormat("HH:mm").format(updatedTime);
     }
 
-    if (diff < Duration(days: 2)) {
+    final yesterday = now.subtract(Duration(days: 1));
+    if (updatedTime.day == yesterday.day &&
+        updatedTime.month == yesterday.month &&
+        updatedTime.year == yesterday.year) {
       return "Yesterday, " + DateFormat("HH:mm").format(updatedTime);
     }
 

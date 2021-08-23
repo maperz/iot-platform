@@ -1,6 +1,6 @@
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-detail/device-detail.dart';
-import 'package:curtains_client/screens/main/components/helper/last-update-text.dart';
+import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:curtains_client/utils/colors.dart';
 import 'package:flutter/cupertino.dart';

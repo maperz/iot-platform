@@ -1,5 +1,5 @@
 import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/screens/main/components/helper/last-update-text.dart';
+import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
 import 'package:flutter/material.dart';
 
 import '../device-icon.dart';

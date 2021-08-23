@@ -14,11 +14,14 @@ abstract class IAuthService {
 
 class FirebaseAuthService extends IAuthService {
   late FirebaseAuth _auth;
-  late BehaviorSubject<User?> _userStream;
+  Stream<User?>? _userStream;
 
   @override
   Stream<User?> currentUser() {
-    return _auth.idTokenChanges();
+    if (_userStream == null) {
+      _userStream = _auth.idTokenChanges().shareReplay(maxSize: 1);
+    }
+    return _userStream!;
   }
 
   @override

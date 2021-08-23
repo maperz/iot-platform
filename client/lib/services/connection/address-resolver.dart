@@ -44,7 +44,7 @@ class AddressResolver implements IAddressResolver {
         default:
           return Stream<HubAddress>.empty();
       }
-    }).asBroadcastStream();
+    }).shareReplay(maxSize: 1);
   }
 
   @override
