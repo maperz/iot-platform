@@ -2,7 +2,7 @@
 
 namespace Shared
 {
-    public class DeviceInfo
+    public record DeviceInfo
     {
         public string Name { get; set; }
         

@@ -1,4 +1,5 @@
 using System;
+using Hub.Data;
 using Hub.Server;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -59,6 +60,7 @@ namespace Hub
 
             services.AddSingleton<IDeviceService, DeviceService>();
             services.AddSingleton<IApiBroadcaster, ApiBroadcaster>();
+            services.AddSingleton<IStateRepository, StateRepository>();
 
             services.AddControllers();
         }

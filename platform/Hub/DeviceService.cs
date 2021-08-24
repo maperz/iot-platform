@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using Hub.Data;
 using Microsoft.Extensions.Logging;
 using Shared;
 
@@ -10,115 +9,94 @@ namespace Hub
 {
     public class DeviceService : IDeviceService
     {
-        private readonly SemaphoreSlim _lock = new (1);
-        private readonly Dictionary<string, DeviceState> _deviceStates = new();
         private readonly IApiBroadcaster _broadcaster;
+        private readonly IStateRepository _stateRepository;
         private readonly ILogger<DeviceService> _logger;
 
-        public DeviceService(IApiBroadcaster broadcaster, ILogger<DeviceService> logger)
+        public DeviceService(IApiBroadcaster broadcaster, IStateRepository stateRepository, ILogger<DeviceService> logger)
         {
+            _stateRepository = stateRepository;
             _broadcaster = broadcaster;
             _logger = logger;
         }
         
         public async Task DeviceConnected(string deviceId)
         {
-            await _lock.WaitAsync();
-            try
-            {
-                _logger.LogInformation("Client connected: {String}", deviceId);
+            _logger.LogInformation("Client connected: {String}", deviceId);
 
-                if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
-                {
-                    deviceState = new DeviceState() {DeviceId = deviceId};
-                    _deviceStates.Add(deviceId, deviceState);
-                }
+            var lastState = await _stateRepository.GetLastDeviceState(deviceId);
 
-                deviceState.Connected = true;
-                await BroadcastDeviceChange(deviceState);
-            }
-            finally
+            DeviceState newState;
+            if (lastState == null)
             {
-                _lock.Release();
+                newState = new DeviceState() { DeviceId = deviceId, Connected = true };
             }
+            else
+            {
+                newState = lastState with {Connected = true};
+            }
+
+            await _stateRepository.SetDeviceState(newState);
+            await BroadcastDeviceChange(newState);
         }
 
         public async Task DeviceDisconnected(string deviceId)
         {
-            await _lock.WaitAsync();
-            try
-            {
-                if (_deviceStates.TryGetValue(deviceId, out var deviceState))
-                {
-                    _logger.LogInformation("Client disconnected: {DeviceId}", deviceId);
+            _logger.LogInformation("Client disconnected: {DeviceId}", deviceId);
+            var lastState = await _stateRepository.GetLastDeviceState(deviceId);
 
-                    deviceState.Connected = false;
-                    await BroadcastDeviceChange(deviceState);
-                }
-            }
-            finally
+            if (lastState == null)
             {
-                _lock.Release();
+                _logger.LogWarning("Trying to set disconnected state of unknown device: {DeviceId}", deviceId);
+                return;
             }
+            
+            var newState = lastState with {Connected = false};
+                
+            await _stateRepository.SetDeviceState(newState);
+            await BroadcastDeviceChange(newState);
         }
 
         public async Task SetDeviceInfo(string deviceId, DeviceInfo deviceInfo)
         {
-            await _lock.WaitAsync();
-            try
-            {
-                if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
-                {
-                    _logger.LogWarning("Trying to set state of unknown device not found: {DeviceId}", deviceId);
-                    return;
-                }
+            
+            var lastState = await _stateRepository.GetLastDeviceState(deviceId);
 
-                deviceState.Info = deviceInfo;
-                await BroadcastDeviceChange(deviceState);
-            }
-            finally
+            if (lastState == null)
             {
-                _lock.Release();
+                _logger.LogWarning("Trying to set state of unknown device: {DeviceId}", deviceId);
+                return;
             }
+            
+            var newState = lastState with {Info = deviceInfo};
+                
+            await _stateRepository.SetDeviceState(newState);
+            await BroadcastDeviceChange(newState);
         }
 
         public async Task SetStateOfDevice(string deviceId, string state)
         {
-            await _lock.WaitAsync();
-            try
-            {
-                if (!_deviceStates.TryGetValue(deviceId, out var deviceState))
-                {
-                    _logger.LogWarning("Trying to set state of unknown device not found: {DeviceId}", deviceId);
-                    return;
-                }
+            var lastState = await _stateRepository.GetLastDeviceState(deviceId);
 
-                deviceState.State = state;
-                deviceState.LastUpdate = DateTime.UtcNow;
-                await BroadcastDeviceChange(deviceState);
-            }
-            finally
+            if (lastState == null)
             {
-                _lock.Release();
+                _logger.LogWarning("Trying to set state of unknown device: {DeviceId}", deviceId);
+                return;
             }
+            
+            var newState = lastState with {State = state, LastUpdate = DateTime.UtcNow};
+                
+            await _stateRepository.SetDeviceState(newState);
+            await BroadcastDeviceChange(newState);
         }
 
-        public async Task<IEnumerable<DeviceState>> GetDeviceStates()
+        public Task<IEnumerable<DeviceState>> GetDeviceStates()
         {
-            await _lock.WaitAsync();
-            try
-            {
-                return _deviceStates.Values.Where(x => x.Info != null);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return _stateRepository.GetLastDeviceStates();
         }
 
         private async Task BroadcastDeviceChange(DeviceState changedDevice)
         {
-
             if (changedDevice.Info == null || (changedDevice.Connected && changedDevice.State == null))
             {
                 return;

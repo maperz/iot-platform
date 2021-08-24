@@ -3,7 +3,7 @@ using System;
 #nullable disable
 namespace Shared
 {
-    public class DeviceState
+    public record DeviceState
     {
         public string DeviceId { get; set; }
         
