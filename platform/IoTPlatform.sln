@@ -9,11 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{E048A8B2-101C-4C5F-9D26-EC106102FB81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmpoweredSignalR", "EmpoweredSignalR\EmpoweredSignalR.csproj", "{80AD21A9-36FB-4369-B12D-D882D8678152}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmpoweredSignalR", "libs\EmpoweredSignalR\EmpoweredSignalR.csproj", "{80AD21A9-36FB-4369-B12D-D882D8678152}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmpoweredSignalR.Tests", "EmpoweredSignalR.Tests\EmpoweredSignalR.Tests.csproj", "{802206CB-1259-481C-83F2-CFBBE5F70DBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmpoweredSignalR.Tests", "libs\EmpoweredSignalR.Tests\EmpoweredSignalR.Tests.csproj", "{802206CB-1259-481C-83F2-CFBBE5F70DBC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataPoller", "..\data-poller\DataPoller.csproj", "{D135CFE8-6641-412A-8843-B2689747F338}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{B9E7AF25-88FD-4DB4-A868-06768A2DA24A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api-clients", "api-clients", "{E7679E77-2339-4D48-BC93-9E4C46BE2231}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,5 +107,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F1A3B3AB-20B6-44D7-8733-E26A455DED83}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{80AD21A9-36FB-4369-B12D-D882D8678152} = {B9E7AF25-88FD-4DB4-A868-06768A2DA24A}
+		{802206CB-1259-481C-83F2-CFBBE5F70DBC} = {B9E7AF25-88FD-4DB4-A868-06768A2DA24A}
+		{D135CFE8-6641-412A-8843-B2689747F338} = {E7679E77-2339-4D48-BC93-9E4C46BE2231}
 	EndGlobalSection
 EndGlobal

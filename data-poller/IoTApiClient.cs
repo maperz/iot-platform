@@ -1,11 +1,10 @@
 ﻿using DataPoller.Model;
-using Newtonsoft.Json;
 using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DataPoller
@@ -31,7 +30,8 @@ namespace DataPoller
 
 			var response = await _client.GetAsync(endpoint);
 			var json = await response.Content.ReadAsStringAsync();
-			var deviceStates = JsonConvert.DeserializeObject<IEnumerable<DeviceState>>(json);
+			
+			var deviceStates = JsonSerializer.Deserialize<IEnumerable<DeviceState>>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 			return deviceStates ?? Array.Empty<DeviceState>();
 		}
 
@@ -39,9 +39,9 @@ namespace DataPoller
 		{
 			var address = $"{_baseAddress}/devices";
 			var request = new DeviceStateRequest() { DeviceId = deviceId, Name = name, Payload = value };
-			var content = new StringContent(JsonConvert.SerializeObject(request));
+			
+			var content = new StringContent(JsonSerializer.Serialize(request, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 			await _client.PostAsync(address, content);
 		}
-
 	}
 }

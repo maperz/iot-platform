@@ -1,36 +1,40 @@
-
 using System;
-using System.Net.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using DataPoller.Model;
 using System.Collections.Generic;
 using Shared;
-using Newtonsoft.Json;
 using System.IO;
 using System.Globalization;
+using System.Text.Json;
+using Serilog;
 
 namespace DataPoller
 {
-    public class Program
+    public static class Program
     {
-        public static readonly string DefaultFileName = "thermo.csv";
+        private const string DefaultFileName = "thermo.csv";
 
         public static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:dd.MM.yyyy, HH:mm:ss}][{Level:u1}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+            
             var filename = args.FirstOrDefault() ?? DefaultFileName;
-            var program = new Program();
+            
             try
             {
-                await program.Run(filename);
+                await Run(filename);
             }
             catch (Exception e)
 			{
-                Console.WriteLine($"Running program failed with following exception:\n{e.Message}");
+                Log.Error("Running program failed with following exception {Exception}", e.Message);
             }
         }
 
-        private async Task Run(string filename)
+        private static async Task Run(string fileName)
 		{
             var serviceDiscovery = new HubServiceDiscovery();
 
@@ -38,41 +42,43 @@ namespace DataPoller
 
             if (hubAddress == null)
             {
-                Console.WriteLine("Failed to retrieve Hub address - Quitting");
+                Log.Error("Failed to retrieve Hub address - Quitting");
                 return;
             }
             
-    
             var client = new IoTApiClient(hubAddress);
 
             var devices = await client.GetDevices();
 
-            var thermoData = ExtractThermometerData(devices);
+            var thermoData = ExtractThermometerData(devices).ToList();
 
-            if (!File.Exists(filename))
+            if (!File.Exists(fileName))
             {
-				_ = Directory.CreateDirectory(Path.GetDirectoryName(filename)!);
-                Console.WriteLine($"Output file at '{filename}' not found - Creating and writing CSV header");
-                using (StreamWriter sw = File.CreateText(filename))
+                Log.Information("Output file at '{FileName}' not found - Creating and writing CSV header", fileName);
+                var directory = Path.GetDirectoryName(fileName);
+                if (!string.IsNullOrWhiteSpace(directory))
                 {
-                    sw.WriteLine(SerializeDataToHeader());
+                    _ = Directory.CreateDirectory(directory!);
                 }
+                
+                await using StreamWriter sw = File.CreateText(fileName);
+                await sw.WriteLineAsync(SerializeDataToHeader());
             }
 
-            using (StreamWriter sw = File.AppendText(filename))
+            await using (StreamWriter sw = File.AppendText(fileName))
             {
-                Console.WriteLine($"Appending {thermoData.Count()} data entries to file at '{filename}'");
-                sw.WriteLine(SerializeDataToCSV(thermoData));
+                Log.Information("Appending {Count} data entries to file at '{FileName}'", thermoData.Count, fileName);
+                await sw.WriteLineAsync(SerializeDataToCsv(thermoData));
             }
         }
 
-        private IEnumerable<ThermometerData> ExtractThermometerData(IEnumerable<DeviceState> devices)
+        private static IEnumerable<ThermometerData> ExtractThermometerData(IEnumerable<DeviceState> devices)
 		{
             var now = DateTime.UtcNow;
             var thermometers = devices.Where(device => device.Info.Type == "thermo" && !string.IsNullOrWhiteSpace(device.State));
             return thermometers.Select(thermo =>
             {
-                var state = JsonConvert.DeserializeObject<ThermometerState>(thermo.State);
+                var state = JsonSerializer.Deserialize<ThermometerState>(thermo.State, new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
                 return new ThermometerData()
                 {
                     DeviceId = thermo.DeviceId,
@@ -85,13 +91,13 @@ namespace DataPoller
             });
         }
 
-        private string SerializeDataToHeader()
+        private static string SerializeDataToHeader()
 		{
             var headers = typeof(ThermometerData).GetProperties().Select(property => property.Name.ToString());
             return string.Join(',', headers);
         }
 
-        private string SerializeDataToCSV(IEnumerable<ThermometerData> thermometers) 
+        private static string SerializeDataToCsv(IEnumerable<ThermometerData> thermometers) 
 		{
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
