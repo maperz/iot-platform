@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,18 +21,26 @@ namespace Hub.Controllers
 
 
         [HttpGet]
-
-        public async Task<IEnumerable<DeviceState>> GetDevices([FromQuery] IEnumerable<string>? devices = null)
+        public async Task<IEnumerable<DeviceState>> GetDeviceStates([FromQuery] IEnumerable<string>? devices = null)
         {
+            var deviceQuery = devices?.ToList();
             var devicesList = await _mediator.Send(new GetDeviceListRequest());
 
-            if (devices == null || !devices.Where(x => !string.IsNullOrWhiteSpace(x)).Any())
+            if (deviceQuery == null || deviceQuery.All(string.IsNullOrWhiteSpace))
 			{
                 return devicesList;
 			}
 
-            return devicesList.Where(device => devices.Contains(device.DeviceId));
+            return devicesList.Where(device => deviceQuery.Contains(device.DeviceId));
         }
+        
+        [HttpGet("history")]
+        public async Task<IEnumerable<DeviceState>> GetDeviceStateHistory([FromQuery] GetDeviceStateHistoryRequest request)
+        {
+            var deviceStates = await _mediator.Send(request);
+            return deviceStates;
+        }
+        
 
         [HttpPost]
         public Task SendDeviceRequest([FromBody] SendDeviceRequest request)

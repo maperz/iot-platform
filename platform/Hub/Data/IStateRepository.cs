@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shared;
@@ -9,6 +10,8 @@ namespace Hub.Data
         public Task SetDeviceState(DeviceState state);
         
         public Task<DeviceState?> GetLastDeviceState(string deviceId);
+        
+        public Task<IEnumerable<DeviceState>> GetStateHistoryForDevice(string deviceId, DateTime? start = null, DateTime? end = null);
         
         public Task<IEnumerable<DeviceState>> GetLastDeviceStates();
     }

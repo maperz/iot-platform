@@ -57,7 +57,7 @@ namespace Hub
             services.AddHostedService<MqttConnectionManager>();
             services.AddHostedService<LocalServiceDiscovery>();
             services.AddHostedService<HubBroadcaster>();
-
+            
             services.AddSingleton<IDeviceService, DeviceService>();
             services.AddSingleton<IApiBroadcaster, ApiBroadcaster>();
             services.AddSingleton<IStateRepository, StateRepository>();

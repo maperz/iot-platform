@@ -25,7 +25,14 @@ namespace Hub
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await AdvertiseServices(stoppingToken);
+                try
+                {
+                    await AdvertiseServices(stoppingToken);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("Failure occured during service advertisement: {Exception}", e);
+                }
             }
         }
 
@@ -43,8 +50,17 @@ namespace Hub
                 _logger.LogInformation("Announcing services for Hub and Mqtt");
                 serviceDiscovery.Announce(HubService);
                 serviceDiscovery.Announce(MqttService);
-                await Task.Delay(_announceInterval, stoppingToken);
+                try
+                {
+                    await Task.Delay(_announceInterval, stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                }
             }
+            
+            serviceDiscovery.Unadvertise(HubService);
+            serviceDiscovery.Unadvertise(MqttService);
         }
     }
 }

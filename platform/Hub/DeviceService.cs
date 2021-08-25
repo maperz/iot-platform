@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hub.Data;
+using Hub.Server;
 using Microsoft.Extensions.Logging;
 using Shared;
 
@@ -93,6 +94,11 @@ namespace Hub
         public Task<IEnumerable<DeviceState>> GetDeviceStates()
         {
             return _stateRepository.GetLastDeviceStates();
+        }
+
+        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start = null, DateTime? end = null)
+        {
+            return _stateRepository.GetStateHistoryForDevice(deviceId, start, end);
         }
 
         private async Task BroadcastDeviceChange(DeviceState changedDevice)

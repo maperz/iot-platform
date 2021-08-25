@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EmpoweredSignalR;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Tmds.Linux;
 
 namespace Hub.Server
 {
@@ -16,14 +19,18 @@ namespace Hub.Server
         private readonly HubConnection _hubConnection;
         private readonly ILogger<ServerConnection> _logger;
         private readonly IMediator _mediator;
-        
         private readonly string _hubId;
+        private readonly IDeviceService _deviceService;
 
-        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster, AppSettings appSettings)
+
+        public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster,
+            IDeviceService deviceService,
+            AppSettings appSettings)
         {
             _logger = logger;
             _mediator = mediator;
             _hubId = appSettings.HubId;
+            _deviceService = deviceService;
 
             var serverAddress = appSettings.ServerAddress;
             
@@ -57,7 +64,7 @@ namespace Hub.Server
                 });
             
             _hubConnection.Reconnecting += (_ => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
-            _hubConnection.Reconnected += (_ => OnConnectionEstablished());
+            _hubConnection.Reconnected += (_ => ConnectionEstablished());
             _hubConnection.Closed += (_ => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
         }
 
@@ -65,11 +72,14 @@ namespace Hub.Server
         {
             return Task.FromResult(_hubConnection.State == HubConnectionState.Connected);
         }
-
-        private async Task OnConnectionEstablished(CancellationToken cancellationToken = default)
+        
+        private async Task ConnectionEstablished(CancellationToken cancellationToken = default)
         {
             await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), _hubId, cancellationToken);
             _logger.LogInformation("Connected to Server");
+
+            var states = await _deviceService.GetDeviceStates();
+            await DeviceStateChanged(states);
         }
         
         public async Task<bool> Connect(CancellationToken cancellationToken = default)
@@ -80,7 +90,7 @@ namespace Hub.Server
                 try
                 {
                     await _hubConnection.StartAsync(cancellationToken);
-                    await OnConnectionEstablished(cancellationToken);
+                    await ConnectionEstablished(cancellationToken);
                     return true;
                 }
                 catch when (cancellationToken.IsCancellationRequested)
@@ -104,7 +114,7 @@ namespace Hub.Server
 
         public async Task DeviceStateChanged(IEnumerable<DeviceState> deviceStates)
         {
-            if (await IsConnected())
+            if (await IsConnected() && deviceStates.Any())
             { 
                 await _hubConnection.InvokeAsync(nameof(IApiListener.DeviceStateChanged), deviceStates);
             }
