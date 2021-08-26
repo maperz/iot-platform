@@ -48,15 +48,28 @@ namespace Hub.Data
             }
         }
 
-        public async Task<IEnumerable<DeviceState>> GetStateHistoryForDevice(string deviceId, DateTime? start = null, DateTime? end = null)
+        public async Task<IEnumerable<DeviceState>> GetStateHistoryForDevice(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null)
         {
             var sql = (start, end) switch
             {
-                (null, null) => "SELECT * FROM DeviceStates WHERE DeviceId = @id;",
-                (_, null) => "SELECT * FROM DeviceStates WHERE DeviceId = @id AND LastUpdate >= @start;",
+                (null, null) => "SELECT * FROM DeviceStates WHERE DeviceId = @id",
+                (_, null) => "SELECT * FROM DeviceStates WHERE DeviceId = @id AND LastUpdate >= @start",
                 (null, _) => "SELECT * FROM DeviceStates WHERE DeviceId = @id AND LastUpdate <= @end",
-                (_, _) => "SELECT * FROM DeviceStates WHERE DeviceId = @id AND LastUpdate BETWEEN @start AND @end;"
+                (_, _) => "SELECT * FROM DeviceStates WHERE DeviceId = @id AND LastUpdate BETWEEN @start AND @end"
             };
+
+            var currentInterval = (int)_devicePersistenceInterval.TotalSeconds;
+            if (intervalSeconds > currentInterval)
+            {
+                var demandedInterval = intervalSeconds.GetValueOrDefault();
+                var actualInterval = demandedInterval - (demandedInterval % currentInterval);
+
+                if (actualInterval != currentInterval)
+                {
+                    var steps = actualInterval / currentInterval;
+                    sql = "SELECT * FROM (SELECT *, ROW_NUMBER() OVER(ORDER BY LastUpdate) AS RowNum FROM (" + sql + ")) WHERE RowNum % " + steps + " = 1";
+                }
+            }
             
             using var db = Connection;
             var states = await db.QueryAsync<StateEntity>(sql, new{id = deviceId, start, end});

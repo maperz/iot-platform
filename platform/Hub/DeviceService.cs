@@ -96,9 +96,9 @@ namespace Hub
             return _stateRepository.GetLastDeviceStates();
         }
 
-        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start = null, DateTime? end = null)
+        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null)
         {
-            return _stateRepository.GetStateHistoryForDevice(deviceId, start, end);
+            return _stateRepository.GetStateHistoryForDevice(deviceId, start, end, intervalSeconds);
         }
 
         private async Task BroadcastDeviceChange(DeviceState changedDevice)
