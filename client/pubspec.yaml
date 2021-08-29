@@ -38,6 +38,8 @@ dependencies:
   firebase_auth: ^3.0.1
   firebase_core: ^1.4.0
   flutter_bloc: ^7.1.0
+  flutter_slidable: ^1.0.0-dev.9
+  charts_flutter: ^0.11.0
 
 dev_dependencies:
   flutter_test:

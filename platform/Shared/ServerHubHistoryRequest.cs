@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using MediatR;
-using Shared;
 
-namespace Hub.Domain
+namespace Shared
 {
-    public class GetDeviceStateHistoryRequest: IRequest<IEnumerable<DeviceState>>
+    public class ServerHubHistoryRequest
     {
         public string DeviceId { get; set; } = "";
         

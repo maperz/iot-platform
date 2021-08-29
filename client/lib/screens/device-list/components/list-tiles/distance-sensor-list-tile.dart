@@ -4,7 +4,7 @@ import 'package:curtains_client/models/device/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'generic-device-tile.dart';
+import 'helper/generic-device-tile.dart';
 
 class DistanseSensorState {
   late double distance;
@@ -23,12 +23,12 @@ class DistanceSensorListTile extends StatelessWidget {
   late final DistanseSensorState distanceSensorState;
 
   final OnDeviceClickedCallback onClick;
-  final ShowDeviceDetailCallback showDeviceDetail;
+  final ShowDeviceDetailCallback showDeviceSettings;
 
   DistanceSensorListTile(
       {required this.deviceState,
       required this.onClick,
-      required this.showDeviceDetail,
+      required this.showDeviceSettings,
       Key? key})
       : super(key: key) {
     this.distanceSensorState = DistanseSensorState(this.deviceState.state);
@@ -38,7 +38,7 @@ class DistanceSensorListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GenericDeviceTile(
         onClick: onClick,
-        showDeviceDetail: showDeviceDetail,
+        showDeviceSettings: showDeviceSettings,
         deviceState: deviceState,
         builder: (context) =>
             Text(distanceSensorState.distance.toString() + "cm"));

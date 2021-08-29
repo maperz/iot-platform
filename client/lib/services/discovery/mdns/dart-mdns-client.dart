@@ -14,7 +14,8 @@ class DartMDNSClient implements IMDNSClient {
     await client.start();
     try {
       await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
-          ResourceRecordQuery.serverPointer(serviceName))) {
+          ResourceRecordQuery.serverPointer(serviceName),
+          timeout: Duration(seconds: 1, milliseconds: 500))) {
         await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
             ResourceRecordQuery.service(ptr.domainName))) {
           String name = srv.target;

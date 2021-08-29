@@ -48,7 +48,7 @@ namespace Hub.Data
             }
         }
 
-        public async Task<IEnumerable<DeviceState>> GetStateHistoryForDevice(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null)
+        public async Task<IEnumerable<DeviceState>> GetStateHistoryForDevice(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null, int? count = null)
         {
             var sql = (start, end) switch
             {
@@ -69,6 +69,11 @@ namespace Hub.Data
                     var steps = actualInterval / currentInterval;
                     sql = "SELECT * FROM (SELECT *, ROW_NUMBER() OVER(ORDER BY LastUpdate) AS RowNum FROM (" + sql + ")) WHERE RowNum % " + steps + " = 1";
                 }
+            }
+
+            if (count != null)
+            {
+                sql += " LIMIT " + count;
             }
             
             using var db = Connection;

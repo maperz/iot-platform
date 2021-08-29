@@ -25,5 +25,19 @@ namespace Hub.Server
             var deviceList = await _mediator.Send(new GetDeviceListRequest());
             return deviceList;
         }
+        
+        public async Task<IEnumerable<DeviceState>> GetDeviceStateHistory(ServerHubHistoryRequest request)
+        {
+            _logger.LogInformation("GetDeviceStateHistory request received");
+            var deviceList = await _mediator.Send(new GetDeviceStateHistoryRequest()
+            {
+                DeviceId = request.DeviceId,
+                Start = request.Start,
+                End = request.End,
+                IntervalSeconds = request.IntervalSeconds,
+                Count = request.Count,
+            });
+            return deviceList;
+        }
     }
 }

@@ -2,7 +2,7 @@ import 'package:curtains_client/models/device/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'generic-device-tile.dart';
+import 'helper/generic-device-tile.dart';
 
 class UnknownListTile extends StatelessWidget {
   final DeviceState deviceState;

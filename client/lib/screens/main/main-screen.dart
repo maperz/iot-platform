@@ -27,7 +27,7 @@ class MainScreen extends StatelessWidget {
 
           if (state is InitialAuthenticationState) {
             return ConnectionPlaceholderPage(
-              alternativeStatus: "Determining Authentication",
+              alternativeStatus: "Determining authentication status",
             );
           }
           return Container();

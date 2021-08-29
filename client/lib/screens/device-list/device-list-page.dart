@@ -19,7 +19,10 @@ class DeviceListPage extends StatelessWidget {
                 if (snapshot.hasData && info != null && info.isConnected) {
                   return DeviceListWidget();
                 }
-                return ConnectionPlaceholderPage(info: info);
+                return ConnectionPlaceholderPage(
+                  info: info,
+                  alternativeStatus: "Waiting for handshake reply",
+                );
               }),
     );
   }

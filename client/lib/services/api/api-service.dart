@@ -1,3 +1,4 @@
+import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/services/connection/connection.dart';
 
 abstract class IApiService {
@@ -6,12 +7,16 @@ abstract class IApiService {
   Future setDeviceName(String deviceId, String name);
 
   Future<Iterable<dynamic>> getDeviceList();
+
+  Future<Iterable<dynamic>> getDeviceStateHistory(String deviceId,
+      {DateTime? start, DateTime? end, int? intervalSeconds, int? count});
 }
 
 class ApiEndpoints {
   static const String SendRequest = "SendRequest";
   static const String ChangeDeviceName = "ChangeDeviceName";
   static const String GetDeviceList = "GetDeviceList";
+  static const String GetDeviceStateHistory = "GetDeviceStateHistory";
 }
 
 class ApiService extends IApiService {
@@ -34,6 +39,18 @@ class ApiService extends IApiService {
   @override
   Future<Iterable<dynamic>> getDeviceList() async {
     var deviceList = await connectionService.invoke(ApiEndpoints.GetDeviceList);
+    return deviceList as Iterable<dynamic>;
+  }
+
+  @override
+  Future<Iterable<dynamic>> getDeviceStateHistory(String deviceId,
+      {DateTime? start,
+      DateTime? end,
+      int? intervalSeconds,
+      int? count}) async {
+    var deviceList = await connectionService.invoke(
+        ApiEndpoints.GetDeviceStateHistory,
+        args: [deviceId, start, end, intervalSeconds, count]);
     return deviceList as Iterable<dynamic>;
   }
 }

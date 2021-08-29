@@ -1,55 +1,36 @@
-import 'dart:convert';
-
 import 'package:curtains_client/models/device/index.dart';
+import 'package:curtains_client/models/device/models/domain-states/thermo-state.dart';
+import 'package:curtains_client/screens/device-list/components/list-tiles/details/thermo-detail-page.dart';
+import 'package:curtains_client/services/device/device-state-service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'generic-device-tile.dart';
-
-class ThermoState {
-  /* Example curtain state
-   * {
-   *  temp: "1.0",
-   *  hum: "32.0",
-   * }
-   */
-
-  late double temp;
-  late double hum;
-
-  ThermoState(String jsonEncode) {
-    final state = json.decode(jsonEncode);
-
-    var tempJson = state['temp'] ?? "0.0";
-    var humJson = state['hum'] ?? "0.0";
-
-    temp = tempJson is int ? (tempJson).toDouble() : tempJson;
-    hum = humJson is int ? (humJson).toDouble() : humJson;
-  }
-}
+import 'helper/generic-device-tile.dart';
 
 class ThermoListTile extends StatelessWidget {
   final DeviceState deviceState;
   late final ThermoState thermoState;
+  final IDeviceStateService deviceStateService;
 
   final OnDeviceClickedCallback onClick;
-  final ShowDeviceDetailCallback showDeviceDetail;
+  final ShowDeviceDetailCallback showDeviceSettings;
 
   ThermoListTile(
       {required this.deviceState,
       required this.onClick,
-      required this.showDeviceDetail,
+      required this.deviceStateService,
+      required this.showDeviceSettings,
       Key? key})
       : super(key: key) {
-    this.thermoState = ThermoState(this.deviceState.state);
+    this.thermoState = ThermoState.fromJson(this.deviceState.state);
   }
 
   @override
   Widget build(BuildContext context) {
     return GenericDeviceTile(
         onClick: onClick,
-        showDeviceDetail: showDeviceDetail,
+        showDeviceSettings: showDeviceSettings,
         deviceState: deviceState,
         builder: (context) => Row(
               children: [
@@ -59,6 +40,25 @@ class ThermoListTile extends StatelessWidget {
                 ),
                 Text(thermoState.hum.toString() + "%")
               ],
-            ));
+            ),
+        detailBuilder: (context) => FutureBuilder<Iterable<DeviceState>>(
+            future: deviceStateService.getStateHistory(deviceState.deviceId,
+                intervalSeconds: Duration(hours: 1).inSeconds, count: 100),
+            builder: (context, stateHistorySnapshot) {
+              if (stateHistorySnapshot.hasData) {
+                return AspectRatio(
+                  aspectRatio: 2.5,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 200),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: ThermoDetailPage.fromDeviceHistory(
+                          stateHistorySnapshot.data!),
+                    ),
+                  ),
+                );
+              }
+              return Container();
+            }));
   }
 }

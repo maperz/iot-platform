@@ -21,10 +21,13 @@ class ConnectingPlaceholderInfo extends StatelessWidget {
             ),
             if (status != null)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 12.0),
                 child: Text(
                   status!,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption!
+                      .copyWith(fontSize: 18),
                 ),
               )
           ],

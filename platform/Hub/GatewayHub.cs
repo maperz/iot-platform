@@ -46,6 +46,11 @@ namespace Hub
 
             return deviceList;
         }
+
+        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start, DateTime? end, int? intervalSeconds, int? count)
+        {
+            return _mediator.Send(new GetDeviceStateHistoryRequest() { DeviceId = deviceId, Start = start, End = end, IntervalSeconds = intervalSeconds});
+        }
         
         public Task SendRequest(string deviceId, string name, string payload)
         {

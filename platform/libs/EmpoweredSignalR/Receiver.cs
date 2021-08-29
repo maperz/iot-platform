@@ -27,7 +27,8 @@ namespace EmpoweredSignalR
                         break;
                     case 1:
                     {
-                        object[] parameters = new[] { JsonConvert.DeserializeObject(request.Payload, parameterInfos[0].GetType()) };
+                        var parameterType = parameterInfos[0].ParameterType;
+                        object[] parameters = new[] { JsonConvert.DeserializeObject(request.Payload, parameterType) };
                         resultTask = (Task) methodInfo.Invoke(this, parameters)!;
                         break;
                     }
@@ -55,6 +56,7 @@ namespace EmpoweredSignalR
                     {
                         Id = request.Id, Exception = exception
                     });
+                Console.WriteLine("Exception occured in receiver: " + exception.Message);
             }
         }
     }

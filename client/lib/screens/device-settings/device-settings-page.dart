@@ -3,12 +3,12 @@ import 'package:curtains_client/services/api/api-service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class DetailDevicePage extends StatelessWidget {
+class DeviceSettingsPage extends StatelessWidget {
   final DeviceState state;
   final IApiService apiService;
   final nameController = TextEditingController();
 
-  DetailDevicePage(this.state, this.apiService) {
+  DeviceSettingsPage(this.state, this.apiService) {
     nameController.text = state.getDisplayName();
   }
 

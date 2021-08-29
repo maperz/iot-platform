@@ -16,7 +16,7 @@ namespace Hub
 
         public Task<IEnumerable<DeviceState>> GetDeviceStates();
         
-        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null);
+        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start = null, DateTime? end = null, int? intervalSeconds = null, int? count = null);
 
     }
 }

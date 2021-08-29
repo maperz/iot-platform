@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EmpoweredSignalR.Tests.Hub;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -9,23 +10,55 @@ namespace EmpoweredSignalR.Tests.Client
     {
         private readonly HubConnection _hubConnection;
         private readonly Receiver _receiver;
-        
-        public ExampleClient(Receiver receiver, string serverAddress = "http://localhost:5000/hub")
+        private CancellationTokenSource _cancellationTokenSource;
+
+        public ExampleClient(Receiver receiver, string serverAddress = "http://localhost:6262/hub")
         {
             _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress)
                 .Build();
             _receiver = receiver;
         }
 
-        public async Task Start()
+        public Task Start()
         {
-            await _hubConnection.StartAsync();
-            _hubConnection.AddBidirectionalReceiver(_receiver);
+            if (_cancellationTokenSource != null)
+            {
+                throw new Exception("Already started Example Client");
+            }
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            var waitHandle = new AutoResetEvent(false);
+            
+            new Thread(async () =>
+            {
+                await RunInternal(waitHandle, _cancellationTokenSource.Token);
+            }).Start();
+
+            waitHandle.WaitOne();
+            return Task.CompletedTask;
         }
 
-        public async Task Stop()
+        private async Task RunInternal(EventWaitHandle waitHandle, CancellationToken token)
         {
-            await _hubConnection.StopAsync();
+            await _hubConnection.StartAsync(token);
+            _hubConnection.AddBidirectionalReceiver(_receiver);
+
+            waitHandle.Set();
+            
+            while (!token.IsCancellationRequested)
+            {
+                Thread.Sleep(2);
+            }
+            
+            
+            await _hubConnection.StopAsync(token);
+        }
+        
+        public Task Stop()
+        {
+            _cancellationTokenSource?.Cancel();
+            return Task.CompletedTask;
         }
 
         public async Task MakePingRequest()

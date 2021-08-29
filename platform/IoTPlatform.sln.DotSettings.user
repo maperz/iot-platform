@@ -1,0 +1,12 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=18aa6940_002D3a71_002D4205_002D8fca_002D507077e09511/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestNoParameterCall #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::802206CB-1259-481C-83F2-CFBBE5F70DBC::net5.0::EmpoweredSignalR.Tests.EmpoweredHubTests.TestNoParameterCall&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=969365c3_002Dd706_002D4bba_002Db876_002D5a2fa43c11b4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestNoParameterCall" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::802206CB-1259-481C-83F2-CFBBE5F70DBC::net5.0::EmpoweredSignalR.Tests.EmpoweredHubTests.TestNoParameterCall&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::802206CB-1259-481C-83F2-CFBBE5F70DBC::net5.0::EmpoweredSignalR.Tests.EmpoweredHubTests.TestSingleParameterCall&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

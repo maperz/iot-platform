@@ -1,5 +1,6 @@
 import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/screens/device-detail/device-detail.dart';
+import 'package:curtains_client/screens/device-list/components/list-tiles/helper/slidable-list-menu.dart';
+import 'package:curtains_client/screens/device-settings/device-settings-page.dart';
 import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:curtains_client/utils/colors.dart';
@@ -14,9 +15,11 @@ import '../device-icon.dart';
 class LampListTile extends StatefulWidget {
   late final LampState lampState;
   final DeviceState deviceState;
+  final Function? showDeviceSettings;
 
   LampListTile(
     this.deviceState, {
+    this.showDeviceSettings,
     Key? key,
   }) : super(key: key) {
     this.lampState = LampState(this.deviceState.state);
@@ -61,35 +64,22 @@ class _LampListTileState extends State<LampListTile> {
                 child: InkWell(
                   onTap: () => setState(
                       () => setSwitchState(apiService, !widget.lampState.isOn)),
-                  child: ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                      enabled: widget.deviceState.connected,
-                      leading: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: DeviceIcon(widget.deviceState),
-                      ),
-                      trailing: InkWell(
-                        onTap: widget.deviceState.connected
-                            ? () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DetailDevicePage(
-                                            widget.deviceState, apiService)));
-                              }
-                            : null,
-                        child: Padding(
+                  child: SlideableListMenu(
+                    enabled: widget.deviceState.connected,
+                    onSettingsPressed: this.widget.showDeviceSettings,
+                    child: ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                        enabled: widget.deviceState.connected,
+                        leading: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.more_vert_rounded,
-                          ),
+                          child: DeviceIcon(widget.deviceState),
                         ),
-                      ),
-                      title: Text(widget.deviceState.getDisplayName()),
-                      subtitle: FriendlyChangeText(
-                          widget.deviceState.lastUpdate,
-                          key: UniqueKey())),
+                        title: Text(widget.deviceState.getDisplayName()),
+                        subtitle: FriendlyChangeText(
+                            widget.deviceState.lastUpdate,
+                            key: UniqueKey())),
+                  ),
                 ),
               ),
             ));

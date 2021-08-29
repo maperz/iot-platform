@@ -116,6 +116,13 @@ namespace Server
             return await _mediator.Send(new GetDeviceListRequest() {HubId = hubId});
         }
 
+        public async Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start, DateTime? end, int? intervalSeconds, int? count)
+        {
+            var hubId = await GetHubIdForCurrentUser();
+            return await _mediator.Send(new GetDeviceStateHistoryRequest()
+                {HubId = hubId, DeviceId = deviceId, Start = start, End = end, IntervalSeconds = intervalSeconds, Count = count});
+        }
+
         [Authorize]
         public async Task SendRequest(string deviceId, string name, string payload)
         {

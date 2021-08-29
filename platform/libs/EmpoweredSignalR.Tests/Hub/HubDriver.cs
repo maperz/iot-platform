@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ namespace EmpoweredSignalR.Tests.Hub
         private readonly IHost _host;
         private CancellationTokenSource _cancellationTokenSource;
         
-        public HubDriver(int port = 5000)
+        public HubDriver(int port = 6262)
         {
             _host = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -42,32 +43,40 @@ namespace EmpoweredSignalR.Tests.Hub
         
         public void Start()
         {
+            
             if (_cancellationTokenSource != null)
             {
                 throw new Exception("HubDriver already running");
             }
             
             _cancellationTokenSource = new CancellationTokenSource();
-            _host.RunAsync(_cancellationTokenSource.Token);
+
+            new Thread(async () =>
+            {
+                await RunOnNewThread(_cancellationTokenSource.Token);
+            }).Start();
         }
 
+        private async Task RunOnNewThread(CancellationToken token)
+        {
+            await _host.RunAsync(token);
+        }
+        
         public void Stop()
         {
             if (_cancellationTokenSource == null)
-            { 
-                throw new Exception("HubDriver is not running");
+            {
+                return;
             }
             
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource = null;
         }
-
+        
+        
         public void Dispose()
         {
-            if (_cancellationTokenSource == null) return;
-            
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource = null;
+            Stop();
         }
     }
 }

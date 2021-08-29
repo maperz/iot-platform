@@ -26,4 +26,9 @@ class DeviceState {
   String getDisplayName() {
     return this.info.name ?? this.info.type.getName();
   }
+
+  @override
+  String toString() {
+    return "[$deviceId-${info.type}]: Connected: $connected, $lastUpdate, $state";
+  }
 }

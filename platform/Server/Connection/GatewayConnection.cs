@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -26,6 +27,18 @@ namespace Server.Connection
         public Task<IEnumerable<DeviceState>> GetDeviceList()
         {
             return _context.Clients.InvokeBidirectional<IEnumerable<DeviceState>>(_connectionId, "GetDeviceStates");
+        }
+
+        public Task<IEnumerable<DeviceState>> GetDeviceStateHistory(string deviceId, DateTime? start, DateTime? end, int? intervalSeconds, int? count)
+        {
+            return _context.Clients.InvokeBidirectional<IEnumerable<DeviceState>>(_connectionId, "GetDeviceStateHistory", new ServerHubHistoryRequest()
+            {
+                DeviceId = deviceId,
+                Start = start,
+                End = end,
+                IntervalSeconds = intervalSeconds,
+                Count = count
+            });
         }
 
         public Task SendRequest(string deviceId, string name, string payload)

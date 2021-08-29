@@ -20,7 +20,7 @@ namespace Hub.Domain
         
         public Task<IEnumerable<DeviceState>> Handle(GetDeviceStateHistoryRequest request, CancellationToken cancellationToken)
         {
-            return _deviceService.GetDeviceStateHistory(request.DeviceId, request.Start, request.End, request.IntervalSeconds);
+            return _deviceService.GetDeviceStateHistory(request.DeviceId, request.Start, request.End, request.IntervalSeconds, request.Count);
         }
     }
 }

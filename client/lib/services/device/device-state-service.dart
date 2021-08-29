@@ -9,11 +9,14 @@ import 'package:rxdart/rxdart.dart';
 typedef DeviceStateMap = Map<String?, DeviceState>;
 typedef DeviceStateList = Iterable<DeviceState>;
 
-abstract class IDeviceListService {
+abstract class IDeviceStateService {
   Stream<DeviceStateList> getDeviceStateUpdates();
+  Stream<DeviceStateList> getDeviceStates();
+  Future<DeviceStateList> getStateHistory(String deviceId,
+      {DateTime? start, DateTime? end, int? intervalSeconds, int? count});
 }
 
-class DeviceListService implements IDeviceListService {
+class DeviceListService implements IDeviceStateService {
   final IApiService apiService;
   final IConnectionService connectionService;
   final logger = Logger("DeviceListService");
@@ -65,17 +68,33 @@ class DeviceListService implements IDeviceListService {
     return _deviceStates!;
   }
 
+  @override
+  Future<DeviceStateList> getStateHistory(String deviceId,
+      {DateTime? start,
+      DateTime? end,
+      int? intervalSeconds,
+      int? count}) async {
+    logger.info("Fetching history for device $deviceId");
+
+    var rawResponse = await apiService.getDeviceStateHistory(deviceId,
+        start: start, end: end, intervalSeconds: intervalSeconds, count: count);
+    return _mapJsonToDeviceStateList(rawResponse);
+  }
+
   Stream<Iterable<DeviceState>> _getUpdateStream() {
     return connectionService
         .listenOn<List<dynamic>>(Endpoints.DeviceStateChangedEndpoint)
         .where((updateList) => updateList.length > 0)
-        .map((updateList) =>
-            updateList.map((json) => DeviceState.fromJson(json)).toList());
+        .map((raw) => _mapJsonToDeviceStateList(raw).toList());
   }
 
   Future<Iterable<DeviceState>> _fetchDeviceList() async {
     logger.info("Fetching device list");
     var rawResponse = await apiService.getDeviceList();
-    return rawResponse.map((json) => DeviceState.fromJson(json));
+    return _mapJsonToDeviceStateList(rawResponse);
+  }
+
+  Iterable<DeviceState> _mapJsonToDeviceStateList(Iterable<dynamic> raw) {
+    return raw.map((json) => DeviceState.fromJson(json));
   }
 }

@@ -15,6 +15,7 @@ class RemoteHubDiscovery implements HubDiscovery {
   static const String PUBLIC_SERVER_HOST = "localhost";
   static const int? PUBLIC_SERVER_PORT = 4000;
   */
+
   @override
   Stream<HubAddress> getHubAddresses() async* {
     logger.info('Accessing global hub address');
