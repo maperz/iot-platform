@@ -1,8 +1,18 @@
+import 'package:equatable/equatable.dart';
+
 import 'device-type.dart';
 
-class DeviceInfo {
+class DeviceInfo extends Equatable {
+  final String id;
   final String? name;
   final String version;
   final DeviceType type;
-  DeviceInfo(this.name, this.type, this.version);
+  DeviceInfo(this.id, this.name, this.type, this.version);
+
+  @override
+  List<Object?> get props => [id, name, version, type];
+
+  String getDisplayName() {
+    return this.name ?? this.type.getName();
+  }
 }

@@ -33,9 +33,4 @@ class LoginPage extends StatelessWidget {
       this.loggedInCallback(result);
     }
   }
-
-  String _getAppTitle(BuildContext context) {
-    final Title? ancestorTitle = context.findAncestorWidgetOfExactType<Title>();
-    return ancestorTitle?.title ?? "";
-  }
 }

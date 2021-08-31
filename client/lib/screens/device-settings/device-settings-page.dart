@@ -1,21 +1,22 @@
-import 'package:curtains_client/models/device/models/device-state.dart';
+import 'package:curtains_client/models/device/index.dart';
+import 'package:curtains_client/screens/device-list/components/list-tiles/helper/device-state-stream-builder.dart';
 import 'package:curtains_client/services/api/api-service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DeviceSettingsPage extends StatelessWidget {
-  final DeviceState state;
+  final DeviceInfo deviceInfo;
   final IApiService apiService;
   final nameController = TextEditingController();
 
-  DeviceSettingsPage(this.state, this.apiService) {
-    nameController.text = state.getDisplayName();
+  DeviceSettingsPage(this.deviceInfo, this.apiService) {
+    nameController.text = deviceInfo.getDisplayName();
   }
 
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text(this.state.getDisplayName()),
+      title: Text(this.deviceInfo.getDisplayName()),
     );
 
     return Scaffold(
@@ -40,32 +41,34 @@ class DeviceSettingsPage extends StatelessWidget {
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.state.deviceId.toString(),
+              initialValue: this.deviceInfo.id.toString(),
               decoration: const InputDecoration(
                 labelText: "Device Id",
               ),
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.state.info.type.toString(),
+              initialValue: this.deviceInfo.type.toString(),
               decoration: const InputDecoration(
                 labelText: "Device Type",
               ),
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.state.info.version,
+              initialValue: this.deviceInfo.version,
               decoration: const InputDecoration(
                 labelText: "Device Version",
               ),
             ),
-            TextFormField(
-              enabled: false,
-              initialValue: this.state.lastUpdate.toLocal().toString(),
-              decoration: const InputDecoration(
-                labelText: "Last Update",
-              ),
-            ),
+            DeviceStateStreamBuilder(
+                deviceId: deviceInfo.id,
+                builder: (context, deviceState) => TextFormField(
+                      enabled: false,
+                      initialValue: deviceState.lastUpdate.toLocal().toString(),
+                      decoration: const InputDecoration(
+                        labelText: "Last Update",
+                      ),
+                    )),
           ],
         ),
       ),
@@ -73,6 +76,6 @@ class DeviceSettingsPage extends StatelessWidget {
   }
 
   Future _changeDeviceName(String newName) {
-    return this.apiService.setDeviceName(this.state.deviceId, newName);
+    return this.apiService.setDeviceName(this.deviceInfo.id, newName);
   }
 }

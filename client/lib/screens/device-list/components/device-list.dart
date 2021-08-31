@@ -20,60 +20,61 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
         IDeviceStateService deviceStateService = new DeviceListService(
             connectionService: connectionService, apiService: apiService);
 
-        return StreamBuilder<DeviceStateList>(
-            stream: deviceStateService.getDeviceStates(),
-            builder: (context, deviceStatesSnapshot) {
-              if (deviceStatesSnapshot.data == null) {
-                return Container();
-              }
+        return Provider<IDeviceStateService>(
+          create: (context) => deviceStateService,
+          child: StreamBuilder<DeviceList>(
+              stream: deviceStateService.getDevices(),
+              builder: (context, deviceStatesSnapshot) {
+                if (deviceStatesSnapshot.data == null) {
+                  return Container();
+                }
 
-              final devices = deviceStatesSnapshot.data!;
+                final devices = deviceStatesSnapshot.data!;
+                return ListView.builder(
+                  itemCount: devices.length,
+                  itemBuilder: (context, index) {
+                    final device = devices.elementAt(index);
+                    final type = device.type;
 
-              return ListView.builder(
-                itemCount: devices.length,
-                itemBuilder: (context, index) {
-                  final deviceState = devices.elementAt(index);
-                  final type = deviceState.info.type;
-
-                  switch (type) {
-                    case DeviceType.Curtain:
-                      return CurtainListTile(deviceState);
-                    case DeviceType.Lamp:
-                      return LampListTile(
-                        deviceState,
-                        showDeviceSettings: () =>
-                            _showDeviceSettingsPage(deviceState, apiService),
-                      );
-                    case DeviceType.Thermo:
-                      return ThermoListTile(
-                          deviceStateService: deviceStateService,
-                          deviceState: deviceState,
-                          onClick: () => apiService.sendRequest(
-                              deviceState.deviceId, "temperature", ""),
+                    switch (type) {
+                      case DeviceType.Curtain:
+                        return CurtainListTile(device);
+                      case DeviceType.Lamp:
+                        return LampListTile(
+                          device,
                           showDeviceSettings: () =>
-                              _showDeviceSettingsPage(deviceState, apiService));
-                    case DeviceType.DistanceSensor:
-                      return DistanceSensorListTile(
-                          deviceState: deviceState,
-                          onClick: () => apiService.sendRequest(
-                              deviceState.deviceId, "measure", ""),
-                          showDeviceSettings: () =>
-                              _showDeviceSettingsPage(deviceState, apiService));
-                    default:
-                      return UnknownListTile(deviceState);
-                  }
-                },
-              );
-            });
+                              _showDeviceSettingsPage(device, apiService),
+                        );
+                      case DeviceType.Thermo:
+                        return ThermoListTile(
+                            deviceStateService: deviceStateService,
+                            deviceInfo: device,
+                            onClick: () => apiService.sendRequest(
+                                device.id, "temperature", ""),
+                            showDeviceSettings: () =>
+                                _showDeviceSettingsPage(device, apiService));
+                      case DeviceType.DistanceSensor:
+                        return DistanceSensorListTile(
+                            deviceInfo: device,
+                            onClick: () => apiService.sendRequest(
+                                device.id, "measure", ""),
+                            showDeviceSettings: () =>
+                                _showDeviceSettingsPage(device, apiService));
+                      default:
+                        return UnknownListTile(device);
+                    }
+                  },
+                );
+              }),
+        );
       },
     );
   }
 
-  void _showDeviceSettingsPage(
-      DeviceState deviceState, IApiService apiService) {
+  void _showDeviceSettingsPage(DeviceInfo deviceInfo, IApiService apiService) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => DeviceSettingsPage(deviceState, apiService)));
+            builder: (context) => DeviceSettingsPage(deviceInfo, apiService)));
   }
 }

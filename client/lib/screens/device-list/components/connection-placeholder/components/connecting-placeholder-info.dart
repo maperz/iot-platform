@@ -1,4 +1,3 @@
-import 'package:curtains_client/models/connection/index.dart';
 import 'package:flutter/material.dart';
 
 class ConnectingPlaceholderInfo extends StatelessWidget {

@@ -16,8 +16,8 @@ class ThermoState {
 
     final state = json.decode(jsonState);
 
-    var tempJson = state['temp'] ?? "0.0";
-    var humJson = state['hum'] ?? "0.0";
+    var tempJson = state['temp'] ?? 0.0;
+    var humJson = state['hum'] ?? 0.0;
 
     var temp = tempJson is int ? (tempJson).toDouble() : tempJson;
     var hum = humJson is int ? (humJson).toDouble() : humJson;

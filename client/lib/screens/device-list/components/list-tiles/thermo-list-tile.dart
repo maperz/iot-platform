@@ -9,56 +9,58 @@ import 'package:flutter/widgets.dart';
 import 'helper/generic-device-tile.dart';
 
 class ThermoListTile extends StatelessWidget {
-  final DeviceState deviceState;
-  late final ThermoState thermoState;
+  final DeviceInfo deviceInfo;
   final IDeviceStateService deviceStateService;
 
   final OnDeviceClickedCallback onClick;
   final ShowDeviceDetailCallback showDeviceSettings;
 
   ThermoListTile(
-      {required this.deviceState,
+      {required this.deviceInfo,
       required this.onClick,
       required this.deviceStateService,
       required this.showDeviceSettings,
       Key? key})
-      : super(key: key) {
-    this.thermoState = ThermoState.fromJson(this.deviceState.state);
-  }
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GenericDeviceTile(
         onClick: onClick,
         showDeviceSettings: showDeviceSettings,
-        deviceState: deviceState,
-        builder: (context) => Row(
-              children: [
-                Text(thermoState.temp.toString() + "°C"),
-                Container(
-                  width: 10,
-                ),
-                Text(thermoState.hum.toString() + "%")
-              ],
-            ),
-        detailBuilder: (context) => FutureBuilder<Iterable<DeviceState>>(
-            future: deviceStateService.getStateHistory(deviceState.deviceId,
-                intervalSeconds: Duration(hours: 1).inSeconds, count: 100),
-            builder: (context, stateHistorySnapshot) {
-              if (stateHistorySnapshot.hasData) {
-                return AspectRatio(
-                  aspectRatio: 2.5,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 200),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: ThermoDetailPage.fromDeviceHistory(
-                          stateHistorySnapshot.data!),
+        deviceInfo: deviceInfo,
+        builder: (context, deviceState) {
+          var thermoState = ThermoState.fromJson(deviceState.state);
+          return Row(
+            children: [
+              Text(thermoState.temp.toString() + "°C"),
+              Container(
+                width: 10,
+              ),
+              Text(thermoState.hum.toString() + "%")
+            ],
+          );
+        },
+        detailBuilder: (context, deviceState) {
+          return FutureBuilder<Iterable<DeviceState>>(
+              future: deviceStateService.getStateHistory(deviceState.deviceId,
+                  intervalSeconds: Duration(hours: 1).inSeconds, count: 100),
+              builder: (context, stateHistorySnapshot) {
+                if (stateHistorySnapshot.hasData) {
+                  return AspectRatio(
+                    aspectRatio: 2.5,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 200),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: ThermoDetailPage.fromDeviceHistory(
+                            stateHistorySnapshot.data!),
+                      ),
                     ),
-                  ),
-                );
-              }
-              return Container();
-            }));
+                  );
+                }
+                return Container();
+              });
+        });
   }
 }

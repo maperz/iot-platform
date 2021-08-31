@@ -1,7 +1,9 @@
+import 'package:equatable/equatable.dart';
+
 import 'device-info.dart';
 import 'device-type.dart';
 
-class DeviceState {
+class DeviceState extends Equatable {
   final String deviceId;
   final DeviceInfo info;
 
@@ -20,15 +22,18 @@ class DeviceState {
     var lastUpdate = DateTime.parse(json['lastUpdate']);
 
     return DeviceState(json['deviceId'], json['connected'], state,
-        new DeviceInfo(name, type, version), lastUpdate);
+        new DeviceInfo(json['deviceId'], name, type, version), lastUpdate);
   }
 
   String getDisplayName() {
-    return this.info.name ?? this.info.type.getName();
+    return this.info.getDisplayName();
   }
 
   @override
   String toString() {
     return "[$deviceId-${info.type}]: Connected: $connected, $lastUpdate, $state";
   }
+
+  @override
+  List<Object> get props => [deviceId, info, connected, state, lastUpdate];
 }

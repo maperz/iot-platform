@@ -1,9 +1,9 @@
-import 'dart:convert';
-
 import 'package:curtains_client/models/device/index.dart';
+import 'package:curtains_client/models/device/models/domain-states/curtain-state.dart';
 import 'package:curtains_client/screens/device-settings/device-settings-page.dart';
 import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
 import 'package:curtains_client/services/api/api-service.dart';
+import 'package:curtains_client/services/device/device-state-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -11,96 +11,91 @@ import 'package:provider/provider.dart';
 import '../device-icon.dart';
 
 class CurtainListTile extends StatefulWidget {
-  final DeviceState deviceState;
-  late final CurtainState curtainState;
+  final DeviceInfo deviceInfo;
 
   CurtainListTile(
-    this.deviceState, {
+    this.deviceInfo, {
     Key? key,
-  }) : super(key: key) {
-    this.curtainState = CurtainState(this.deviceState.state);
-  }
+  }) : super(key: key);
 
   @override
   _CurtainListTileState createState() => _CurtainListTileState();
 }
 
-class CurtainState {
-  /* Example curtain state
-   * {
-   *  speed: "1.0",
-   * }
-   */
-
-  late double progress;
-
-  CurtainState(String jsonEncode) {
-    final state = json.decode(jsonEncode);
-
-    var speedJson = state['speed'];
-    progress = speedJson is int ? (speedJson).toDouble() : speedJson;
-  }
-}
-
 class _CurtainListTileState extends State<CurtainListTile> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<IApiService>(
-        builder: (context, apiService, child) => Card(
-              child: ListTile(
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                  enabled: widget.deviceState.connected,
-                  leading: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DeviceIcon(widget.deviceState),
-                  ),
-                  trailing: InkWell(
-                    onTap: widget.deviceState.connected
-                        ? () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DeviceSettingsPage(
-                                        widget.deviceState, apiService)));
-                          }
-                        : null,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.more_vert_rounded,
-                      ),
-                    ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(widget.deviceState.getDisplayName()),
-                      Expanded(
-                        child: Slider(
-                          value: widget.curtainState.progress,
-                          min: -1.0,
-                          max: 1.0,
-                          divisions: 40,
-                          label: (widget.curtainState.progress * 100)
-                                  .round()
-                                  .toString() +
-                              " Percent",
-                          onChanged: widget.deviceState.connected
-                              ? (double value) {
-                                  setState(() => setSpeed(apiService, value));
+    return Consumer2<IApiService, IDeviceStateService>(
+        builder: (context, apiService, deviceStateService, child) => Card(
+              child: StreamBuilder<DeviceState>(
+                  stream: deviceStateService
+                      .getDeviceStateUpdates(widget.deviceInfo.id),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return Container();
+                    }
+
+                    var deviceState = snapshot.data!;
+                    var curtainState = CurtainState.fromJson(deviceState.state);
+
+                    return ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                        enabled: deviceState.connected,
+                        leading: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DeviceIcon(deviceState),
+                        ),
+                        trailing: InkWell(
+                          onTap: deviceState.connected
+                              ? () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              DeviceSettingsPage(
+                                                  widget.deviceInfo,
+                                                  apiService)));
                                 }
                               : null,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              Icons.more_vert_rounded,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  subtitle: FriendlyChangeText(widget.deviceState.lastUpdate,
-                      key: UniqueKey())),
+                        title: Row(
+                          children: [
+                            Text(deviceState.getDisplayName()),
+                            Expanded(
+                              child: Slider(
+                                value: curtainState.progress,
+                                min: -1.0,
+                                max: 1.0,
+                                divisions: 40,
+                                label: (curtainState.progress * 100)
+                                        .round()
+                                        .toString() +
+                                    " Percent",
+                                onChanged: deviceState.connected
+                                    ? (double value) {
+                                        setState(() => setSpeed(
+                                            apiService, value, deviceState));
+                                      }
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: FriendlyChangeText(deviceState.lastUpdate,
+                            key: UniqueKey()));
+                  }),
             ));
   }
 
-  void setSpeed(IApiService apiService, double value) {
+  void setSpeed(IApiService apiService, double value, DeviceState deviceState) {
     apiService.sendRequest(
-        widget.deviceState.deviceId, "speed", value.toStringAsPrecision(2));
+        deviceState.deviceId, "speed", value.toStringAsPrecision(2));
   }
 }

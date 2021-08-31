@@ -1,17 +1,21 @@
 import 'package:curtains_client/models/device/index.dart';
+import 'package:curtains_client/services/device/device-state-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 import 'helper/generic-device-tile.dart';
 
 class UnknownListTile extends StatelessWidget {
-  final DeviceState deviceState;
+  final DeviceInfo deviceInfo;
 
-  UnknownListTile(this.deviceState);
+  UnknownListTile(this.deviceInfo);
 
   @override
   Widget build(BuildContext context) {
-    return GenericDeviceTile(
-        deviceState: deviceState, builder: (context) => Text("(Unknown Type)"));
+    return Consumer<IDeviceStateService>(
+        builder: (context, deviceStateService, child) => GenericDeviceTile(
+            deviceInfo: deviceInfo,
+            builder: (context, deviceState) => Text("(Unknown Type)")));
   }
 }

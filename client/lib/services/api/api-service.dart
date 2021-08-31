@@ -1,4 +1,3 @@
-import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/services/connection/connection.dart';
 
 abstract class IApiService {
