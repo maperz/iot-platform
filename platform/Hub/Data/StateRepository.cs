@@ -73,7 +73,7 @@ namespace Hub.Data
 
             if (count != null)
             {
-                sql += " LIMIT " + count;
+                sql = "SELECT * FROM (SELECT * FROM (" +  sql + ") ORDER BY LastUpdate DESC LIMIT " + count + ") ORDER BY LastUpdate ASC";
             }
             
             using var db = Connection;

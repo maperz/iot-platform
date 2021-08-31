@@ -47,9 +47,14 @@ class ApiService extends IApiService {
       DateTime? end,
       int? intervalSeconds,
       int? count}) async {
-    var deviceList = await connectionService.invoke(
-        ApiEndpoints.GetDeviceStateHistory,
-        args: [deviceId, start, end, intervalSeconds, count]);
+    var deviceList = await connectionService
+        .invoke(ApiEndpoints.GetDeviceStateHistory, args: [
+      deviceId,
+      start?.toIso8601String(),
+      end?.toIso8601String(),
+      intervalSeconds,
+      count
+    ]);
     return deviceList as Iterable<dynamic>;
   }
 }

@@ -1,8 +1,8 @@
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/models/device/models/domain-states/curtain-state.dart';
+import 'package:curtains_client/screens/device-list/components/list-tiles/helper/device-state-stream-builder.dart';
 import 'package:curtains_client/screens/device-settings/device-settings-page.dart';
 import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
-import 'package:curtains_client/services/api/api-service.dart';
 import 'package:curtains_client/services/device/device-state-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -25,17 +25,11 @@ class CurtainListTile extends StatefulWidget {
 class _CurtainListTileState extends State<CurtainListTile> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<IApiService, IDeviceStateService>(
-        builder: (context, apiService, deviceStateService, child) => Card(
-              child: StreamBuilder<DeviceState>(
-                  stream: deviceStateService
-                      .getDeviceStateUpdates(widget.deviceInfo.id),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData || snapshot.data == null) {
-                      return Container();
-                    }
-
-                    var deviceState = snapshot.data!;
+    return Consumer<IDeviceStateService>(
+        builder: (context, deviceStateService, child) => Card(
+              child: DeviceStateStreamBuilder(
+                  deviceId: widget.deviceInfo.id,
+                  builder: (context, deviceState) {
                     var curtainState = CurtainState.fromJson(deviceState.state);
 
                     return ListTile(
@@ -55,7 +49,7 @@ class _CurtainListTileState extends State<CurtainListTile> {
                                           builder: (context) =>
                                               DeviceSettingsPage(
                                                   widget.deviceInfo,
-                                                  apiService)));
+                                                  deviceStateService)));
                                 }
                               : null,
                           child: Padding(
@@ -81,7 +75,9 @@ class _CurtainListTileState extends State<CurtainListTile> {
                                 onChanged: deviceState.connected
                                     ? (double value) {
                                         setState(() => setSpeed(
-                                            apiService, value, deviceState));
+                                            deviceStateService,
+                                            value,
+                                            deviceState));
                                       }
                                     : null,
                               ),
@@ -94,8 +90,9 @@ class _CurtainListTileState extends State<CurtainListTile> {
             ));
   }
 
-  void setSpeed(IApiService apiService, double value, DeviceState deviceState) {
-    apiService.sendRequest(
+  void setSpeed(IDeviceStateService deviceStateService, double value,
+      DeviceState deviceState) {
+    deviceStateService.sendRequest(
         deviceState.deviceId, "speed", value.toStringAsPrecision(2));
   }
 }

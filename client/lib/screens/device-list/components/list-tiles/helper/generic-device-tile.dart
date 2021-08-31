@@ -2,7 +2,6 @@ import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-list/components/list-tiles/helper/device-state-stream-builder.dart';
 import 'package:curtains_client/screens/device-list/components/list-tiles/helper/slidable-list-menu.dart';
 import 'package:curtains_client/screens/main/components/helper/friendly-change-text.dart';
-import 'package:curtains_client/services/device/device-state-service.dart';
 import 'package:flutter/material.dart';
 
 import '../../device-icon.dart';

@@ -19,7 +19,6 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
       builder: (context, connectionService, apiService, child) {
         IDeviceStateService deviceStateService = new DeviceListService(
             connectionService: connectionService, apiService: apiService);
-
         return Provider<IDeviceStateService>(
           create: (context) => deviceStateService,
           child: StreamBuilder<DeviceList>(
@@ -42,8 +41,8 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                       case DeviceType.Lamp:
                         return LampListTile(
                           device,
-                          showDeviceSettings: () =>
-                              _showDeviceSettingsPage(device, apiService),
+                          showDeviceSettings: () => _showDeviceSettingsPage(
+                              device, deviceStateService),
                         );
                       case DeviceType.Thermo:
                         return ThermoListTile(
@@ -51,15 +50,15 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                             deviceInfo: device,
                             onClick: () => apiService.sendRequest(
                                 device.id, "temperature", ""),
-                            showDeviceSettings: () =>
-                                _showDeviceSettingsPage(device, apiService));
+                            showDeviceSettings: () => _showDeviceSettingsPage(
+                                device, deviceStateService));
                       case DeviceType.DistanceSensor:
                         return DistanceSensorListTile(
                             deviceInfo: device,
                             onClick: () => apiService.sendRequest(
                                 device.id, "measure", ""),
-                            showDeviceSettings: () =>
-                                _showDeviceSettingsPage(device, apiService));
+                            showDeviceSettings: () => _showDeviceSettingsPage(
+                                device, deviceStateService));
                       default:
                         return UnknownListTile(device);
                     }
@@ -71,10 +70,12 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
     );
   }
 
-  void _showDeviceSettingsPage(DeviceInfo deviceInfo, IApiService apiService) {
+  void _showDeviceSettingsPage(
+      DeviceInfo deviceInfo, IDeviceStateService deviceStateService) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => DeviceSettingsPage(deviceInfo, apiService)));
+            builder: (context) =>
+                DeviceSettingsPage(deviceInfo, deviceStateService)));
   }
 }

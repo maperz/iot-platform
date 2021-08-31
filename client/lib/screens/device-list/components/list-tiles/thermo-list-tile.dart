@@ -42,19 +42,25 @@ class ThermoListTile extends StatelessWidget {
           );
         },
         detailBuilder: (context, deviceState) {
+          final lastWeekAgo =
+              DateTime.now().toUtc().subtract(Duration(days: 7));
           return FutureBuilder<Iterable<DeviceState>>(
               future: deviceStateService.getStateHistory(deviceState.deviceId,
-                  intervalSeconds: Duration(hours: 1).inSeconds, count: 100),
+                  intervalSeconds: Duration(hours: 1).inSeconds,
+                  start: lastWeekAgo,
+                  type: DeviceType.Thermo),
               builder: (context, stateHistorySnapshot) {
-                if (stateHistorySnapshot.hasData) {
+                if (stateHistorySnapshot.hasData &&
+                    stateHistorySnapshot.data != null) {
+                  var stateHistory = stateHistorySnapshot.data!;
+
                   return AspectRatio(
                     aspectRatio: 2.5,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: 200),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: ThermoDetailPage.fromDeviceHistory(
-                            stateHistorySnapshot.data!),
+                        child: ThermoDetailPage.fromDeviceHistory(stateHistory),
                       ),
                     ),
                   );

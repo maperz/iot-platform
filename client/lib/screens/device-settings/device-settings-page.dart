@@ -1,15 +1,17 @@
 import 'package:curtains_client/models/device/index.dart';
 import 'package:curtains_client/screens/device-list/components/list-tiles/helper/device-state-stream-builder.dart';
-import 'package:curtains_client/services/api/api-service.dart';
+import 'package:curtains_client/services/device/device-state-service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DeviceSettingsPage extends StatelessWidget {
   final DeviceInfo deviceInfo;
-  final IApiService apiService;
+  final IDeviceStateService deviceStateService;
+
   final nameController = TextEditingController();
 
-  DeviceSettingsPage(this.deviceInfo, this.apiService) {
+  DeviceSettingsPage(this.deviceInfo, this.deviceStateService) {
     nameController.text = deviceInfo.getDisplayName();
   }
 
@@ -60,15 +62,19 @@ class DeviceSettingsPage extends StatelessWidget {
                 labelText: "Device Version",
               ),
             ),
-            DeviceStateStreamBuilder(
-                deviceId: deviceInfo.id,
-                builder: (context, deviceState) => TextFormField(
-                      enabled: false,
-                      initialValue: deviceState.lastUpdate.toLocal().toString(),
-                      decoration: const InputDecoration(
-                        labelText: "Last Update",
-                      ),
-                    )),
+            Provider<IDeviceStateService>(
+              create: (_) => deviceStateService,
+              child: DeviceStateStreamBuilder(
+                  deviceId: deviceInfo.id,
+                  builder: (context, deviceState) => TextFormField(
+                        enabled: false,
+                        initialValue:
+                            deviceState.lastUpdate.toLocal().toString(),
+                        decoration: const InputDecoration(
+                          labelText: "Last Update",
+                        ),
+                      )),
+            ),
           ],
         ),
       ),
@@ -76,6 +82,6 @@ class DeviceSettingsPage extends StatelessWidget {
   }
 
   Future _changeDeviceName(String newName) {
-    return this.apiService.setDeviceName(this.deviceInfo.id, newName);
+    return this.deviceStateService.setDeviceName(this.deviceInfo.id, newName);
   }
 }

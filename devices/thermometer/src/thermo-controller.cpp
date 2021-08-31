@@ -4,7 +4,10 @@
 #include "DHT.h"
 #include <Adafruit_Sensor.h>
 
-DHT dht(D1, DHT22);
+#define DHTPIN 1
+// #define DHTPIN D1
+
+DHT dht(DHTPIN, DHT22);
 
 const unsigned long measureInterval = 60000; // [ms]
 

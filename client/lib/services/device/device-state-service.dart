@@ -18,7 +18,15 @@ abstract class IDeviceStateService {
   Stream<DeviceState> getDeviceStateUpdates(String deviceId);
 
   Future<DeviceStateList> getStateHistory(String deviceId,
-      {DateTime? start, DateTime? end, int? intervalSeconds, int? count});
+      {DateTime? start,
+      DateTime? end,
+      int? intervalSeconds,
+      int? count,
+      DeviceType? type});
+
+  Future sendRequest(String deviceId, String name, String payload);
+
+  Future setDeviceName(String deviceId, String name);
 }
 
 class DeviceListService implements IDeviceStateService {
@@ -37,12 +45,20 @@ class DeviceListService implements IDeviceStateService {
       {DateTime? start,
       DateTime? end,
       int? intervalSeconds,
-      int? count}) async {
+      int? count,
+      DeviceType? type}) async {
     logger.info("Fetching history for device $deviceId");
 
     var rawResponse = await apiService.getDeviceStateHistory(deviceId,
         start: start, end: end, intervalSeconds: intervalSeconds, count: count);
-    return _mapJsonToDeviceStateList(rawResponse);
+    var stateHistoryList = _mapJsonToDeviceStateList(rawResponse);
+
+    if (type != null) {
+      stateHistoryList =
+          stateHistoryList.where((state) => state.info.type == type);
+    }
+
+    return stateHistoryList;
   }
 
   Stream<Iterable<DeviceState>> _getUpdateStream() {
@@ -120,5 +136,15 @@ class DeviceListService implements IDeviceStateService {
     }
 
     return _deviceStates!;
+  }
+
+  @override
+  Future sendRequest(String deviceId, String name, String payload) {
+    return apiService.sendRequest(deviceId, name, payload);
+  }
+
+  @override
+  Future setDeviceName(String deviceId, String name) {
+    return apiService.setDeviceName(deviceId, name);
   }
 }
