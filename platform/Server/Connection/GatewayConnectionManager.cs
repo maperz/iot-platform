@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace Server.Connection
 {
@@ -10,10 +11,12 @@ namespace Server.Connection
 
         private readonly Dictionary<string, GatewayConnection> _connectionIdMap = new ();
         private readonly Dictionary<string, GatewayConnection> _hubIdMap = new ();
-
-        public GatewayConnectionManager(IHubContext<ServerHub> context)
+        private readonly ILogger<GatewayConnectionManager> _logger;
+        
+        public GatewayConnectionManager(IHubContext<ServerHub> context, ILogger<GatewayConnectionManager> logger)
         {
             _context = context;
+            _logger = logger;
         }
         
         
@@ -23,12 +26,15 @@ namespace Server.Connection
             {
                 if (_connectionIdMap.ContainsKey(connectionId))
                 {
+                    _logger.LogWarning("Trying to add connection with CId: '{ConnectionId}' again - Ignoring request", connectionId);
                     return;
                 }
 
                 var connection = new GatewayConnection(connectionId, address, hubId, _context);
                 _connectionIdMap[connectionId] = connection;
                 _hubIdMap[hubId] = connection;
+                _logger.LogInformation("Added connection with CId: '{ConnectionId}' for HubId: '{HubId}'", connectionId, hubId);
+
             }
         }
         
@@ -36,12 +42,16 @@ namespace Server.Connection
         {
             lock(this)
             {
-                if (!_connectionIdMap.TryGetValue(connectionId, out var connection)) return false;
+                if (!_connectionIdMap.TryGetValue(connectionId, out var connection))
+                {
+                    _logger.LogWarning("Trying to remove not registered connection with CId: '{ConnectionId}' - Ignoring request", connectionId);
+                    return false;
+                }
                 
                 _connectionIdMap.Remove(connectionId);
                 _hubIdMap.Remove(connection.GetHubId());
+                _logger.LogInformation("Removed connection with CId: '{ConnectionId}' with HubId: '{HubId}'", connectionId, connection.GetHubId());
                 return true;
-
             }
         }
 

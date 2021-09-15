@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared;
-using Tmds.Linux;
 
 namespace Hub.Server
 {
@@ -21,6 +19,7 @@ namespace Hub.Server
         private readonly IMediator _mediator;
         private readonly string _hubId;
         private readonly IDeviceService _deviceService;
+        private readonly string _serverAddress;
 
 
         public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster,
@@ -32,11 +31,11 @@ namespace Hub.Server
             _hubId = appSettings.HubId;
             _deviceService = deviceService;
 
-            var serverAddress = appSettings.ServerAddress;
+            _serverAddress = appSettings.ServerAddress;
             
-            _logger.LogInformation("Creating server hub connection with address at {String}", serverAddress);
+            _logger.LogInformation("Creating server hub connection with address at {String}", _serverAddress);
             
-            _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress)
+            _hubConnection = new HubConnectionBuilder().WithUrl(_serverAddress)
                 .WithAutomaticReconnect(new ServerRetryPolicy())
                 .Build();
 
@@ -63,9 +62,22 @@ namespace Hub.Server
                     await _mediator.Send(new SetNameRequest() {DeviceId = deviceId, Name = name});
                 });
             
-            _hubConnection.Reconnecting += (_ => Task.Run(() => _logger.LogInformation("Attempting to reconnect to Server")));
-            _hubConnection.Reconnected += (_ => ConnectionEstablished());
-            _hubConnection.Closed += (_ => Task.Run(() => _logger.LogInformation("Lost connection to Server")));
+            _hubConnection.Reconnecting += error=> Task.Run(() =>
+            {
+                if (error == null)
+                {
+                    _logger.LogInformation("Attempting to reconnect to server at {Address}",
+                        _serverAddress);
+                }
+                else
+                {
+                    _logger.LogError("Attempting to reconnect to server at {Address} after {Error}",
+                        _serverAddress, error.Message);
+                }
+            });
+            
+            _hubConnection.Reconnected += _ => ConnectionEstablished();
+            _hubConnection.Closed += _ => Task.Run(() => _logger.LogInformation("Lost connection to Server"));
         }
 
         public Task<bool> IsConnected()

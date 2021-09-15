@@ -48,7 +48,6 @@ class DeviceListService implements IDeviceStateService {
       int? count,
       DeviceType? type}) async {
     logger.info("Fetching history for device $deviceId");
-
     var rawResponse = await apiService.getDeviceStateHistory(deviceId,
         start: start, end: end, intervalSeconds: intervalSeconds, count: count);
     var stateHistoryList = _mapJsonToDeviceStateList(rawResponse);

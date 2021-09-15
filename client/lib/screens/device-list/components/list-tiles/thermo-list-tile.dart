@@ -46,10 +46,15 @@ class ThermoListTile extends StatelessWidget {
               DateTime.now().toUtc().subtract(Duration(days: 7));
           return FutureBuilder<Iterable<DeviceState>>(
               future: deviceStateService.getStateHistory(deviceState.deviceId,
-                  intervalSeconds: Duration(hours: 1).inSeconds,
+                  intervalSeconds: Duration(hours: 4).inSeconds,
                   start: lastWeekAgo,
                   type: DeviceType.Thermo),
               builder: (context, stateHistorySnapshot) {
+                if (stateHistorySnapshot.hasError) {
+                  return Text(
+                      "An error occured while gettint the state history");
+                }
+
                 if (stateHistorySnapshot.hasData &&
                     stateHistorySnapshot.data != null) {
                   var stateHistory = stateHistorySnapshot.data!;
