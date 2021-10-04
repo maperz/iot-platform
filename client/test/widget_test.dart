@@ -7,8 +7,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:iot_client/main.dart';
-
 void main() {
   testWidgets('App is started', (WidgetTester tester) async {
     // Build our app and trigger a frame.
