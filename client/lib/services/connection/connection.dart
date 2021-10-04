@@ -19,6 +19,7 @@ class ConnectionStateData {
   static const ConnectionStateData disconnected =
       ConnectionStateData(false, null);
 
+  @override
   String toString() {
     var connected = isConnected ? "Connected" : "Disconnected";
     return "[$connected] $info";
@@ -65,12 +66,13 @@ class ConnectionService implements IConnectionService {
 
   ConnectionService({required this.addressResolver, required this.authService});
 
+  @override
   Future start() async {
     void onReconnecting(Exception? err) {}
 
     void onReconnected(String? id) {}
 
-    this.signalR = new SignalRHelper(
+    signalR = SignalRHelper(
         onReconnect: onReconnecting, onReconnected: onReconnected);
 
     Rx.combineLatest2(
@@ -104,7 +106,7 @@ class ConnectionService implements IConnectionService {
       logger.fine(
           "Handle connection to $hubUrl. Requires Auth: ${address.requiresAuthentication} and Token: ${token?.substring(0, 5)}...");
 
-      await this.signalR.stop();
+      await signalR.stop();
       _onConnectionStopped();
 
       if (address.requiresAuthentication && token == null) {
@@ -114,7 +116,7 @@ class ConnectionService implements IConnectionService {
         continue;
       }
 
-      await this.signalR.init(hubUrl, token);
+      await signalR.init(hubUrl, token);
 
       listenOn<Json>(ConnectionEndpoints.ConnectionInfo)
           .map((json) => ConnectionInfo.fromJson(hubUrl, json))
@@ -122,7 +124,7 @@ class ConnectionService implements IConnectionService {
         _connectionInfo.add(info);
       });
 
-      await this.signalR.start();
+      await signalR.start();
       _onConnectionStarted(hubUrl);
     }
   }
@@ -160,7 +162,7 @@ class ConnectionService implements IConnectionService {
 
     void callback(List<dynamic>? values) {
       try {
-        if (values != null && values.length > 0) {
+        if (values != null && values.isNotEmpty) {
           controller.add(values[0] as S);
         }
       } catch (error) {
@@ -186,6 +188,7 @@ class ConnectionService implements IConnectionService {
     return controller.stream;
   }
 
+  @override
   Future stop() async {
     await signalR.stop();
     _isConnected.close();

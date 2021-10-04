@@ -12,23 +12,25 @@ abstract class IAddressResolver {
 }
 
 class WebAddressResolver implements IAddressResolver {
-  final remoteDiscovery = new RemoteHubDiscovery();
+  final remoteDiscovery = RemoteHubDiscovery();
 
   @override
   Stream<HubAddress> getAddress() {
     return remoteDiscovery.getHubAddresses();
   }
 
+  @override
   Future init() async {}
 }
 
 class AddressResolver implements IAddressResolver {
-  final localDiscovery = new LocalHubDiscovery();
-  final remoteDiscovery = new RemoteHubDiscovery();
-  final logger = new Logger("AddressResolver");
+  final localDiscovery = LocalHubDiscovery();
+  final remoteDiscovery = RemoteHubDiscovery();
+  final logger = Logger("AddressResolver");
 
   late Stream<HubAddress> _hubUrlStream;
 
+  @override
   Future init() async {
     var currentConnectivity = await Connectivity().checkConnectivity();
     _hubUrlStream = Connectivity()

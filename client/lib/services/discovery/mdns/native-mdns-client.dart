@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 import 'mdns-client.dart';
 
 class NativeMDNSClient implements IMDNSClient {
-  final _logger = new Logger("NativeMDNSClient");
+  final _logger = Logger("NativeMDNSClient");
 
   @override
   Future<MDNSResult?> discoverService(String serviceName) async {

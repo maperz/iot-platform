@@ -29,12 +29,12 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    connectionService = new ConnectionService(
+    connectionService = ConnectionService(
         addressResolver: widget.addressResolver,
         authService: widget.authService);
     connectionService.start();
 
-    apiService = new ApiService(connectionService: connectionService);
+    apiService = ApiService(connectionService: connectionService);
   }
 
   @override
@@ -71,11 +71,11 @@ class _MainPageState extends State<MainPage> {
       child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
-          children: [
+          children: const [
             DrawerHeader(
               decoration: BoxDecoration(
                 gradient:
-                    LinearGradient(colors: [Color(0xFF0D47A1), Colors.blue]),
+                    LinearGradient(colors: const [Color(0xFF0D47A1), Colors.blue]),
               ),
               child: ProfileDrawerWidget(),
             ),

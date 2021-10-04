@@ -13,7 +13,7 @@ class ConnectionPlaceholderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var title = _getTitleMessage(info);
-    var status = _getStatusMessage(info) ?? this.alternativeStatus;
+    var status = _getStatusMessage(info) ?? alternativeStatus;
 
     return Stack(children: [
       ConnectingListPlaceholder(),

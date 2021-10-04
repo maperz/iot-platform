@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ConnectionInfoPage extends StatelessWidget {
   final IConnectionService connectionService;
 
-  ConnectionInfoPage({required this.connectionService});
+  const ConnectionInfoPage({required this.connectionService});
 
   @override
   Widget build(BuildContext context) {

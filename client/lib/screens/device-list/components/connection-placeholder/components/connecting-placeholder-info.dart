@@ -4,7 +4,7 @@ class ConnectingPlaceholderInfo extends StatelessWidget {
   final String title;
   final String? status;
 
-  ConnectingPlaceholderInfo({required this.title, required this.status});
+  const ConnectingPlaceholderInfo({required this.title, required this.status});
 
   @override
   Widget build(BuildContext context) {

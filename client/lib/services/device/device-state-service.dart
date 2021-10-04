@@ -63,7 +63,7 @@ class DeviceListService implements IDeviceStateService {
   Stream<Iterable<DeviceState>> _getUpdateStream() {
     return connectionService
         .listenOn<List<dynamic>>(Endpoints.DeviceStateChangedEndpoint)
-        .where((updateList) => updateList.length > 0)
+        .where((updateList) => updateList.isNotEmpty)
         .map((raw) => _mapJsonToDeviceStateList(raw).toList());
   }
 
@@ -124,7 +124,7 @@ class DeviceListService implements IDeviceStateService {
         }
 
         return states;
-      }, DeviceStateMap());
+      }, {});
 
       var stateMapStream = _getAllDeviceStateUpdates()
           .transform<DeviceStateMap>(accumulateStatesTransformer);

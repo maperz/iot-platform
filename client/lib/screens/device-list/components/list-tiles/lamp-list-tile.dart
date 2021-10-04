@@ -15,7 +15,7 @@ class LampListTile extends StatefulWidget {
   final DeviceInfo deviceInfo;
   final Function? showDeviceSettings;
 
-  LampListTile(
+  const LampListTile(
     this.deviceInfo, {
     this.showDeviceSettings,
     Key? key,
@@ -30,7 +30,7 @@ class _LampListTileState extends State<LampListTile> {
   Widget build(BuildContext context) {
     return Consumer<IApiService>(
         builder: (context, apiService, child) => DeviceStateStreamBuilder(
-            deviceId: this.widget.deviceInfo.id,
+            deviceId: widget.deviceInfo.id,
             builder: (context, deviceState) {
               var lampState = LampState.fromJson(deviceState.state);
 
@@ -47,7 +47,7 @@ class _LampListTileState extends State<LampListTile> {
                         apiService, !lampState.isOn, deviceState)),
                     child: SlideableListMenu(
                       enabled: deviceState.connected,
-                      onSettingsPressed: this.widget.showDeviceSettings,
+                      onSettingsPressed: widget.showDeviceSettings,
                       child: ListTile(
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 8, vertical: 16),

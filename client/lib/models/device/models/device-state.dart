@@ -11,7 +11,7 @@ class DeviceState extends Equatable {
   final String state;
   final DateTime lastUpdate;
 
-  DeviceState(
+  const DeviceState(
       this.deviceId, this.connected, this.state, this.info, this.lastUpdate);
 
   factory DeviceState.fromJson(Map<String, dynamic> json) {
@@ -22,11 +22,11 @@ class DeviceState extends Equatable {
     var lastUpdate = DateTime.parse(json['lastUpdate']);
 
     return DeviceState(json['deviceId'], json['connected'], state,
-        new DeviceInfo(json['deviceId'], name, type, version), lastUpdate);
+        DeviceInfo(json['deviceId'], name, type, version), lastUpdate);
   }
 
   String getDisplayName() {
-    return this.info.getDisplayName();
+    return info.getDisplayName();
   }
 
   @override

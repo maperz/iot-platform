@@ -11,7 +11,7 @@ class DistanceSensorListTile extends StatelessWidget {
   final OnDeviceClickedCallback onClick;
   final ShowDeviceDetailCallback showDeviceSettings;
 
-  DistanceSensorListTile(
+  const DistanceSensorListTile(
       {required this.deviceInfo,
       required this.onClick,
       required this.showDeviceSettings,

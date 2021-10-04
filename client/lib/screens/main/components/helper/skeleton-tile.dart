@@ -36,8 +36,9 @@ class Skeleton extends StatefulWidget {
   final double height;
   final double width;
 
-  Skeleton({Key? key, this.height = 20, this.width = 200}) : super(key: key);
+  const Skeleton({Key? key, this.height = 20, this.width = 200}) : super(key: key);
 
+  @override
   createState() => SkeletonState();
 }
 
@@ -79,7 +80,7 @@ class SkeletonState extends State<Skeleton>
           gradient: LinearGradient(
               begin: Alignment(_gradientPosition.value, 0),
               end: Alignment(-1, 0),
-              colors: [Colors.black12, Colors.black26, Colors.black12])),
+              colors: const [Colors.black12, Colors.black26, Colors.black12])),
     );
   }
 }

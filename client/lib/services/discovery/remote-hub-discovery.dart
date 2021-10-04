@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 import 'hub-discovery.dart';
 
 class RemoteHubDiscovery implements HubDiscovery {
-  final logger = new Logger('RemoteHubDiscovery');
+  final logger = Logger('RemoteHubDiscovery');
 
   static const String PUBLIC_SERVER_PROTOCOL = "https";
   static const String PUBLIC_SERVER_HOST = "iot.perz.cloud";
@@ -19,7 +19,7 @@ class RemoteHubDiscovery implements HubDiscovery {
   @override
   Stream<HubAddress> getHubAddresses() async* {
     logger.info('Accessing global hub address');
-    yield new HubAddress(
+    yield HubAddress(
         PUBLIC_SERVER_PROTOCOL, PUBLIC_SERVER_HOST, PUBLIC_SERVER_PORT, true);
   }
 }

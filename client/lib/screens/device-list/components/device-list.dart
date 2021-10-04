@@ -17,7 +17,7 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
   Widget build(BuildContext context) {
     return Consumer2<IConnectionService, IApiService>(
       builder: (context, connectionService, apiService, child) {
-        IDeviceStateService deviceStateService = new DeviceListService(
+        IDeviceStateService deviceStateService = DeviceListService(
             connectionService: connectionService, apiService: apiService);
         return Provider<IDeviceStateService>(
           create: (context) => deviceStateService,

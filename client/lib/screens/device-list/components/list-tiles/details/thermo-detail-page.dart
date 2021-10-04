@@ -8,8 +8,8 @@ class ThermoDetailPage extends StatefulWidget {
   final bool animate;
 
   ThermoDetailPage(List<ThermoTimeData> data, {required this.animate}) {
-    this.seriesList = [
-      new charts.Series<ThermoTimeData, DateTime>(
+    seriesList = [
+      charts.Series<ThermoTimeData, DateTime>(
         id: 'Temperature',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (ThermoTimeData sales, _) => sales.time,
@@ -33,14 +33,14 @@ class ThermoDetailPage extends StatefulWidget {
             ThermoTimeData(state.lastUpdate, ThermoState.fromJson(state.state)))
         .toList();
 
-    return new ThermoDetailPage(
+    return ThermoDetailPage(
       data,
       animate: true,
     );
   }
 
   factory ThermoDetailPage.withSampleData() {
-    return new ThermoDetailPage(
+    return ThermoDetailPage(
       _createSampleData(),
       animate: true,
     );
@@ -52,13 +52,13 @@ class ThermoDetailPage extends StatefulWidget {
   /// Create one series with sample hard coded data.
   static List<ThermoTimeData> _createSampleData() {
     final data = [
-      new ThermoTimeData(new DateTime(2021, 8, 20), new ThermoState(25, 70)),
-      new ThermoTimeData(new DateTime(2021, 8, 21), new ThermoState(26, 80)),
-      new ThermoTimeData(new DateTime(2021, 8, 22), new ThermoState(25.4, 80)),
-      new ThermoTimeData(new DateTime(2021, 8, 23), new ThermoState(23.2, 80)),
-      new ThermoTimeData(new DateTime(2021, 8, 24), new ThermoState(27.2, 80)),
-      new ThermoTimeData(new DateTime(2021, 8, 25), new ThermoState(21.2, 80)),
-      new ThermoTimeData(new DateTime(2021, 8, 26), new ThermoState(28.2, 80)),
+      ThermoTimeData(DateTime(2021, 8, 20), ThermoState(25, 70)),
+      ThermoTimeData(DateTime(2021, 8, 21), ThermoState(26, 80)),
+      ThermoTimeData(DateTime(2021, 8, 22), ThermoState(25.4, 80)),
+      ThermoTimeData(DateTime(2021, 8, 23), ThermoState(23.2, 80)),
+      ThermoTimeData(DateTime(2021, 8, 24), ThermoState(27.2, 80)),
+      ThermoTimeData(DateTime(2021, 8, 25), ThermoState(21.2, 80)),
+      ThermoTimeData(DateTime(2021, 8, 26), ThermoState(28.2, 80)),
     ];
 
     return data;
@@ -68,23 +68,23 @@ class ThermoDetailPage extends StatefulWidget {
 class _ThermoDetailPageState extends State<ThermoDetailPage> {
   @override
   Widget build(BuildContext context) {
-    return new charts.TimeSeriesChart(widget.seriesList,
+    return charts.TimeSeriesChart(widget.seriesList,
         defaultRenderer:
-            new charts.LineRendererConfig(includeArea: true, stacked: true),
+            charts.LineRendererConfig(includeArea: true, stacked: true),
         animate: widget.animate,
         dateTimeFactory: const charts.LocalDateTimeFactory(),
-        domainAxis: new charts.DateTimeAxisSpec(
+        domainAxis: charts.DateTimeAxisSpec(
           renderSpec: charts.GridlineRendererSpec(
-              labelStyle: new charts.TextStyleSpec(
+              labelStyle: charts.TextStyleSpec(
                 fontSize: 10,
                 color: charts.MaterialPalette.white,
               ),
               lineStyle: charts.LineStyleSpec(
                 color: charts.MaterialPalette.gray.shadeDefault,
               )),
-          tickProviderSpec: new charts.AutoDateTimeTickProviderSpec(),
-          tickFormatterSpec: new charts.AutoDateTimeTickFormatterSpec(
-            day: new charts.TimeFormatterSpec(
+          tickProviderSpec: charts.AutoDateTimeTickProviderSpec(),
+          tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
+            day: charts.TimeFormatterSpec(
               format: 'dd MMM',
               transitionFormat: 'dd MMM',
             ),
@@ -94,7 +94,7 @@ class _ThermoDetailPageState extends State<ThermoDetailPage> {
           tickProviderSpec: charts.BasicNumericTickProviderSpec(
               zeroBound: false, desiredTickCount: 5),
           renderSpec: charts.GridlineRendererSpec(
-              labelStyle: new charts.TextStyleSpec(
+              labelStyle: charts.TextStyleSpec(
                 fontSize: 10,
                 color: charts.MaterialPalette.white,
               ),

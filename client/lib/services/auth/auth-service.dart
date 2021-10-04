@@ -18,9 +18,7 @@ class FirebaseAuthService extends IAuthService {
 
   @override
   Stream<User?> currentUser() {
-    if (_userStream == null) {
-      _userStream = _auth.idTokenChanges().shareReplay(maxSize: 1);
-    }
+    _userStream ??= _auth.idTokenChanges().shareReplay(maxSize: 1);
     return _userStream!;
   }
 

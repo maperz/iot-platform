@@ -16,11 +16,11 @@ void main() async {
         '[${record.level.name}]: ${record.time}: (${record.loggerName}) ${record.message}');
   });
 
-  IAuthService authService = new FirebaseAuthService();
+  IAuthService authService = FirebaseAuthService();
   await authService.init();
 
   IAddressResolver addressResolver =
-      PlatformInfo.isWeb() ? new WebAddressResolver() : new AddressResolver();
+      PlatformInfo.isWeb() ? WebAddressResolver() : AddressResolver();
 
   await addressResolver.init();
 

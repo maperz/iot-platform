@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 
 class DeviceIcon extends StatelessWidget {
   final DeviceState state;
-  DeviceIcon(this.state);
+  const DeviceIcon(this.state);
 
   @override
   Widget build(BuildContext context) {
     final asset = _getIconForType(state.info.type);
-    final width = 36.0;
+    const width = 36.0;
     final color = Colors.white.withOpacity(state.connected ? 1 : 0.3);
 
     return Image.asset("assets/icons/$asset", width: width, color: color);

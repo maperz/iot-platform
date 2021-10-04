@@ -15,7 +15,7 @@ class ThermoListTile extends StatelessWidget {
   final OnDeviceClickedCallback onClick;
   final ShowDeviceDetailCallback showDeviceSettings;
 
-  ThermoListTile(
+  const ThermoListTile(
       {required this.deviceInfo,
       required this.onClick,
       required this.deviceStateService,

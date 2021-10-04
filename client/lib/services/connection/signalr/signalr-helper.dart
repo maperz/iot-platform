@@ -23,9 +23,9 @@ class SignalRHelper {
         : null;
 
     final options =
-        new HttpConnectionOptions(accessTokenFactory: accessTokenFactory);
+        HttpConnectionOptions(accessTokenFactory: accessTokenFactory);
 
-    var retryPolicy = new IntervalRetryPolicy([
+    var retryPolicy = IntervalRetryPolicy([
       Duration(seconds: 1),
       Duration(seconds: 5),
       Duration(seconds: 10),
@@ -91,5 +91,5 @@ class SignalRHelper {
     }
   }
 
-  HubConnection? getConnection() => this._connection;
+  HubConnection? getConnection() => _connection;
 }

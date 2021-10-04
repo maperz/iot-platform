@@ -19,11 +19,11 @@ class ConnectionInfoIcon extends StatelessWidget {
             color: Colors.green,
           );
         }
-        return Container(
+        return SizedBox(
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(Colors.grey),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
             ));
       },
     );

@@ -18,7 +18,7 @@ class DeviceSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text(this.deviceInfo.getDisplayName()),
+      title: Text(deviceInfo.getDisplayName()),
     );
 
     return Scaffold(
@@ -43,21 +43,21 @@ class DeviceSettingsPage extends StatelessWidget {
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.deviceInfo.id.toString(),
+              initialValue: deviceInfo.id.toString(),
               decoration: const InputDecoration(
                 labelText: "Device Id",
               ),
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.deviceInfo.type.toString(),
+              initialValue: deviceInfo.type.toString(),
               decoration: const InputDecoration(
                 labelText: "Device Type",
               ),
             ),
             TextFormField(
               enabled: false,
-              initialValue: this.deviceInfo.version,
+              initialValue: deviceInfo.version,
               decoration: const InputDecoration(
                 labelText: "Device Version",
               ),
@@ -82,6 +82,6 @@ class DeviceSettingsPage extends StatelessWidget {
   }
 
   Future _changeDeviceName(String newName) {
-    return this.deviceStateService.setDeviceName(this.deviceInfo.id, newName);
+    return deviceStateService.setDeviceName(deviceInfo.id, newName);
   }
 }

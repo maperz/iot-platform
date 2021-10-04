@@ -13,7 +13,7 @@ import '../device-icon.dart';
 class CurtainListTile extends StatefulWidget {
   final DeviceInfo deviceInfo;
 
-  CurtainListTile(
+  const CurtainListTile(
     this.deviceInfo, {
     Key? key,
   }) : super(key: key);

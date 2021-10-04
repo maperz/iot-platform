@@ -9,7 +9,7 @@ import 'helper/generic-device-tile.dart';
 class UnknownListTile extends StatelessWidget {
   final DeviceInfo deviceInfo;
 
-  UnknownListTile(this.deviceInfo);
+  const UnknownListTile(this.deviceInfo);
 
   @override
   Widget build(BuildContext context) {

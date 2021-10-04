@@ -4,7 +4,7 @@ import 'package:multicast_dns/multicast_dns.dart';
 import 'mdns-client.dart';
 
 class DartMDNSClient implements IMDNSClient {
-  final _logger = new Logger("DartMDNSClient");
+  final _logger = Logger("DartMDNSClient");
 
   @override
   Future<MDNSResult?> discoverService(String serviceName) async {
@@ -23,13 +23,13 @@ class DartMDNSClient implements IMDNSClient {
           await for (IPAddressResourceRecord record
               in client.lookup<IPAddressResourceRecord>(
                   ResourceRecordQuery.addressIPv4(name))) {
-            return new MDNSResult(record.address.host, port);
+            return MDNSResult(record.address.host, port);
           }
 
           await for (IPAddressResourceRecord record
               in client.lookup<IPAddressResourceRecord>(
                   ResourceRecordQuery.addressIPv6(name))) {
-            return new MDNSResult(record.address.host, port);
+            return MDNSResult(record.address.host, port);
           }
         }
       }

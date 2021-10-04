@@ -21,7 +21,7 @@ class ThermoState {
 
     var temp = tempJson is int ? (tempJson).toDouble() : tempJson;
     var hum = humJson is int ? (humJson).toDouble() : humJson;
-    return new ThermoState(temp, hum);
+    return ThermoState(temp, hum);
   }
 
   @override

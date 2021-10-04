@@ -30,7 +30,7 @@ class LoginPage extends StatelessWidget {
     var result = await authService.login(email, password);
 
     if (result != null) {
-      this.loggedInCallback(result);
+      loggedInCallback(result);
     }
   }
 }
