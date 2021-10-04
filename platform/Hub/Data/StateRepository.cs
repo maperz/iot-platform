@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shared;
 using Dapper;
+using Hub.Config;
 using Hub.Data.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Hub.Data
 {
@@ -20,11 +22,12 @@ namespace Hub.Data
 
         private IDbConnection Connection => new SqliteConnection("Data Source=" + _databasePath);
 
-        public StateRepository(AppSettings settings, ILogger<StateRepository> logger)
+        public StateRepository(ILogger<StateRepository> logger, IOptions<StorageConfig> storageConfig)
         {
-            _databasePath = settings.DatabasePath;
             _logger = logger;
-            _devicePersistenceInterval = TimeSpan.FromSeconds(settings.StateStorageIntervalSeconds);
+            
+            _databasePath = storageConfig.Value.DatabasePath;
+            _devicePersistenceInterval = TimeSpan.FromSeconds(storageConfig.Value.StateStorageIntervalSeconds);
             
             SetupDatabase();
             InitializeCache();

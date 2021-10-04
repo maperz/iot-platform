@@ -1,4 +1,5 @@
 using System;
+using Hub.Config;
 using Hub.Data;
 using Hub.Server;
 using MediatR;
@@ -39,18 +40,21 @@ namespace Hub
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "IoT Hub - API", Version = "v1" })             
             );
 
-            services.Configure<AppSettings>(Configuration);
-            var appSettings = new AppSettings();
-            Configuration.Bind(appSettings);
-            services.AddSingleton(appSettings);
+            
+            services.AddOptions<HubConfig>().Bind(Configuration.GetSection("HubConfig"));
+            services.AddOptions<StorageConfig>().Bind(Configuration.GetSection("StorageConfig"));
+            
+            const string serverConnectionConfigKey = "ServerConnectionConfig";
+            var connectionOptions = Configuration.GetSection(serverConnectionConfigKey).Get<ServerConnectionConfig>();
+            services.AddOptions<ServerConnectionConfig>().Bind(Configuration.GetSection(serverConnectionConfigKey));
             
             services.AddSignalR(
                 options =>
-                {                    
+                {
                     options.EnableDetailedErrors = true;
-                    options.HandshakeTimeout = TimeSpan.FromSeconds(appSettings.HandshakeTimeout);
-                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(2 * appSettings.KeepAliveTimeout);
-                    options.KeepAliveInterval = TimeSpan.FromSeconds(appSettings.KeepAliveTimeout);
+                    options.HandshakeTimeout = TimeSpan.FromSeconds(connectionOptions.HandshakeTimeout);
+                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(2 * connectionOptions.KeepAliveTimeout);
+                    options.KeepAliveInterval = TimeSpan.FromSeconds(connectionOptions.KeepAliveTimeout);
                 });
             
             services.AddHostedService<ServerConnection>();

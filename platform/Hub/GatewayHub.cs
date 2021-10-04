@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Hub.Config;
 using Hub.Domain;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Shared;
 
 namespace Hub
@@ -16,11 +18,11 @@ namespace Hub
         private readonly ILogger<GatewayHub> _logger;
         private readonly string _hubId;
         
-        public GatewayHub(IMediator mediator, ILogger<GatewayHub> logger, AppSettings appSettings)
+        public GatewayHub(IMediator mediator, ILogger<GatewayHub> logger, IOptions<HubConfig> hubConfigOptions)
         {
             _mediator = mediator;
             _logger = logger;
-            _hubId = appSettings.HubId;
+            _hubId = hubConfigOptions.Value.HubId;
         }
 
         public override async Task OnConnectedAsync()

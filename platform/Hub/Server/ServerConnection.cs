@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EmpoweredSignalR;
+using Hub.Config;
 using Hub.Domain;
 using MediatR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Shared;
 
 namespace Hub.Server
@@ -19,23 +21,24 @@ namespace Hub.Server
         private readonly IMediator _mediator;
         private readonly string _hubId;
         private readonly IDeviceService _deviceService;
-        private readonly string _serverAddress;
+        private readonly string _serverHubAddress;
 
 
         public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster,
             IDeviceService deviceService,
-            AppSettings appSettings)
+            IOptions<HubConfig> hubConfigOptions,
+            IOptions<ServerConnectionConfig> serverConfigOptions)
         {
             _logger = logger;
             _mediator = mediator;
-            _hubId = appSettings.HubId;
             _deviceService = deviceService;
+            
+            _hubId = hubConfigOptions.Value.HubId;
+            _serverHubAddress = serverConfigOptions.Value.ServerBaseAddress + "/hub";
 
-            _serverAddress = appSettings.ServerAddress;
+            _logger.LogInformation("Creating server hub connection with address at {String}", _serverHubAddress);
             
-            _logger.LogInformation("Creating server hub connection with address at {String}", _serverAddress);
-            
-            _hubConnection = new HubConnectionBuilder().WithUrl(_serverAddress)
+            _hubConnection = new HubConnectionBuilder().WithUrl(_serverHubAddress)
                 .WithAutomaticReconnect(new ServerRetryPolicy())
                 .Build();
 
@@ -67,12 +70,12 @@ namespace Hub.Server
                 if (error == null)
                 {
                     _logger.LogInformation("Attempting to reconnect to server at {Address}",
-                        _serverAddress);
+                        _serverHubAddress);
                 }
                 else
                 {
                     _logger.LogError("Attempting to reconnect to server at {Address} after {Error}",
-                        _serverAddress, error.Message);
+                        _serverHubAddress, error.Message);
                 }
             });
             
