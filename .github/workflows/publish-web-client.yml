@@ -11,9 +11,16 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: '2.5.2'
-      - run: flutter pub get
-      - run: flutter test
-      - run: flutter build web
+        working-directory: client
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: client
+      - name: Run flutter tests
+        run: flutter test
+        working-directory: client
+      - name: Build web application
+        working-directory: client
+        run: flutter build web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
