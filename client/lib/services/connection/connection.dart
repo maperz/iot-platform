@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:curtains_client/models/connection/index.dart';
+import 'package:iot_client/models/connection/index.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:curtains_client/services/auth/auth-service.dart';
-import 'package:curtains_client/services/connection/address-resolver.dart';
-import 'package:curtains_client/services/connection/signalr/signalr-helper.dart';
-import 'package:curtains_client/models/connection/models/hub-address.dart';
+import 'package:iot_client/services/auth/auth-service.dart';
+import 'package:iot_client/services/connection/address-resolver.dart';
+import 'package:iot_client/services/connection/signalr/signalr-helper.dart';
+import 'package:iot_client/models/connection/models/hub-address.dart';
 
 typedef Json = Map<String, dynamic>;
 

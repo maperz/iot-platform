@@ -1,5 +1,5 @@
-import 'package:curtains_client/screens/device-list/components/device-list.dart';
-import 'package:curtains_client/services/connection/connection.dart';
+import 'package:iot_client/screens/device-list/components/device-list.dart';
+import 'package:iot_client/services/connection/connection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

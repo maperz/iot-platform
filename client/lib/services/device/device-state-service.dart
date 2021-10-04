@@ -1,6 +1,6 @@
-import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/services/api/api-service.dart';
-import 'package:curtains_client/services/connection/connection.dart';
+import 'package:iot_client/models/device/index.dart';
+import 'package:iot_client/services/api/api-service.dart';
+import 'package:iot_client/services/connection/connection.dart';
 import 'package:logging/logging.dart';
 import 'device-endpoints.dart';
 import 'package:collection/collection.dart';

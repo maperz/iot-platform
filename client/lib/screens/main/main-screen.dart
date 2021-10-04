@@ -1,9 +1,9 @@
-import 'package:curtains_client/screens/device-list/components/connection-placeholder/connection-placeholder-page.dart';
-import 'package:curtains_client/screens/device-list/device-list-page.dart';
-import 'package:curtains_client/screens/login/login-page.dart';
-import 'package:curtains_client/screens/main/bloc/authentication_bloc.dart';
-import 'package:curtains_client/services/auth/auth-service.dart';
-import 'package:curtains_client/services/connection/address-resolver.dart';
+import 'package:iot_client/screens/device-list/components/connection-placeholder/connection-placeholder-page.dart';
+import 'package:iot_client/screens/device-list/device-list-page.dart';
+import 'package:iot_client/screens/login/login-page.dart';
+import 'package:iot_client/screens/main/bloc/authentication_bloc.dart';
+import 'package:iot_client/services/auth/auth-service.dart';
+import 'package:iot_client/services/connection/address-resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';

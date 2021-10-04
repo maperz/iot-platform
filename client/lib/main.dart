@@ -1,7 +1,7 @@
-import 'package:curtains_client/screens/main/main-page.dart';
-import 'package:curtains_client/services/auth/auth-service.dart';
-import 'package:curtains_client/services/connection/address-resolver.dart';
-import 'package:curtains_client/utils/index.dart';
+import 'package:iot_client/screens/main/main-page.dart';
+import 'package:iot_client/services/auth/auth-service.dart';
+import 'package:iot_client/services/connection/address-resolver.dart';
+import 'package:iot_client/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';

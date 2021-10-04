@@ -1,4 +1,4 @@
-package com.example.curtains_client
+package com.example.iot_client
 
 import io.flutter.embedding.android.FlutterActivity
 

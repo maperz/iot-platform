@@ -1,5 +1,5 @@
-import 'package:curtains_client/models/connection/index.dart';
-import 'package:curtains_client/services/connection/connection.dart';
+import 'package:iot_client/models/connection/index.dart';
+import 'package:iot_client/services/connection/connection.dart';
 import 'package:flutter/material.dart';
 
 class ConnectionInfoPage extends StatelessWidget {

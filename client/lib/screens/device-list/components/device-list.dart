@@ -1,8 +1,8 @@
-import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/screens/device-settings/device-settings-page.dart';
-import 'package:curtains_client/services/api/api-service.dart';
-import 'package:curtains_client/services/connection/connection.dart';
-import 'package:curtains_client/services/device/device-state-service.dart';
+import 'package:iot_client/models/device/index.dart';
+import 'package:iot_client/screens/device-settings/device-settings-page.dart';
+import 'package:iot_client/services/api/api-service.dart';
+import 'package:iot_client/services/connection/connection.dart';
+import 'package:iot_client/services/device/device-state-service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './list-tiles/index.dart';

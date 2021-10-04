@@ -1,4 +1,4 @@
-import 'package:curtains_client/models/device/index.dart';
+import 'package:iot_client/models/device/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 

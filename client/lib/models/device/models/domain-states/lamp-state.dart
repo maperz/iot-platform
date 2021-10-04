@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:curtains_client/utils/colors.dart';
+import 'package:iot_client/utils/colors.dart';
 
 class LampState {
   late bool isOn;

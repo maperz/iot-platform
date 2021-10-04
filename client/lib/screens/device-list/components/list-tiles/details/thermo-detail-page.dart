@@ -1,6 +1,6 @@
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:curtains_client/models/device/index.dart';
-import 'package:curtains_client/models/device/models/domain-states/thermo-state.dart';
+import 'package:iot_client/models/device/index.dart';
+import 'package:iot_client/models/device/models/domain-states/thermo-state.dart';
 import 'package:flutter/material.dart';
 
 class ThermoDetailPage extends StatefulWidget {

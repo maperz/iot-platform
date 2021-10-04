@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:curtains_client/models/connection/index.dart';
-import 'package:curtains_client/services/discovery/index.dart';
+import 'package:iot_client/models/connection/index.dart';
+import 'package:iot_client/services/discovery/index.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 

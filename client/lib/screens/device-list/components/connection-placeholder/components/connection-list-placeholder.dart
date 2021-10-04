@@ -1,4 +1,4 @@
-import 'package:curtains_client/screens/main/components/helper/skeleton-tile.dart';
+import 'package:iot_client/screens/main/components/helper/skeleton-tile.dart';
 import 'package:flutter/material.dart';
 
 class ConnectingListPlaceholder extends StatelessWidget {

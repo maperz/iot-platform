@@ -1,4 +1,4 @@
-import 'package:curtains_client/services/connection/connection.dart';
+import 'package:iot_client/services/connection/connection.dart';
 import 'package:flutter/material.dart';
 
 class ConnectionInfoIcon extends StatelessWidget {

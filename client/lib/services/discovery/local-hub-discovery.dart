@@ -1,6 +1,6 @@
-import 'package:curtains_client/models/connection/index.dart';
+import 'package:iot_client/models/connection/index.dart';
 
-import 'package:curtains_client/utils/platform.dart';
+import 'package:iot_client/utils/platform.dart';
 
 import 'hub-discovery.dart';
 import 'mdns/index.dart';

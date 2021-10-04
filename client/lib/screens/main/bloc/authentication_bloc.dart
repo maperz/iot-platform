@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:curtains_client/services/auth/auth-service.dart';
-import 'package:curtains_client/services/connection/address-resolver.dart';
+import 'package:iot_client/services/auth/auth-service.dart';
+import 'package:iot_client/services/connection/address-resolver.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 

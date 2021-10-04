@@ -1,4 +1,4 @@
-import 'package:curtains_client/models/connection/models/connection-info.dart';
+import 'package:iot_client/models/connection/models/connection-info.dart';
 import 'package:flutter/material.dart';
 
 import 'components/index.dart';

@@ -1,5 +1,5 @@
-import 'package:curtains_client/screens/login/components/login-form.dart';
-import 'package:curtains_client/services/auth/auth-service.dart';
+import 'package:iot_client/screens/login/components/login-form.dart';
+import 'package:iot_client/services/auth/auth-service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

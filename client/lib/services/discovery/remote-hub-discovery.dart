@@ -1,4 +1,4 @@
-import 'package:curtains_client/models/connection/index.dart';
+import 'package:iot_client/models/connection/index.dart';
 import 'package:logging/logging.dart';
 
 import 'hub-discovery.dart';

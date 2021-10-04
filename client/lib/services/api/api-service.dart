@@ -1,4 +1,4 @@
-import 'package:curtains_client/services/connection/connection.dart';
+import 'package:iot_client/services/connection/connection.dart';
 
 abstract class IApiService {
   Future sendRequest(String deviceId, String name, String payload);
