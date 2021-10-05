@@ -1,3 +1,3 @@
-export './hub-discovery.dart';
-export './local-hub-discovery.dart';
-export './remote-hub-discovery.dart';
+export 'hub_discovery.dart';
+export 'local_hub_discovery.dart';
+export 'remote_hub_discovery.dart';

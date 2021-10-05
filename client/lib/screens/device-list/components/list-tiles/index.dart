@@ -1,6 +1,6 @@
-export 'curtain-list-tile.dart';
-export 'distance-sensor-list-tile.dart';
-export 'lamp-list-tile.dart';
-export 'thermo-list-tile.dart';
-export 'thermo-list-tile.dart';
-export 'unknown-list-tile.dart';
+export 'curtain_list_tile.dart';
+export 'distance_sensor_list_tile.dart';
+export 'lamp_list_tile.dart';
+export 'thermo_list_tile.dart';
+export 'thermo_list_tile.dart';
+export 'unknown_list_tile.dart';

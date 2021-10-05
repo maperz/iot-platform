@@ -1,3 +1,3 @@
-export './dart-mdns-client.dart';
-export './mdns-client.dart';
-export './native-mdns-client.dart';
+export 'dart_mdns_client.dart';
+export 'mdns_client.dart';
+export 'native_mdns_client.dart';

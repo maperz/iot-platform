@@ -1,5 +1,5 @@
-import 'package:iot_client/screens/login/login-page.dart';
-import 'package:iot_client/services/auth/auth-service.dart';
+import 'package:iot_client/screens/login/login_page.dart';
+import 'package:iot_client/services/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,7 @@ class ProfileDrawerWidget extends StatelessWidget {
               },
             ));
           },
-          child: Text("Login"));
+          child: const Text("Login"));
     }
 
     var userImage = user.photoURL;
@@ -52,7 +52,7 @@ class ProfileDrawerWidget extends StatelessWidget {
         ),
         Text(
           user.displayName ?? "",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         TextButton(
             style: ButtonStyle(
@@ -61,7 +61,7 @@ class ProfileDrawerWidget extends StatelessWidget {
               await authService.logout();
               _tryPop(context);
             },
-            child: Text("Logout"))
+            child: const Text("Logout"))
       ],
     );
   }

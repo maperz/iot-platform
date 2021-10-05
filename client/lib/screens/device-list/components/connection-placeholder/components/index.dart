@@ -1,2 +1,2 @@
-export './connecting-placeholder-info.dart';
-export './connection-list-placeholder.dart';
+export 'connecting_placeholder_info.dart';
+export 'connection_list_placeholder.dart';
