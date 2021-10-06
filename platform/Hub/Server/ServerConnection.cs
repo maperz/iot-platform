@@ -22,8 +22,7 @@ namespace Hub.Server
         private readonly string _hubId;
         private readonly IDeviceService _deviceService;
         private readonly string _serverHubAddress;
-
-
+        
         public ServerConnection(IMediator mediator, ILogger<ServerConnection> logger, IApiBroadcaster apiBroadcaster,
             IDeviceService deviceService,
             IOptions<HubConfig> hubConfigOptions,
@@ -35,8 +34,6 @@ namespace Hub.Server
             
             _hubId = hubConfigOptions.Value.HubId;
             _serverHubAddress = serverConfigOptions.Value.ServerBaseAddress + "/hub";
-
-            _logger.LogInformation("Creating server hub connection with address at {String}", _serverHubAddress);
             
             _hubConnection = new HubConnectionBuilder().WithUrl(_serverHubAddress)
                 .WithAutomaticReconnect(new ServerRetryPolicy())
@@ -69,18 +66,18 @@ namespace Hub.Server
             {
                 if (error == null)
                 {
-                    _logger.LogInformation("Attempting to reconnect to server at {Address}",
+                    _logger.LogInformation("Attempting to reconnect to server. [Address={Address}]",
                         _serverHubAddress);
                 }
                 else
                 {
-                    _logger.LogError("Attempting to reconnect to server at {Address} after {Error}",
+                    _logger.LogError("Attempting to reconnect to server. [Address={Address}, Error={Error}]",
                         _serverHubAddress, error.Message);
                 }
             });
             
             _hubConnection.Reconnected += _ => ConnectionEstablished();
-            _hubConnection.Closed += _ => Task.Run(() => _logger.LogInformation("Lost connection to Server"));
+            _hubConnection.Closed += _ => Task.Run(() => _logger.LogInformation("Lost connection to server"));
         }
 
         public Task<bool> IsConnected()
@@ -91,7 +88,7 @@ namespace Hub.Server
         private async Task ConnectionEstablished(CancellationToken cancellationToken = default)
         {
             await _hubConnection.InvokeAsync(nameof(IServerMethods.RegisterAsGateway), _hubId, cancellationToken);
-            _logger.LogInformation("Connected to Server");
+            _logger.LogInformation("Connected successfully to server");
 
             var states = await _deviceService.GetDeviceStates();
             await DeviceStateChanged(states);
@@ -99,7 +96,7 @@ namespace Hub.Server
         
         public async Task<bool> Connect(CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation("Establishing server connection");
+            _logger.LogInformation("Establishing server connection. [Address={Address}]", _serverHubAddress);
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -110,7 +107,7 @@ namespace Hub.Server
                 }
                 catch when (cancellationToken.IsCancellationRequested)
                 {
-                    _logger.LogInformation("Connecting stopped by cancellation token");
+                    _logger.LogInformation("Connecting process stopped by cancellation token");
                     return false;
                 }
                 catch
