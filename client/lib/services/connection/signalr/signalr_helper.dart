@@ -7,10 +7,10 @@ class SignalRHelper {
   HubConnection? _connection;
 
   final Logger logger = Logger("SignalR");
-  final void Function(Exception?) onReconnect;
+  final void Function(Exception?) onReconnecting;
   final void Function(String?) onReconnected;
 
-  SignalRHelper({required this.onReconnect, required this.onReconnected});
+  SignalRHelper({required this.onReconnecting, required this.onReconnected});
 
   Future init(String hubUrl, String? token) async {
     assert(_connection == null ||
@@ -27,11 +27,10 @@ class SignalRHelper {
 
     var retryPolicy = IntervalRetryPolicy([
       const Duration(seconds: 1),
-      const Duration(seconds: 5),
+      const Duration(seconds: 3),
+      const Duration(seconds: 7),
       const Duration(seconds: 10),
       const Duration(seconds: 15),
-      const Duration(seconds: 15),
-      const Duration(seconds: 30),
     ]);
 
     var connection = HubConnectionBuilder()
@@ -43,11 +42,11 @@ class SignalRHelper {
     _connection = connection;
 
     connection.onreconnecting((error) {
-      logger.severe(
-          error != null ? 'Reconnecting with error' : 'Reconnecting ...',
-          error);
+      logger.warning(error != null
+          ? 'An error occured during connection, Trying to reconnect ... [Err=$error]'
+          : 'Connection closed, trying to reconnect ...');
 
-      onReconnect(error);
+      onReconnecting(error);
     });
 
     connection.onreconnected((connectionId) {

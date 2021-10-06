@@ -68,12 +68,16 @@ class ConnectionService implements IConnectionService {
 
   @override
   Future start() async {
-    void onReconnecting(Exception? err) {}
+    void onReconnecting(Exception? err) {
+      _onConnectionStopped();
+    }
 
-    void onReconnected(String? id) {}
+    void onReconnected(String? id) {
+      _onConnectionStarted();
+    }
 
     signalR = SignalRHelper(
-        onReconnect: onReconnecting, onReconnected: onReconnected);
+        onReconnecting: onReconnecting, onReconnected: onReconnected);
 
     Rx.combineLatest2(
             _isConnected,
@@ -125,7 +129,7 @@ class ConnectionService implements IConnectionService {
       });
 
       await signalR.start();
-      _onConnectionStarted(hubUrl);
+      _onConnectionStarted();
     }
   }
 
@@ -134,7 +138,7 @@ class ConnectionService implements IConnectionService {
     _isConnected.add(false);
   }
 
-  void _onConnectionStarted(String hubUrl) {
+  void _onConnectionStarted() {
     _isConnected.add(true);
   }
 
@@ -157,7 +161,6 @@ class ConnectionService implements IConnectionService {
 
   @override
   Stream<S> listenOn<S>(String endpoint) {
-    // ignore: close_sinks
     late StreamController<S> controller;
 
     void callback(List<dynamic>? values) {
