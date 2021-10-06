@@ -43,10 +43,10 @@ namespace Hub
             
             services.AddOptions<HubConfig>().Bind(Configuration.GetSection("HubConfig"));
             services.AddOptions<StorageConfig>().Bind(Configuration.GetSection("StorageConfig"));
-            
-            const string serverConnectionConfigKey = "ServerConnectionConfig";
-            var connectionOptions = Configuration.GetSection(serverConnectionConfigKey).Get<ServerConnectionConfig>();
-            services.AddOptions<ServerConnectionConfig>().Bind(Configuration.GetSection(serverConnectionConfigKey));
+
+            var serverConnectionSection = Configuration.GetSection("ServerConnectionConfig");
+            var connectionOptions = serverConnectionSection.Get<ServerConnectionConfig>();
+            services.AddOptions<ServerConnectionConfig>().Bind(serverConnectionSection);
             
             services.AddSignalR(
                 options =>

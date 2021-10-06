@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Server.Config;
 using Server.Connection;
 using Server.Users;
 
@@ -28,13 +28,17 @@ namespace Server
         {
             services.AddCors();
             
-            services.Configure<AppSettings>(Configuration);
-            var appSettings = new AppSettings();
-            Configuration.Bind(appSettings);
-            services.AddSingleton(appSettings);
+            services.AddOptions<StorageConfig>().Bind(Configuration.GetSection("StorageConfig"));
+
+            var connectionSection = Configuration.GetSection("ConnectionsConfig");
+            var connectionsConfig = connectionSection.Get<ConnectionsConfig>();
+            services.AddOptions<ConnectionsConfig>().Bind(connectionSection);
             
-            string firebaseAppId = appSettings.FirebaseAppId;
-            services
+            var authSection = Configuration.GetSection("AuthConfig");
+            var authConfig = authSection.Get<AuthConfig>();
+            services.AddOptions<AuthConfig>().Bind(authSection);
+            
+            services    
                 .AddAuthentication( options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -42,13 +46,13 @@ namespace Server
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = $"https://securetoken.google.com/{firebaseAppId}";
+                    options.Authority = authConfig.JwtAuthority;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = $"https://securetoken.google.com/{firebaseAppId}",
+                        ValidIssuer = authConfig.JwtIssuer,
                         ValidateAudience = true,
-                        ValidAudience = firebaseAppId,
+                        ValidAudience = authConfig.JwtAudience,
                         ValidateLifetime = true
                     };
                     
@@ -57,7 +61,6 @@ namespace Server
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];
-
                             // Check if the request is for the hub
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
@@ -74,9 +77,9 @@ namespace Server
                 options =>
                 {                    
                     options.EnableDetailedErrors = true;
-                    options.HandshakeTimeout = TimeSpan.FromSeconds(appSettings.HandshakeTimeout);
-                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(2 * appSettings.KeepAliveTimeout);
-                    options.KeepAliveInterval = TimeSpan.FromSeconds(appSettings.KeepAliveTimeout);
+                    options.HandshakeTimeout = TimeSpan.FromSeconds(connectionsConfig.HandshakeTimeout);
+                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(2 * connectionsConfig.KeepAliveTimeout);
+                    options.KeepAliveInterval = TimeSpan.FromSeconds(connectionsConfig.KeepAliveTimeout);
                 });
             
             services.AddSingleton<IGatewayConnectionManager, GatewayConnectionManager>();
