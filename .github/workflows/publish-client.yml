@@ -20,7 +20,7 @@ jobs:
       - name: Build Web Application
         working-directory: client
         run: flutter build web
-      - Name: Deploy Web Application to Firebase
+      - name: Deploy Web Application to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
