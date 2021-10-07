@@ -5,6 +5,7 @@ import 'package:iot_client/screens/main/components/helper/friendly_change_text.d
 import 'package:flutter/material.dart';
 
 import '../../device_icon.dart';
+import 'detail_list_tile.dart';
 
 typedef OnDeviceClickedCallback = Function();
 typedef ShowDeviceDetailCallback = Function();
@@ -39,11 +40,12 @@ class GenericDeviceTile extends StatelessWidget {
                   enabled: deviceState.connected,
                   onSettingsPressed: showDeviceSettings,
                   child: detailBuilder != null
-                      ? ExpansionTile(
+                      ? DetailListTile(
+                          active: deviceState.connected,
                           key: PageStorageKey(deviceState.deviceId),
                           tilePadding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 16),
-                          children: [detailBuilder!(context, deviceState)],
+                          child: detailBuilder!(context, deviceState),
                           leading: _getLeading(context, deviceState),
                           title: _getTitle(context, deviceState),
                           subtitle: _getSubtitle(context, deviceState))
