@@ -1,4 +1,4 @@
-name: Deploy client to Firebase Hosting
+name: Publish client
 'on':
   push:
     branches:
@@ -11,18 +11,30 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: '2.5.2'
-      - name: Install dependencies
+      - name: Install pub dependencies
         run: flutter pub get
         working-directory: client
       - name: Run flutter tests
         run: flutter test
         working-directory: client
-      - name: Build web application
+      - name: Build Web Application
         working-directory: client
         run: flutter build web
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - Name: Deploy Web Application to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SMARTHOME_D1C03 }}'
           channelId: live
           projectId: smarthome-d1c03
+      - name: Build Android APK
+        working-directory: client
+        run: flutter build apk
+      - name: Upload APK github release 
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "HomeController APK"
+          files: client/build/app/outputs/flutter-apk/app-release.apk
