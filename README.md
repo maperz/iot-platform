@@ -1,6 +1,6 @@
 # IoT Platform
 
-Supported client platforms are _iOS_, _Android, _macOS_, _Web_ .
+Supported client platforms are _iOS_, _Android_, _macOS_, _Web_.
 
 
 

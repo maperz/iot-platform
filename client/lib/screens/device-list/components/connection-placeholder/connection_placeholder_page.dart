@@ -38,7 +38,10 @@ class ConnectionPlaceholderPage extends StatelessWidget {
     }
 
     if (info.isProxy && info.proxiedAddress == null) {
-      return "Make sure the hub is up and running.";
+      if (info.hubId != null) {
+        return "Make sure the hub is running and connected to the internet.";
+      }
+      return "Please connect a hub instance to your account!";
     }
 
     return "Connecting to ${info.targetAddress}";

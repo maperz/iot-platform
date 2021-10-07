@@ -1,4 +1,4 @@
-import 'package:iot_client/screens/main/main_page.dart';
+import 'package:iot_client/screens/main/auth_router.dart';
 import 'package:iot_client/services/auth/auth_service.dart';
 import 'package:iot_client/services/connection/address_resolver.dart';
 import 'package:iot_client/utils/index.dart';
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         title: 'Home Controller',
         theme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
-        home: MainPage(
+        home: AuthRouter(
           addressResolver: addressResolver,
           authService: authService,
         ),

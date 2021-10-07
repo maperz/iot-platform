@@ -21,7 +21,7 @@ class DeviceListPage extends StatelessWidget {
                 }
                 return ConnectionPlaceholderPage(
                   info: info,
-                  alternativeStatus: "Waiting for handshake reply",
+                  alternativeStatus: "Trying to establish a connection ...",
                 );
               }),
     );

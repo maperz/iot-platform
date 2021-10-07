@@ -5,6 +5,8 @@ import 'package:rxdart/rxdart.dart';
 
 abstract class IAuthService {
   Future<User?> login(String email, String password);
+  Future<User?> register(String username, String email, String password);
+
   Future logout();
   Future init();
 
@@ -31,7 +33,18 @@ class FirebaseAuthService extends IAuthService {
   Future<User?> login(String email, String password) async {
     var response = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
+    return response.user;
+  }
+
+  @override
+  Future<User?> register(String username, String email, String password) async {
+    var response = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
     var user = response.user;
+    if (user != null) {
+      await user.updateDisplayName(username);
+      await user.getIdToken(true);
+    }
     return user;
   }
 

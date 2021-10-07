@@ -55,9 +55,10 @@ namespace Server.Users
                 using var db = Connection;
                 await db.ExecuteAsync(sql, new {userId, hubId});
             }
-            catch
+            catch(Exception exception)
             {
-                throw new Exception("Failed set Hub for User: " + userId + " Hub: "+ hubId);
+                _logger.LogWarning("Failed to set HubId for user in database. [User={UserId}, HubId={HubId}, Error={Error}]", userId, hubId, exception.Message);
+                throw new Exception("Failed to set HubId for User: " + userId + " Hub: "+ hubId);
             }
         }
 
@@ -73,10 +74,18 @@ namespace Server.Users
 
         private async Task<string?> TryGetUserHubIdFromDatabase(string userId)
         {
-            const string sql = @"SELECT HubId FROM user_hub_mappings WHERE UserId = @userId;";
-            using var db = Connection;
-            var hubId = (await db.QueryAsync<string>(sql, new{ userId })).FirstOrDefault();
-            return hubId;
+            try
+            {
+                const string sql = @"SELECT HubId FROM user_hub_mappings WHERE UserId = @userId;";
+                using var db = Connection;
+                var hubId = (await db.QueryAsync<string>(sql, new{ userId })).FirstOrDefault();
+                return hubId;
+            }
+            catch(Exception exception)
+            {
+                _logger.LogWarning("Failed load HubId for User from database. [User={UserId}, Error={Error}]", userId, exception.Message);
+                return null;
+            }
         }
         
         private void InitializeDatabase()

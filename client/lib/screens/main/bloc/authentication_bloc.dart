@@ -43,7 +43,7 @@ class AuthenticationBloc
   ) async* {
     if (event is IsAuthenticatedChanged) {
       if (event.isAuthenticated) {
-        yield ShowDeviceListScreen();
+        yield ShowMainScreen();
       } else {
         yield ShowLoginScreen();
       }

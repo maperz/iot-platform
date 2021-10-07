@@ -56,18 +56,21 @@ class ConnectionService implements IConnectionService {
   final IAuthService authService;
   late final SignalRHelper signalR;
 
-  late final BehaviorSubject<ConnectionStateData> _connectionState =
-      BehaviorSubject.seeded(ConnectionStateData.disconnected);
-
-  final BehaviorSubject<bool> _isConnected = BehaviorSubject.seeded(false);
-
-  final BehaviorSubject<ConnectionInfo?> _connectionInfo =
-      BehaviorSubject.seeded(null);
+  late BehaviorSubject<ConnectionStateData> _connectionState;
+  late BehaviorSubject<bool> _isConnected;
+  late BehaviorSubject<ConnectionInfo?> _connectionInfo;
 
   ConnectionService({required this.addressResolver, required this.authService});
 
+  StreamSubscription? _subscription;
+  StreamSubscription? _addressTokenSubscription;
+
   @override
   Future start() async {
+    _isConnected = BehaviorSubject.seeded(false);
+    _connectionInfo = BehaviorSubject.seeded(null);
+    _connectionState = BehaviorSubject.seeded(ConnectionStateData.disconnected);
+
     void onReconnecting(Exception? err) {
       _onConnectionStopped();
     }
@@ -79,7 +82,7 @@ class ConnectionService implements IConnectionService {
     signalR = SignalRHelper(
         onReconnecting: onReconnecting, onReconnected: onReconnected);
 
-    Rx.combineLatest2(
+    _subscription = Rx.combineLatest2(
             _isConnected,
             _connectionInfo,
             (bool connected, ConnectionInfo? info) =>
@@ -95,13 +98,15 @@ class ConnectionService implements IConnectionService {
         .asyncMap((user) => user?.getIdToken() ?? Future.value(null))
         .distinct();
 
-    var changeStream = Rx.combineLatest2(
-        addressChanged,
-        tokenChanged,
-        (HubAddress address, String? token) =>
-            AddressTokenTuple(address, token)).distinct();
+    StreamSubscription? lastConnectionInfoSub;
 
-    await for (var change in changeStream) {
+    _addressTokenSubscription = Rx.combineLatest2(
+            addressChanged,
+            tokenChanged,
+            (HubAddress address, String? token) =>
+                AddressTokenTuple(address, token))
+        .distinct()
+        .listen((change) async {
       var address = change.address;
       var token = change.token;
 
@@ -117,12 +122,13 @@ class ConnectionService implements IConnectionService {
         // Requires authentication
         logger.warning(
             "Not connecting since token is not set and auth is required");
-        continue;
+        return;
       }
 
       await signalR.init(hubUrl, token);
 
-      listenOn<Json>(ConnectionEndpoints.connectionInfo)
+      await lastConnectionInfoSub?.cancel();
+      lastConnectionInfoSub = listenOn<Json>(ConnectionEndpoints.connectionInfo)
           .map((json) => ConnectionInfo.fromJson(hubUrl, json))
           .listen((info) {
         _connectionInfo.add(info);
@@ -130,7 +136,7 @@ class ConnectionService implements IConnectionService {
 
       await signalR.start();
       _onConnectionStarted();
-    }
+    });
   }
 
   void _onConnectionStopped() {
@@ -196,5 +202,7 @@ class ConnectionService implements IConnectionService {
     await signalR.stop();
     _isConnected.close();
     _connectionInfo.close();
+    _subscription?.cancel();
+    _addressTokenSubscription?.cancel();
   }
 }

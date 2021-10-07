@@ -39,7 +39,7 @@ namespace Server
         {
             var connectionId = Context.ConnectionId;
 
-            _logger.LogInformation("SignalR Client connected {ClientId}", connectionId);
+            _logger.LogInformation("SignalR Client connected [Connection={ConnectionId}]", connectionId);
             await Groups.AddToGroupAsync(connectionId, "clients");
 
             var user = GetUser();
@@ -54,6 +54,7 @@ namespace Server
                 
                 var info = await GetConnectionInfoForUser(user);
                 await Clients.Caller.SendAsync(nameof(ConnectionInfo), info);
+                _logger.LogInformation("Sent connection info to user. [User={User}, Connection={ConnectionId}]", user.Name, connectionId);
             }
             
             await base.OnConnectedAsync();
@@ -63,13 +64,13 @@ namespace Server
         {
             var connectionId = Context.ConnectionId;
 
-            _logger.LogInformation("SignalR Client disconnected {ClientId}", connectionId);
+            _logger.LogInformation("SignalR Client disconnected [Connection={ConnectionId}]", connectionId);
 
             var hubConnection = _connectionManager.GetConnectionByConnectionId(connectionId);
             if (hubConnection != null && _connectionManager.RemoveConnection(connectionId))
             {
                 var hubGroup = hubConnection.GetHubGroupName();
-                await Clients.Group(hubGroup).SendAsync(nameof(ConnectionInfo), GetDisconnectedInfo());
+                await Clients.Group(hubGroup).SendAsync(nameof(ConnectionInfo), GetDisconnectedInfo(hubConnection.GetHubId()));
             }
             
             await base.OnDisconnectedAsync(exception);
@@ -188,7 +189,7 @@ namespace Server
         private async Task<ConnectionInfo> GetConnectionInfoForUser(User user)
         {
             var hubId = await _userHubManager.GetHubForUser(user.Id);
-            if (hubId == null) return GetDisconnectedInfo();
+            if (hubId == null) return GetDisconnectedInfo(null);
             
             var connection = _connectionManager.GetConnectionByHubId(hubId);
             if (connection != null)
@@ -196,7 +197,7 @@ namespace Server
                 return await connection.GetConnectionInfo();
             }
 
-            return GetDisconnectedInfo();
+            return GetDisconnectedInfo(hubId);
         }
         
         private User? GetUser()
@@ -212,14 +213,14 @@ namespace Server
             return new User() { Name = username, Id = id };
         }
         
-        private ConnectionInfo GetDisconnectedInfo()
+        private ConnectionInfo GetDisconnectedInfo(string? hubId)
         {
             return new ()
             {
                 IsConnected = false,
                 IsProxy = true,
                 ProxiedAddress = null,
-                HubId = null,
+                HubId = hubId,
                 Version = GetType()
                     .Assembly
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "",

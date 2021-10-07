@@ -8,7 +8,7 @@ class ConnectingListPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     const heightOfTile = 98;
-    int count = (height / heightOfTile).floor();
+    int count = (height / heightOfTile).ceil();
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, i) {

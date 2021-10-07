@@ -1,6 +1,6 @@
 # IoT Client
 
-Client application for the IoT platform. Currently supports the following platforms: _iOS_, _Android, _macOS_, _Web_ .
+Client application for the IoT platform. Currently supports the following platforms: _iOS_, _Android_, _macOS_, _Web_.
 
 ![Multiplatform screenshot](../screenshots/mockup_combined.png "Multiplatform screenshot")
 
