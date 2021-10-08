@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'platform/**'
 jobs:
   test:
     name: Test Platform .NET

@@ -3,6 +3,8 @@ name: Publish client
   push:
     branches:
       - master
+    paths:
+      - 'client/**'
 jobs:
   build_and_deploy:
     runs-on: macos-11
