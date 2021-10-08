@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('App is started', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    // TODO: Write proper tests
+    // TODO: Write tests
     // await tester.pumpWidget(MyApp());
   });
 }
