@@ -32,7 +32,7 @@ jobs:
         run: flutter build apk
       - name: Build MacOS
         working-directory: client
-        run: flutter build macos
+        run: flutter config --enable-macos-desktop && flutter build macos 
       - name: Upload to github release 
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
