@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "354418938883",
+    "project_id": "smarthome-d1c03",
+    "storage_bucket": "smarthome-d1c03.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354418938883:android:2df394f416bff5376caa36",
+        "android_client_info": {
+          "package_name": "com.example.iot_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354418938883-5dbugja279hf1mlehgsu4sr71e9par0g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg_Q1bLFeV-C1iRR27pu0nAvROvA3toHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354418938883-5dbugja279hf1mlehgsu4sr71e9par0g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "354418938883-vj7fc9uchc8f605f8n8edgngea4acdbq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "cloud.perz.client"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

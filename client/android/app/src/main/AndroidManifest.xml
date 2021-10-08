@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.home_controller">
+    package="com.example.iot_client">
    <application
         android:label="HomeController"
         android:icon="@mipmap/ic_launcher">
