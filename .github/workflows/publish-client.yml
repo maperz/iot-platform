@@ -43,5 +43,5 @@ jobs:
           prerelease: true
           title: "HomeController APK"
           files: |
-            client/build/macos/Build/Products/Release/HomeController.app 
+            client/build/macos/Build/Products/Release/HomeController.app/**
             client/build/app/outputs/flutter-apk/app-release.apk
