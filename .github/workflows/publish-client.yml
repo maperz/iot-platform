@@ -40,6 +40,6 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "HomeController APK"
-          files:
-            - client/build/macos/Build/Products/Release/HomeController.app 
-            - client/build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            client/build/macos/Build/Products/Release/HomeController.app 
+            client/build/app/outputs/flutter-apk/app-release.apk
