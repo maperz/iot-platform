@@ -32,9 +32,9 @@ jobs:
       - name: Build Android APK
         working-directory: client
         run: flutter build apk
-      - name: Build MacOS
+      - name: Build macOS App
         working-directory: client
-        run: flutter config --enable-macos-desktop && flutter build macos 
+        run: flutter config --enable-macos-desktop && flutter build macos && zip -r HomeController_macOS.zip HomeController.app
       - name: Upload to github release 
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
@@ -43,5 +43,5 @@ jobs:
           prerelease: true
           title: "HomeController APK"
           files: |
-            client/build/macos/Build/Products/Release/HomeController.app/**
+            client/build/macos/Build/Products/Release/HomeController_macOS.zip
             client/build/app/outputs/flutter-apk/app-release.apk
