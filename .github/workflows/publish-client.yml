@@ -34,7 +34,10 @@ jobs:
         run: flutter build apk
       - name: Build macOS App
         working-directory: client
-        run: flutter config --enable-macos-desktop && flutter build macos && zip -r HomeController_macOS.zip HomeController.app
+        run: flutter config --enable-macos-desktop && flutter build macos
+      - name: Pack macOS App
+        working-directory: client/build/macos/Build/Products/Release
+        run: zip -r HomeController_macOS.zip HomeController.app
       - name: Upload to github release 
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
