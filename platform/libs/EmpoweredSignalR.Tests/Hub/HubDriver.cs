@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,16 +13,19 @@ namespace EmpoweredSignalR.Tests.Hub
     {
         private readonly IHost _host;
         private CancellationTokenSource _cancellationTokenSource;
-        
-        public HubDriver(int port = 6262)
+        private readonly int _port;
+        public HubDriver()
         {
+            var rng = new Random();
+            _port = rng.Next(2000, 9999);
+            
             _host = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseKestrel(
                         o =>
                         {
-                            o.ListenAnyIP(port);
+                            o.ListenAnyIP(_port);
                         });
                     webBuilder.ConfigureServices(
                         services =>
@@ -39,6 +43,11 @@ namespace EmpoweredSignalR.Tests.Hub
                         });
                     });
                 }).Build();
+        }
+
+        public int GetPort()
+        {
+            return _port;
         }
         
         public void Start()

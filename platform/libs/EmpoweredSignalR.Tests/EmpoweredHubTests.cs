@@ -10,14 +10,14 @@ namespace EmpoweredSignalR.Tests
     public class EmpoweredHubTests
     {
         [Fact]
-        private async Task TestNoParameterCall()
+        private async Task     TestNoParameterCall()
         {
             HubDriver<ExampleHub> driver = new();
             driver.Start();
             using (driver)
             {
                 MockReceiver receiver = new();
-                ExampleClient client = new(receiver);
+                ExampleClient client = new(receiver, driver.GetPort());
                 await client.Start();
                 await using (client)
                 {
@@ -38,7 +38,7 @@ namespace EmpoweredSignalR.Tests
             using (driver)
             {
                 MockReceiver receiver = new();
-                ExampleClient client = new(receiver);
+                ExampleClient client = new(receiver, driver.GetPort());
 
                 await client.Start();
                 await using (client)

@@ -17,7 +17,7 @@ namespace EmpoweredSignalR.Tests.Client
             return Task.FromResult(new EmptyObject());
         }
 
-        public Task<TextMessage> ToUpper(TextMessage request)
+        public static Task<TextMessage> ToUpper(TextMessage request)
         {
             var response = new TextMessage()
             {

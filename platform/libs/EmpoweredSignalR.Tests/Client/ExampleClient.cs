@@ -12,9 +12,10 @@ namespace EmpoweredSignalR.Tests.Client
         private readonly Receiver _receiver;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public ExampleClient(Receiver receiver, string serverAddress = "http://localhost:6262/hub")
+        public ExampleClient(Receiver receiver, int port, string serverAddress = "http://localhost")
         {
-            _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress)
+            
+            _hubConnection = new HubConnectionBuilder().WithUrl(serverAddress + $":{port}/hub")
                 .Build();
             _receiver = receiver;
         }
