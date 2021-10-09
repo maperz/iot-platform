@@ -55,8 +55,8 @@ namespace EmpoweredSignalR.Tests.Client
             
             await _hubConnection.StopAsync(token);
         }
-        
-        public Task Stop()
+
+        private Task Stop()
         {
             _cancellationTokenSource?.Cancel();
             return Task.CompletedTask;
