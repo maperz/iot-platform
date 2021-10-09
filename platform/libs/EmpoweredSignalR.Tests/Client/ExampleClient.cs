@@ -8,8 +8,9 @@ namespace EmpoweredSignalR.Tests.Client
 {
     public class ExampleClient : IAsyncDisposable
     {
-        private readonly HubConnection _hubConnection;
         private readonly Receiver _receiver;
+        private readonly HubConnection _hubConnection;
+
         private CancellationTokenSource _cancellationTokenSource;
 
         public ExampleClient(Receiver receiver, int port, string serverAddress = "http://localhost")
