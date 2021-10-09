@@ -3,7 +3,7 @@ using EmpoweredSignalR.Tests.Client;
 
 namespace EmpoweredSignalR.Tests.Hub
 {
-    public class ExampleHub : EmpoweredHub
+    public abstract class ExampleHub : EmpoweredHub
     {
         public async Task MakePingRequest()
         {
