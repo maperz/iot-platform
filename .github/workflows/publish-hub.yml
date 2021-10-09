@@ -24,16 +24,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
-
-  build:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Build platform
-        run: dotnet build ./platform/IoTPlatform.sln
   test:
     runs-on: ubuntu-latest
-    needs: build
+    needs: setup
     steps:
       - name: Run dotnet platform tests
         run: dotnet test ./platform/IoTPlatform.sln

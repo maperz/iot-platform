@@ -20,7 +20,6 @@ namespace EmpoweredSignalR.Tests.Hub
             var response =
                 await Clients.InvokeBidirectional<TextMessage>(Context.ConnectionId, nameof(MockReceiver.ToUpper),
                     request);
-
             return response.Text;
         }
     }
