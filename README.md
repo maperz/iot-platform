@@ -1,6 +1,6 @@
 #  IoT Platform
 
->  An IoT platform that gives you control over you devices, wherever you are, whenever you like
+>  An IoT platform that gives you control over you devices, wherever you are, whenever you like.
 
 ![Promo picture](./screenshots/client_promo.png "Promo picture")
 
