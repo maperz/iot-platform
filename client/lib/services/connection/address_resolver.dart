@@ -36,6 +36,7 @@ class AddressResolver implements IAddressResolver {
     _hubUrlStream = Connectivity()
         .onConnectivityChanged
         .startWith(currentConnectivity)
+        .distinct()
         .switchMap((result) {
       logger.info('Connectivity changed to: $result');
       switch (result) {

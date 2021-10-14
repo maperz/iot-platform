@@ -19,10 +19,13 @@ class NativeMDNSClient implements IMDNSClient {
         }
         return MDNSResult(result.hostname!, result.port!);
       }
-    } on NsdError catch (err) {
-      _logger.severe("An NsdError occured", err);
-    } catch (err) {
-      _logger.severe("Error occured during discovery", err);
+    } on NsdError catch (err, stacktrace) {
+      _logger.severe("An NsdError occured: '${err.errorCode.toString()}'", err,
+          stacktrace);
+    } catch (err, stacktrace) {
+      _logger.severe("Error occured during discovery", err, stacktrace);
+    } finally {
+      await nativeNsd.stopDiscovery();
     }
     return null;
   }

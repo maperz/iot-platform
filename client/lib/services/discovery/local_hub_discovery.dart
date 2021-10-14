@@ -1,6 +1,6 @@
-import 'package:iot_client/models/connection/index.dart';
+import 'dart:io';
 
-import 'package:iot_client/utils/platform.dart';
+import 'package:iot_client/models/connection/index.dart';
 
 import 'hub_discovery.dart';
 import 'mdns/index.dart';
@@ -43,7 +43,7 @@ class LocalHubDiscovery implements HubDiscovery {
 
   Future<HubAddress?> _discoverLocalAddressViaMDNS() async {
     IMDNSClient mdnsClient =
-        PlatformInfo.isMobile() ? NativeMDNSClient() : DartMDNSClient();
+        Platform.isIOS ? NativeMDNSClient() : DartMDNSClient();
 
     var result = await mdnsClient.discoverService(serviceName);
     if (result == null) {
