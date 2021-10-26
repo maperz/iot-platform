@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+
     connectionService = ConnectionService(
         addressResolver: widget.addressResolver,
         authService: widget.authService);

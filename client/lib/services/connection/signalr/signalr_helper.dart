@@ -60,6 +60,7 @@ class SignalRHelper {
           error != null
               ? 'Connection closed with error: ${error.toString()}'
               : 'Connection closed');
+      start();
     });
 
     logger
