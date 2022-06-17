@@ -1,6 +1,5 @@
 import 'package:iot_client/models/device/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class DeviceIcon extends StatelessWidget {
   final DeviceState state;
@@ -27,6 +26,8 @@ class DeviceIcon extends StatelessWidget {
         return "thermo.png";
       case DeviceType.distanceSensor:
         return "distance-sensor.png";
+      case DeviceType.airqualitySensor:
+        return "airquality.png";
       default:
         return "unknown-device.png";
     }

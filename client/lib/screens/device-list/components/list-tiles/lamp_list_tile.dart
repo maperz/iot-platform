@@ -3,9 +3,7 @@ import 'package:iot_client/models/device/models/domain-states/lamp_state.dart';
 import 'package:iot_client/screens/device-list/components/list-tiles/helper/slidable_list_menu.dart';
 import 'package:iot_client/screens/main/components/helper/friendly_change_text.dart';
 import 'package:iot_client/services/api/api_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../device_icon.dart';

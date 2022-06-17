@@ -4,7 +4,8 @@ enum DeviceType {
   lamp,
   thermometer,
   switcher,
-  distanceSensor
+  distanceSensor,
+  airqualitySensor
 }
 
 extension DeviceTypeNameExtesion on DeviceType {
@@ -18,6 +19,8 @@ extension DeviceTypeNameExtesion on DeviceType {
         return "Switch";
       case DeviceType.thermometer:
         return "Thermometer";
+      case DeviceType.airqualitySensor:
+        return "Air Quality";
       default:
         return 'Unknown';
     }
@@ -36,6 +39,8 @@ DeviceType parseDeviceType(String type) {
       return DeviceType.thermometer;
     case "distance-measure":
       return DeviceType.distanceSensor;
+    case "airquality":
+      return DeviceType.airqualitySensor;
     default:
       return DeviceType.unknown;
   }
