@@ -61,11 +61,11 @@ namespace DataPoller
                     _ = Directory.CreateDirectory(directory!);
                 }
                 
-                await using StreamWriter sw = File.CreateText(fileName);
+                await using var sw = File.CreateText(fileName);
                 await sw.WriteLineAsync(SerializeDataToHeader());
             }
 
-            await using (StreamWriter sw = File.AppendText(fileName))
+            await using (var sw = File.AppendText(fileName))
             {
                 Log.Information("Appending {Count} data entries to file at '{FileName}'", thermoData.Count, fileName);
                 await sw.WriteLineAsync(SerializeDataToCsv(thermoData));
