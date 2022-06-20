@@ -27,10 +27,8 @@ class AirQualityTile extends StatelessWidget {
         deviceInfo: deviceInfo,
         builder: (context, deviceState) {
           var qualityState = AirQualityState.fromJson(deviceState.state);
-          return Text(qualityState.quality.toString() +
-              " ppm, " +
-              qualityState.temp.toString() +
-              "°C");
+          return Text(
+              "${qualityState.quality.toStringAsFixed(1)} ppm, ${qualityState.organic.toStringAsFixed(1)} ppb - T: ${qualityState.temp.toStringAsFixed(1)}°C H: ${qualityState.hum.toStringAsFixed(1)}%");
         });
   }
 }
