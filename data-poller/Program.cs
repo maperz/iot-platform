@@ -95,6 +95,9 @@ namespace DataPoller
                     LastUpdate = device.LastUpdate,
                     Connected = device.Connected,
                     ECo2 = state.Quality,
+                    Organic = state.Organic,
+                    Temp = state.Temp,
+                    Hum = state.Hum,
                     PollTime = now
                 };
             });
