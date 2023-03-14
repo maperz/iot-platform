@@ -83,7 +83,7 @@ class DeviceListService implements IDeviceStateService {
         .map((states) => states.map((state) => state.info).toList())
         .distinct(const ListEquality().equals)
         .map((element) {
-      logger.fine("Devices Changed:" + element.toString());
+      logger.fine("Devices Changed:$element");
       return element;
     });
   }

@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:iot_client/models/connection/index.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:rxdart/subjects.dart';
 import 'package:iot_client/services/auth/auth_service.dart';
 import 'package:iot_client/services/connection/address_resolver.dart';
 import 'package:iot_client/services/connection/signalr/signalr_helper.dart';
-import 'package:iot_client/models/connection/models/hub_address.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -110,7 +108,7 @@ class ConnectionService implements IConnectionService {
       var address = change.address;
       var token = change.token;
 
-      final hubUrl = address.toString() + '/hub';
+      final hubUrl = '$address/hub';
 
       logger.fine(
           "Handle connection to $hubUrl. Requires Auth: ${address.requiresAuthentication} and Token: ${token?.substring(0, 5)}...");

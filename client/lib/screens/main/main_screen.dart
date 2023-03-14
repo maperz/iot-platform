@@ -83,9 +83,9 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(leading: Icon(Icons.person), title: Text("Profile")),
             AboutListTile(
               icon: Icon(Icons.contact_page),
-              child: Text("About"),
               applicationVersion: 'August 2021',
               applicationLegalese: '\u{a9} 2021 maperz',
+              child: Text("About"),
             )
           ]),
     );

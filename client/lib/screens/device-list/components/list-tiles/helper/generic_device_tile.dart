@@ -45,10 +45,10 @@ class GenericDeviceTile extends StatelessWidget {
                           key: PageStorageKey(deviceState.deviceId),
                           tilePadding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 16),
-                          child: detailBuilder!(context, deviceState),
                           leading: _getLeading(context, deviceState),
                           title: _getTitle(context, deviceState),
-                          subtitle: _getSubtitle(context, deviceState))
+                          subtitle: _getSubtitle(context, deviceState),
+                          child: detailBuilder!(context, deviceState))
                       : ListTile(
                           onTap: onClick,
                           enabled: deviceState.connected,

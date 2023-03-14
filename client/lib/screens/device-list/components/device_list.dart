@@ -1,5 +1,6 @@
 import 'package:iot_client/models/device/index.dart';
 import 'package:iot_client/screens/device-list/components/list-tiles/air_quality_tile.dart';
+import 'package:iot_client/screens/device-list/components/list-tiles/blind_list_tile.dart';
 import 'package:iot_client/screens/device-settings/device_settings_page.dart';
 import 'package:iot_client/services/api/api_service.dart';
 import 'package:iot_client/services/connection/connection.dart';
@@ -67,6 +68,13 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
                             deviceInfo: device,
                             onClick: () => apiService.sendRequest(
                                 device.id, "quality", ""),
+                            showDeviceSettings: () => _showDeviceSettingsPage(
+                                device, deviceStateService));
+                      case DeviceType.blind:
+                        return BlindListTile(
+                            deviceInfo: device,
+                            onClick: () => {},
+                            deviceStateService: deviceStateService,
                             showDeviceSettings: () => _showDeviceSettingsPage(
                                 device, deviceStateService));
                       default:

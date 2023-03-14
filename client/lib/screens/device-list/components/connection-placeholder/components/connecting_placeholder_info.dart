@@ -17,7 +17,7 @@ class ConnectingPlaceholderInfo extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           if (status != null)
             Padding(
@@ -25,7 +25,7 @@ class ConnectingPlaceholderInfo extends StatelessWidget {
               child: Text(
                 status!,
                 style:
-                    Theme.of(context).textTheme.caption!.copyWith(fontSize: 18),
+                    Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 18),
               ),
             )
         ],

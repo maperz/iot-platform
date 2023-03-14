@@ -37,15 +37,18 @@ void BlindController::setup() {
 bool BlindController::onRequest(const String &request, char *payload,
                                 size_t plength) {
   if (request.equals(getRequestChannel("move"))) {
-    if (strcmp("bot", payload)) {
+    if (strcmp("bot", payload) == 0) {
+      Serial.println("Move request received for position: Bot");
       moveBlind(BlindPosition::Bot);
       return true;
     }
-    if (strcmp("mid", payload)) {
+    if (strcmp("mid", payload) == 0) {
+      Serial.println("Move request received for position: Mid");
       moveBlind(BlindPosition::Mid);
       return true;
     }
-    if (strcmp("top", payload)) {
+    if (strcmp("top", payload) == 0) {
+      Serial.println("Move request received for position: Top");
       moveBlind(BlindPosition::Top);
       return true;
     }

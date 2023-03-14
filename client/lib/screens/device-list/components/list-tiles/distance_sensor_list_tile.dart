@@ -27,7 +27,7 @@ class DistanceSensorListTile extends StatelessWidget {
         builder: (context, deviceState) {
           var distanceSensorState =
               DistanseSensorState.fromJson(deviceState.state);
-          return Text(distanceSensorState.distance.toString() + "cm");
+          return Text("${distanceSensorState.distance}cm");
         });
   }
 }

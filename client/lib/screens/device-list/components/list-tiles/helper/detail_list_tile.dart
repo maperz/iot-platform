@@ -23,9 +23,9 @@ class DetailListTile extends StatelessWidget {
     return ExpansionTile(
         key: key,
         tilePadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        children: [child],
         leading: leading,
         title: Opacity(opacity: active ? 1.0 : 0.38, child: title),
-        subtitle: Opacity(opacity: active ? 1.0 : 0.38, child: subtitle));
+        subtitle: Opacity(opacity: active ? 1.0 : 0.38, child: subtitle),
+        children: [child]);
   }
 }

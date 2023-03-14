@@ -1,6 +1,5 @@
 import 'package:iot_client/models/device/index.dart';
 import 'package:iot_client/models/device/models/domain-states/airquality_state.dart';
-import 'package:iot_client/models/device/models/domain-states/distance_sensor_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 

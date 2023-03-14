@@ -5,7 +5,6 @@ import 'package:iot_client/screens/device-settings/device_settings_page.dart';
 import 'package:iot_client/screens/main/components/helper/friendly_change_text.dart';
 import 'package:iot_client/services/device/device_state_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../device_icon.dart';
@@ -68,10 +67,8 @@ class _CurtainListTileState extends State<CurtainListTile> {
                                 min: -1.0,
                                 max: 1.0,
                                 divisions: 40,
-                                label: (curtainState.progress * 100)
-                                        .round()
-                                        .toString() +
-                                    " Percent",
+                                label: "${(curtainState.progress * 100)
+                                        .round()} Percent",
                                 onChanged: deviceState.connected
                                     ? (double value) {
                                         setState(() => setSpeed(

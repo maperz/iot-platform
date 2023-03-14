@@ -1,7 +1,6 @@
 import 'package:iot_client/models/device/index.dart';
 import 'package:iot_client/screens/device-list/components/list-tiles/helper/device_state_stream_builder.dart';
 import 'package:iot_client/services/device/device_state_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -75,14 +75,14 @@ class _FriendlyChangeTextState extends State<FriendlyChangeText> {
     if (updatedTime.day == now.day &&
         updatedTime.month == now.month &&
         updatedTime.year == now.year) {
-      return "Today, " + DateFormat("HH:mm").format(updatedTime);
+      return "Today, ${DateFormat("HH:mm").format(updatedTime)}";
     }
 
     final yesterday = now.subtract(const Duration(days: 1));
     if (updatedTime.day == yesterday.day &&
         updatedTime.month == yesterday.month &&
         updatedTime.year == yesterday.year) {
-      return "Yesterday, " + DateFormat("HH:mm").format(updatedTime);
+      return "Yesterday, ${DateFormat("HH:mm").format(updatedTime)}";
     }
 
     return DateFormat("HH:mm, dd.MM.y").format(widget.updateTime);

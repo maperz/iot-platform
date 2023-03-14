@@ -30,7 +30,7 @@ class _LoginOrRegisterFormState extends State<LoginOrRegisterForm> {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(16),
             child: Text(isLogin ? 'Login Account' : "Register Account",
-                style: Theme.of(context).textTheme.headline5)),
+                style: Theme.of(context).textTheme.headlineSmall)),
         if (!isLogin)
           Container(
             padding: const EdgeInsets.all(10),
@@ -107,10 +107,10 @@ class _LoginOrRegisterFormState extends State<LoginOrRegisterForm> {
           height: 12,
         ),
         TextButton(
+            onPressed: _toggleLoginRegisterView,
             child: Text(isLogin
                 ? 'No account yet? - Click to register'
-                : 'Already have an account - Login here'),
-            onPressed: _toggleLoginRegisterView)
+                : 'Already have an account - Login here'))
       ],
     );
   }

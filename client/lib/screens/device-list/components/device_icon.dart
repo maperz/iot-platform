@@ -18,6 +18,8 @@ class DeviceIcon extends StatelessWidget {
     switch (deviceType) {
       case DeviceType.curtain:
         return "curtain.png";
+      case DeviceType.blind:
+        return "curtain.png";
       case DeviceType.lamp:
         return "lamp.png";
       case DeviceType.switcher:
@@ -28,6 +30,7 @@ class DeviceIcon extends StatelessWidget {
         return "distance-sensor.png";
       case DeviceType.airqualitySensor:
         return "airquality.png";
+
       default:
         return "unknown-device.png";
     }

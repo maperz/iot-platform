@@ -33,11 +33,11 @@ class ThermoListTile extends StatelessWidget {
           var thermoState = ThermoState.fromJson(deviceState.state);
           return Row(
             children: [
-              Text(thermoState.temp.toString() + "°C"),
+              Text("${thermoState.temp}°C"),
               Container(
                 width: 10,
               ),
-              Text(thermoState.hum.toString() + "%")
+              Text("${thermoState.hum}%")
             ],
           );
         },
