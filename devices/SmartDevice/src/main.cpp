@@ -9,6 +9,7 @@
 #include "domain/lamp/lamp-controller.h"
 #include "domain/motor/motor-controller.h"
 #include "domain/thermometer/thermo-controller.h"
+#include "domain/blind/blind-controller.h"
 
 #include <ESP8266WiFi.h>
 #include <WiFiManager.h>
@@ -17,7 +18,8 @@ void setupController() {
   // Connectivity::controller = new MotorController(&Connectivity::mqtt);
   // Connectivity::controller = new LampController(&Connectivity::mqtt);
   // Connectivity::controller = new ThermoController(&Connectivity::mqtt);
-  Connectivity::controller = new DistanceMeasureController(&Connectivity::mqtt);
+  // Connectivity::controller = new DistanceMeasureController(&Connectivity::mqtt);
+  Connectivity::controller = new BlindController(&Connectivity::mqtt);
 }
 
 void setup() {

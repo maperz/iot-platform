@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:iot_client/screens/main/auth_router.dart';
 import 'package:iot_client/services/auth/auth_service.dart';
 import 'package:iot_client/services/connection/address_resolver.dart';
@@ -6,7 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   WidgetsFlutterBinding.ensureInitialized();
 
   Logger.root.level =

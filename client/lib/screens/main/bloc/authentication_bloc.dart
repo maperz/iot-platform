@@ -30,6 +30,8 @@ class AuthenticationBloc
     stateStream.listen((isAuthenticated) {
       add(IsAuthenticatedChanged(isAuthenticated: isAuthenticated));
     });
+
+    on<AuthenticationEvent>(_onEventReceived);
   }
   @override
   Future<void> close() {
@@ -37,15 +39,13 @@ class AuthenticationBloc
     return super.close();
   }
 
-  @override
-  Stream<AuthenticationState> mapEventToState(
-    AuthenticationEvent event,
-  ) async* {
+  void _onEventReceived(
+      AuthenticationEvent event, Emitter<AuthenticationState> emit) {
     if (event is IsAuthenticatedChanged) {
       if (event.isAuthenticated) {
-        yield ShowMainScreen();
+        emit(ShowMainScreen());
       } else {
-        yield ShowLoginScreen();
+        emit(ShowLoginScreen());
       }
     }
   }

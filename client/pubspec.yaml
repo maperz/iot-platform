@@ -35,18 +35,18 @@ dependencies:
   connectivity: ^3.0.3
   flutter_nsd: ^1.1.0
   logging: ^1.0.1
-  firebase_auth: ^3.0.1
-  firebase_core: ^1.4.0
-  flutter_bloc: ^7.3.0
-  flutter_slidable: ^1.0.0-dev.9
+  firebase_auth: ^4.2.10
+  firebase_core: ^2.7.1
+  flutter_bloc: ^8.1.2
+  flutter_slidable: ^2.0.0
   charts_flutter: ^0.12.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_launcher_icons: "^0.9.0"
-  flutter_lints: ^1.0.4
+  flutter_launcher_icons: ^0.12.0
+  flutter_lints: ^2.0.1
 
 flutter_icons:
   android: true

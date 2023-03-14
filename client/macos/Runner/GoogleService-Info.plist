@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>354418938883-vj7fc9uchc8f605f8n8edgngea4acdbq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.354418938883-vj7fc9uchc8f605f8n8edgngea4acdbq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAb4Nl94zDZoEfq8GuRiW4BiozTCmFMNos</string>
+	<key>GCM_SENDER_ID</key>
+	<string>354418938883</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>cloud.perz.client</string>
+	<key>PROJECT_ID</key>
+	<string>smarthome-d1c03</string>
+	<key>STORAGE_BUCKET</key>
+	<string>smarthome-d1c03.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:354418938883:ios:40973dbfb32518cc6caa36</string>
+</dict>
+</plist>
